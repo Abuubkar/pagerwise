@@ -12,6 +12,7 @@ dependencies = [
     "pgvector>=0.5.1",
     "pydantic-settings>=2.16.2",
     "sqlalchemy[asyncio]>=2.1.6",
+    "strawberry-graphql>=0.339.1",
     "uvicorn>=0.54.0",
 ]
 

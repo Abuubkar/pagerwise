@@ -1,0 +1,13 @@
+[project]
+name = "pagerwise-client-sse"
+version = "0.1.0"
+description = "Typed reader for Pagerwise's triage event stream, on top of the generated client"
+requires-python = ">=3.13"
+dependencies = ["pagerwise-client"]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+pagerwise-client = { workspace = true }

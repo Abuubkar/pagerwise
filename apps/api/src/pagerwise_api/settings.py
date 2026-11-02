@@ -23,5 +23,12 @@ class Settings(BaseSettings):
     # Chunks retrieved per question; each goes into the prompt as one [Cn] tag.
     retrieval_top_k: int = 8
 
+    # Signs pagination cursors so clients can't forge or edit them. Override in every real deployment.
+    cursor_secret: str = "dev-only-cursor-secret"
+    # A streaming triage renews its heartbeat this often; one silent for triage_abandoned_after_s is treated as
+    # abandoned (its process died or its client left), so it stops blocking a new triage of that incident.
+    triage_heartbeat_s: int = 15
+    triage_abandoned_after_s: int = 120
+
 
 settings = Settings()
