@@ -117,3 +117,32 @@ every failure mode, lowercased "OOM" and "TLS", dated some postmortems after the
 factors with Faker's Latin placeholder sentences.
 - *Did:* an alert name per service and failure mode, phrase-case mode titles, dates clamped to the anchor, and
   written factor sentences. Faker is only used for people's names.
+
+## Slice 4b: clustering, Redis, partitioned alerts
+
+**The online migration deadlocked with the consumer, and my first fix was for the wrong cause.** Both live runs of
+the partition migration under writes logged one "deadlock detected"; the consumer retried the batch and lost
+nothing. I guessed the backfill's foreign-key checks (`FOR KEY SHARE`) against clustering's `FOR UPDATE` on
+incidents and changed it to `FOR NO KEY UPDATE`. The second run deadlocked again. The Postgres log said what was
+actually happening: migration 0006 had locked `incidents` (adding the shadow's foreign key) and was waiting for
+`alert_events` (creating the trigger), while a consumer transaction held `alert_events` and wanted `incidents`.
+- *Did:* 0006 now builds everything slow first, then locks both tables together with a 500 ms `lock_timeout`
+  (under the 1 s deadlock check) and retries, so it backs off instead of a writer being killed. The third run had
+  no deadlock and no failed batch. `FOR NO KEY UPDATE` stayed: it's the right lock for a non-key update anyway.
+- *Lesson:* read the deadlock report (`docker compose logs postgres`) before fixing; it names both statements.
+- *Not verified:* one clean run isn't proof; the deadlock hit once per run before. The swap's own test writer
+  doesn't touch incidents, so no test covers this interleaving.
+
+**Slice 4a's corpus wasn't deterministic across processes.** Regenerating changed 6 postmortems: the action-item
+owner came from `rng.choice` over a set, and set order depends on the per-process hash seed.
+- *Did:* sorted the set; the corpus is now byte-identical under three different `PYTHONHASHSEED`s, and the 6 files
+  are regenerated in this change.
+
+**Clustering costs ingest headroom.** At 2,000 alerts/s on one replica, lag peaked at 3,398 against 293 in slice 3,
+with 227 backpressure pauses; it drained within 5 s of the storm ending. Most batches only add repeat alerts to
+known incidents, but each still takes advisory locks, looks up recent fingerprints and updates incident rows.
+- *Not done:* an in-memory fingerprint -> incident cache per partition would skip most lookups; measure first.
+
+**Small things.** asyncpg runs one statement per `execute`, so multi-statement migration strings failed until split.
+`pg_class.relkind` is Postgres's `"char"` type: it comes back as bytes and won't concatenate with text without a
+cast. `docker compose logs --since` reads a timestamp without a zone as local time.
