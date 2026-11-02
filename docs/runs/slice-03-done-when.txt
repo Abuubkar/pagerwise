@@ -1,0 +1,38 @@
+$ uv run python scripts/storm.py   # 2026-11-02, M-series MacBook, Docker Desktop 8 CPUs / 8 GB
+== Storm: 2000 events/s for 180s, 1% malformed, 5% transient failures, 2 replicas, replica 0 killed at 60s
+  2 replicas in group pagerwise-consumer
+  t=60s SIGKILL replica 0 (pid 62023)
+  produced 360000 events in 180.0s (2000/s): 356474 valid, 3526 malformed; run 5588db70
+  alerts.v1 lag at storm end: 293
+
+== Waiting for retries to drain (alerts.retry.5m holds messages for 5 minutes)
+  t=182s stored 350639/356474, retry lag 30s=2948 5m=2941
+  t=213s stored 352964/356474, retry lag 30s=0 5m=3520
+  t=243s stored 352964/356474, retry lag 30s=0 5m=3520
+  t=274s stored 352964/356474, retry lag 30s=0 5m=3520
+  t=305s stored 352964/356474, retry lag 30s=0 5m=3520
+  t=335s stored 353064/356474, retry lag 30s=0 5m=3431
+  t=366s stored 353582/356474, retry lag 30s=0 5m=2908
+  t=396s stored 354185/356474, retry lag 30s=0 5m=2297
+  t=427s stored 354860/356474, retry lag 30s=0 5m=1645
+  t=457s stored 355474/356474, retry lag 30s=0 5m=1016
+  t=488s stored 356050/356474, retry lag 30s=0 5m=454
+
+== Lag over time (committed-offset lag, one bar per 8s, scaled to the max)
+  alerts.v1        max  21244  ▁▁▁▁▁▁▁▂▇█▂                                                     
+  alerts.retry.30s max   4049  ▁▃▅▆▆▆▆▆▆▆▆▇██▆▆▆▆▆▆▆▆▆▅▄▂                                      
+  alerts.retry.5m  max   3520       ▁▁▁▁▂▃▃▃▄▄▄▅▅▅▆▆▇▇▇███████████████████▇▇▇▇▆▅▅▅▄▄▄▃▃▃▂▂▂▁▁▁ 
+                                      K              E                                            K = replica killed, E = storm ended
+
+== Results
+  [PASS] valid events lost (produced IDs vs DB): 0
+  [PASS] malformed produced vs dead-lettered: 3526 vs 3526
+  [PASS] alerts.v1 lag < 1,000 within 60s of storm end: after 1s
+  stored by attempt: 338556 first try, 14408 after one retry, 3510 after two
+  ingest freshness (first-try events, occurred_at -> row committed): p50 0.01s, p95 6.33s
+  surviving replica: {'client_id': 'consumer-Abubakars-MacBook-Pro-3.local-62024', 'records': 283728, 'inserted': 264498, 'duplicates': 477, 'retried': 16176, 'dead_lettered': 2577, 'pauses': 68, 'infra_retries': 0}
+  logs: build/storm/consumer-*.log
+
+# Backpressure pauses on the surviving replica, by minute (all during catch-up after taking over at 15:55:55):
+  32 15:55
+  36 15:56

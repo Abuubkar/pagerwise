@@ -11,16 +11,20 @@ Incident-response copilot: alerts in, cited triage briefs out, built in thin sli
 ## Run it
 
 ```bash
-docker compose up -d --wait               # Postgres 18 + pgvector on :5435
+docker compose up -d --wait               # Postgres 18 + pgvector on :5435, Redpanda (Kafka API) on :19092
 uv run alembic upgrade head
+make topics                               # alerts.v1, alerts.retry.30s, alerts.retry.5m, alerts.dlq (idempotent)
 ollama pull qwen3.5:9b-q4_K_M             # once; Ollama runs natively on the Mac, not in Docker (ADR 0001)
 uv run python scripts/load_docs.py        # chunk + embed data/runbooks/*.md; unchanged files are skipped
 uv run uvicorn pagerwise_api.main:app --port 8001
 uv run python scripts/ask.py "Why is payments p99 high?"   # answer + citations resolved to chunk text
 make smoke            # generated client end to end: 3 incidents, paging, one streamed triage, GraphQL
+uv run python -m pagerwise_consumer                                  # alerts.v1 + retry topics -> alert_events
+uv run python -m pagerwise_simulator --rate 200 --duration 10 --malformed-rate 0.01
+make storm            # done-when load test: 2,000/s for 3 min, a replica killed; takes ~10 min (5 min retries)
 make test             # unit tests, offline (no Ollama, no DB, no model download)
 make test-int         # service tests (testcontainers Postgres + pgvector; needs Docker)
-make codegen          # regenerate the client and contracts/schema.graphql after changing contracts or GraphQL
+make codegen          # regenerate the client, contracts/schema.graphql and the Kafka alert model
 make contract-check   # oasdiff: the app's emitted OpenAPI vs contracts/openapi.yaml
 ```
 
@@ -48,3 +52,12 @@ Run scripts from the repo root: document paths are stored relative to it.
 - Answers are checked by `citations.parse_answer`, briefs by `citations.parse_brief`, never by the model. Only
   exact `[Cn]` tags that were supplied count; a `REJECTED` answer or `format_invalid` brief is still stored with its
   `problems`. Tag syntax lives only in `citations.py` (`scan_tags`, `TagScanner`).
+- `contracts/kafka/alert.v1.json` is the alert contract; `pagerwise_kafka/alert_v1.py` is generated from it. Topic
+  names, header names and retry routing live only in `pagerwise_kafka`. Producers build an `AlertV1` before
+  sending (that's the validation); only the simulator's malformed events skip it, on purpose.
+- Consumer: mark a record done (`OffsetTracker.done`) only after its row is committed or it has been republished.
+  Writes must stay idempotent (`ON CONFLICT DO NOTHING`): redelivery after a crash or rebalance is normal.
+- A failure of Postgres or Kafka itself is retried in place, never routed to a retry topic; only a failure that
+  belongs to the message (`TransientError`, `PermanentError`) moves it.
+- Keep the round-robin assignor: the sticky one can give a replica no `alerts.v1` partitions at all (ADR 0005).
+
