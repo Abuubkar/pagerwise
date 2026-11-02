@@ -58,3 +58,36 @@ piece at a time, so a piece like `"\nThe"` went out before the scanner noticed t
 problems `text/event-stream`.
 - *Did:* the OpenAPI hook rewrites the stream to `type: string`, moves problems to `application/problem+json`, and
   adds each event payload as a component (ADR 0004).
+
+## Slice 3: Kafka ingestion
+
+**The sticky assignor could give a new replica no alert partitions.** The rebalance service test failed about
+two runs in three: the second consumer was assigned 18 partitions but processed nothing. Sticky balances the
+total across the three subscribed topics, and its picks were 12 of `alerts.retry.30s` plus 6 of
+`alerts.retry.5m`, which are idle unless something is failing.
+- *Did:* round-robin, which splits each topic evenly; the test now also asserts every replica owns part of every
+  topic. Three runs in a row pass.
+- *Alternatives:* range (per topic, but uneven across topics with more members); a separate consumer group for
+  the retry topics.
+
+**Not-yet-due retries would have tripped backpressure.** At 5% transient failures and 2,000/s, about 3,000
+messages sit in `alerts.retry.30s` at any moment. Holding fetched-but-not-due messages in memory would have counted
+them against the 500-record high-water mark and paused ingest of healthy alerts.
+- *Did:* the poll loop seeks a retry partition back to its first not-due message and pauses it until then; records
+  fetched before the seek are dropped when they arrive (`seek_to`), and the offset tracker forgets them.
+
+**A killed replica stalls its partitions for the session timeout.** In the storm, replica 0 was SIGKILLed at
+60 s; the survivor took its partitions about 10 s later (aiokafka's default `session_timeout_ms`), by which time
+alerts.v1 lag was 21k. It caught up in about 16 s, pausing fetches 68 times on the way (500 records queued every
+poll), and redelivery cost 477 duplicates (absorbed by `ON CONFLICT`). That stall is why first-try ingest
+freshness p95 was 6.3 s against the plan's 5 s target.
+- *Not done:* tuning the session timeout; slice 8 adds lag and freshness metrics and SLOs to tune it against.
+
+**Small surprises from current versions.**
+- `uuid.uuid7()` is Python 3.14; this project is on 3.13, so producers use `uuid4`.
+- aiokafka's zstd compression needs an extra on Python < 3.14; producers send uncompressed.
+- `rpk redpanda start --set=key=value` is passed through to Redpanda, which rejects it; `--set` and the value must
+  be separate arguments.
+- `testcontainers.kafka` is deprecated in testcontainers 4.15; the Redpanda container is in
+  `testcontainers.community.kafka` and needs no extra.
+- aiokafka's `describe_consumer_groups` returns raw protocol tuples, not objects.
