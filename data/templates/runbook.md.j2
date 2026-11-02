@@ -1,0 +1,57 @@
+---
+service: {{ service.name }}
+updated_at: {{ updated_at }}
+---
+# {{ service.title }}: {{ mode.title }}
+
+Alert: `{{ alert }}` fires when {{ mode.trigger | replace("{metric}", metric) }}. {{ service.title }} is a
+{{ service.tier }}-tier service owned by the {{ service.team }} team; it calls
+{{ service.depends_on | join(", ") if service.depends_on else "no other internal services" }}{% if callers %}, and
+{{ callers | join(", ") }} call it{% endif %}.
+
+## Symptoms
+
+{% for line in mode.symptoms %}
+- {{ line | replace("{metric}", metric) | replace("{dependency}", dependency) }}
+{% endfor %}
+
+## Likely causes
+
+{% for cause in causes %}
+- **{{ cause.name }}.** {{ cause.text | replace("{dependency}", dependency) }}
+{% endfor %}
+
+The most common cause on {{ service.name }} is {{ causes[0].name | lower }}: it explained {{ common_share }} of the
+last {{ common_total }} pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `{{ service.name }}-overview` dashboard and compare `{{ metric }}` with the
+   same hour last week.
+2. Check recent changes: `deployctl history {{ service.name }} --since 2h`. A deploy in the last hour makes
+   "{{ causes[0].name | lower }}" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n {{ service.team }} logs deploy/{{ service.name }} --since 15m | grep {{ error_code }}
+   ```
+
+4. If `{{ metric }}` stays above {{ threshold }} for {{ minutes }} minutes, treat it as
+   {{ mode.title }} and move to mitigation; below that it usually recovers on its own.
+{% for step in mode.diagnosis %}
+{{ loop.index + 4 }}. {{ step | replace("{dependency}", dependency) | replace("{service}", service.name) }}
+{% endfor %}
+
+## Mitigation
+
+{% for step in mode.mitigation %}
+{{ loop.index }}. {{ step | replace("{dependency}", dependency) | replace("{service}", service.name) }}
+{% endfor %}
+{{ mode.mitigation | length + 1 }}. If that doesn't help within 10 minutes, set `{{ config_key }}={{ config_value }}` on
+   {{ service.name }} (`configctl set {{ service.name }} {{ config_key }} {{ config_value }}`) and restart one pod at a
+   time.
+
+## Escalation
+
+Page the {{ service.team }} secondary after {{ escalate_after }} minutes without improvement, or at once if more than
+{{ customer_impact }}% of {{ service.name }} requests are failing. Coordinate in `#{{ service.team }}-oncall`.

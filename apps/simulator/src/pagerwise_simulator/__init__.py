@@ -1,4 +1,4 @@
-"""Alerts for a simulated 12-service system, published to alerts.v1 at a steady rate.
+"""Alerts for the simulated 12-service system in data/service_graph.yaml, published to alerts.v1 at a steady rate.
 
 Valid alerts go through the shared AlertV1 model before sending, as every producer's do. Malformed ones (a set share,
 for load tests) deliberately skip it: bad JSON, a missing field, an unknown severity, an extra field.
@@ -15,36 +15,44 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from pathlib import Path
+
+import yaml
 
 import pagerwise_kafka as k
 
-# service -> (share of traffic, alert rules as (alertname, severity, summary)). Skewed like a real storm: a few
-# services raise most of the alerts.
-SERVICES: dict[str, tuple[int, list[tuple[str, str, str]]]] = {
-    "api-gateway": (14, [("GatewayHigh5xxRate", "critical", "5xx rate {pct}% on {instance}"),
-                         ("GatewayLatencyHigh", "warning", "p99 {ms} ms on {instance}")]),
-    "auth": (6, [("AuthTokenErrors", "warning", "token validation errors {pct}% on {instance}")]),
-    "payments": (18, [("PaymentsP99LatencyHigh", "critical", "payments p99 {ms} ms on {instance}"),
-                      ("PaymentsAcquirerTimeouts", "critical", "acquirer timeouts {pct}% on {instance}")]),
-    "card-auth": (8, [("CardAuthDeclineSpike", "warning", "decline rate {pct}% on {instance}")]),
-    "ledger": (16, [("LedgerWriteErrors", "critical", "write errors {pct}% on {instance}"),
-                    ("LedgerPoolExhausted", "critical", "connection pool waiting={n} on {instance}")]),
-    "postgres-primary": (10, [("PostgresReplicationLag", "warning", "replica lag {ms} ms on {instance}"),
-                              ("PostgresFailover", "critical", "primary failed over to {instance}")]),
-    "redis-cache": (5, [("RedisEvictionsHigh", "warning", "evictions {n}/s on {instance}")]),
-    "notifications": (4, [("NotificationQueueBacklog", "warning", "backlog {n} messages on {instance}")]),
-    "search": (5, [("SearchLatencyHigh", "warning", "query p95 {ms} ms on {instance}")]),
-    "inventory": (4, [("InventorySyncStale", "info", "last sync {n}s ago on {instance}")]),
-    "orders": (7, [("OrdersCheckoutErrors", "critical", "checkout errors {pct}% on {instance}")]),
-    "kafka-broker": (3, [("BrokerUnderReplicated", "warning", "{n} under-replicated partitions on {instance}")]),
-}
+GRAPH_PATH = Path(__file__).resolve().parents[4] / "data" / "service_graph.yaml"
+
+
+@dataclass(frozen=True)
+class Service:
+    name: str
+    tier: str
+    team: str
+    depends_on: list[str]
+    weight: int
+    rules: list[tuple[str, str, str]]  # (alertname, severity, summary template)
+
+
+def load_graph(path: Path = GRAPH_PATH) -> dict[str, Service]:
+    """data/service_graph.yaml: the simulated system's services, their dependencies and their alert rules."""
+    raw = yaml.safe_load(path.read_text())["services"]
+    graph = {name: Service(name, s["tier"], s["team"], s["depends_on"], s["weight"], [tuple(r) for r in s["rules"]])
+             for name, s in raw.items()}
+    unknown = {d for s in graph.values() for d in s.depends_on} - graph.keys()
+    if unknown:
+        raise ValueError(f"service_graph.yaml: depends_on names unknown services {sorted(unknown)}")
+    return graph
+
+
+SERVICES = load_graph()
 _NAMES = list(SERVICES)
-_WEIGHTS = [weight for weight, _ in SERVICES.values()]
+_WEIGHTS = [s.weight for s in SERVICES.values()]
 
 
 def make_alert(rng: random.Random, run_id: str) -> k.AlertV1:
     service = rng.choices(_NAMES, _WEIGHTS)[0]
-    alertname, severity, summary = rng.choice(SERVICES[service][1])
+    alertname, severity, summary = rng.choice(SERVICES[service].rules)
     instance = f"{service}-{rng.randint(0, 5)}"
     return k.AlertV1(
         event_id=uuid.uuid4(),

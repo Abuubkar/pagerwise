@@ -1,0 +1,4631 @@
+{
+  "seed": 7,
+  "anchor": "2026-11-01",
+  "facts": [
+    {
+      "id": "rb/api-gateway/high-latency/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-high-latency.md",
+      "section": "Api gateway: high p99 latency > Diagnosis",
+      "question": "When should api-gateway high p99 latency move to mitigation?",
+      "answer": "when api_gateway_p99_latency_ms stays above 1263 for 5 minutes",
+      "must_contain": [
+        "1263",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/high-latency/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-high-latency.md",
+      "section": "Api gateway: high p99 latency > Diagnosis",
+      "question": "Which error code does api-gateway log for high p99 latency?",
+      "answer": "API-LAT-504",
+      "must_contain": [
+        "API-LAT-504"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/high-latency/config",
+      "doc": "data/corpus/runbooks/api-gateway-high-latency.md",
+      "section": "Api gateway: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway high p99 latency?",
+      "answer": "set query_timeout_ms=50",
+      "must_contain": [
+        "query_timeout_ms=50"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/error-rate/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-error-rate.md",
+      "section": "Api gateway: elevated error rate > Diagnosis",
+      "question": "When should api-gateway elevated error rate move to mitigation?",
+      "answer": "when api_gateway_error_ratio_pct stays above 3 for 10 minutes",
+      "must_contain": [
+        "3",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/error-rate/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-error-rate.md",
+      "section": "Api gateway: elevated error rate > Diagnosis",
+      "question": "Which error code does api-gateway log for elevated error rate?",
+      "answer": "API-ERR-528",
+      "must_contain": [
+        "API-ERR-528"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/error-rate/config",
+      "doc": "data/corpus/runbooks/api-gateway-error-rate.md",
+      "section": "Api gateway: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway elevated error rate?",
+      "answer": "set retry_budget_pct=17",
+      "must_contain": [
+        "retry_budget_pct=17"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-connection-pool.md",
+      "section": "Api gateway: connection pool exhaustion > Diagnosis",
+      "question": "When should api-gateway connection pool exhaustion move to mitigation?",
+      "answer": "when api_gateway_pool_wait_ms stays above 740 for 10 minutes",
+      "must_contain": [
+        "740",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-connection-pool.md",
+      "section": "Api gateway: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does api-gateway log for connection pool exhaustion?",
+      "answer": "API-POOL-150",
+      "must_contain": [
+        "API-POOL-150"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/connection-pool/config",
+      "doc": "data/corpus/runbooks/api-gateway-connection-pool.md",
+      "section": "Api gateway: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway connection pool exhaustion?",
+      "answer": "set pool_max_size=4",
+      "must_contain": [
+        "pool_max_size=4"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-memory-pressure.md",
+      "section": "Api gateway: memory pressure and OOM kills > Diagnosis",
+      "question": "When should api-gateway memory pressure and OOM kills move to mitigation?",
+      "answer": "when api_gateway_rss_pct_of_limit stays above 97 for 5 minutes",
+      "must_contain": [
+        "97",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-memory-pressure.md",
+      "section": "Api gateway: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does api-gateway log for memory pressure and OOM kills?",
+      "answer": "API-MEM-205",
+      "must_contain": [
+        "API-MEM-205"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/memory-pressure/config",
+      "doc": "data/corpus/runbooks/api-gateway-memory-pressure.md",
+      "section": "Api gateway: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway memory pressure and OOM kills?",
+      "answer": "set gc_target_pct=38",
+      "must_contain": [
+        "gc_target_pct=38"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-cpu-saturation.md",
+      "section": "Api gateway: CPU saturation > Diagnosis",
+      "question": "When should api-gateway CPU saturation move to mitigation?",
+      "answer": "when api_gateway_cpu_util_pct stays above 94 for 6 minutes",
+      "must_contain": [
+        "94",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-cpu-saturation.md",
+      "section": "Api gateway: CPU saturation > Diagnosis",
+      "question": "Which error code does api-gateway log for CPU saturation?",
+      "answer": "API-CPU-608",
+      "must_contain": [
+        "API-CPU-608"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/api-gateway-cpu-saturation.md",
+      "section": "Api gateway: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway CPU saturation?",
+      "answer": "set cache_ttl_s=36",
+      "must_contain": [
+        "cache_ttl_s=36"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/disk-full/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-disk-full.md",
+      "section": "Api gateway: disk full > Diagnosis",
+      "question": "When should api-gateway disk full move to mitigation?",
+      "answer": "when api_gateway_disk_used_pct stays above 87 for 5 minutes",
+      "must_contain": [
+        "87",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/disk-full/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-disk-full.md",
+      "section": "Api gateway: disk full > Diagnosis",
+      "question": "Which error code does api-gateway log for disk full?",
+      "answer": "API-DISK-815",
+      "must_contain": [
+        "API-DISK-815"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/disk-full/config",
+      "doc": "data/corpus/runbooks/api-gateway-disk-full.md",
+      "section": "Api gateway: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway disk full?",
+      "answer": "set log_level=7",
+      "must_contain": [
+        "log_level=7"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-dependency-timeout.md",
+      "section": "Api gateway: dependency timeouts > Diagnosis",
+      "question": "When should api-gateway dependency timeouts move to mitigation?",
+      "answer": "when api_gateway_upstream_timeout_pct stays above 10 for 4 minutes",
+      "must_contain": [
+        "10",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-dependency-timeout.md",
+      "section": "Api gateway: dependency timeouts > Diagnosis",
+      "question": "Which error code does api-gateway log for dependency timeouts?",
+      "answer": "API-DEP-220",
+      "must_contain": [
+        "API-DEP-220"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/api-gateway-dependency-timeout.md",
+      "section": "Api gateway: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway dependency timeouts?",
+      "answer": "set retry_max_attempts=28",
+      "must_contain": [
+        "retry_max_attempts=28"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-bad-deploy.md",
+      "section": "Api gateway: regression after a deploy > Diagnosis",
+      "question": "When should api-gateway regression after a deploy move to mitigation?",
+      "answer": "when api_gateway_post_deploy_error_pct stays above 6 for 8 minutes",
+      "must_contain": [
+        "6",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-bad-deploy.md",
+      "section": "Api gateway: regression after a deploy > Diagnosis",
+      "question": "Which error code does api-gateway log for regression after a deploy?",
+      "answer": "API-DEPLOY-811",
+      "must_contain": [
+        "API-DEPLOY-811"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/bad-deploy/config",
+      "doc": "data/corpus/runbooks/api-gateway-bad-deploy.md",
+      "section": "Api gateway: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway regression after a deploy?",
+      "answer": "set deploy_batch_size=40",
+      "must_contain": [
+        "deploy_batch_size=40"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-cert-expiry.md",
+      "section": "Api gateway: TLS certificate expiry > Diagnosis",
+      "question": "When should api-gateway TLS certificate expiry move to mitigation?",
+      "answer": "when api_gateway_cert_days_left stays above 3 for 7 minutes",
+      "must_contain": [
+        "3",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-cert-expiry.md",
+      "section": "Api gateway: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does api-gateway log for TLS certificate expiry?",
+      "answer": "API-TLS-762",
+      "must_contain": [
+        "API-TLS-762"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/cert-expiry/config",
+      "doc": "data/corpus/runbooks/api-gateway-cert-expiry.md",
+      "section": "Api gateway: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway TLS certificate expiry?",
+      "answer": "set ocsp_stapling=45",
+      "must_contain": [
+        "ocsp_stapling=45"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/api-gateway-queue-backlog.md",
+      "section": "Api gateway: queue backlog > Diagnosis",
+      "question": "When should api-gateway queue backlog move to mitigation?",
+      "answer": "when api_gateway_consumer_lag_msgs stays above 65515 for 8 minutes",
+      "must_contain": [
+        "65515",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/api-gateway-queue-backlog.md",
+      "section": "Api gateway: queue backlog > Diagnosis",
+      "question": "Which error code does api-gateway log for queue backlog?",
+      "answer": "API-QUEUE-272",
+      "must_contain": [
+        "API-QUEUE-272"
+      ]
+    },
+    {
+      "id": "rb/api-gateway/queue-backlog/config",
+      "doc": "data/corpus/runbooks/api-gateway-queue-backlog.md",
+      "section": "Api gateway: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for api-gateway queue backlog?",
+      "answer": "set dlq_after_attempts=9",
+      "must_contain": [
+        "dlq_after_attempts=9"
+      ]
+    },
+    {
+      "id": "rb/auth/high-latency/threshold",
+      "doc": "data/corpus/runbooks/auth-high-latency.md",
+      "section": "Auth: high p99 latency > Diagnosis",
+      "question": "When should auth high p99 latency move to mitigation?",
+      "answer": "when auth_p99_latency_ms stays above 1414 for 10 minutes",
+      "must_contain": [
+        "1414",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/high-latency/error-code",
+      "doc": "data/corpus/runbooks/auth-high-latency.md",
+      "section": "Auth: high p99 latency > Diagnosis",
+      "question": "Which error code does auth log for high p99 latency?",
+      "answer": "AUT-LAT-992",
+      "must_contain": [
+        "AUT-LAT-992"
+      ]
+    },
+    {
+      "id": "rb/auth/high-latency/config",
+      "doc": "data/corpus/runbooks/auth-high-latency.md",
+      "section": "Auth: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for auth high p99 latency?",
+      "answer": "set worker_threads=7",
+      "must_contain": [
+        "worker_threads=7"
+      ]
+    },
+    {
+      "id": "rb/auth/error-rate/threshold",
+      "doc": "data/corpus/runbooks/auth-error-rate.md",
+      "section": "Auth: elevated error rate > Diagnosis",
+      "question": "When should auth elevated error rate move to mitigation?",
+      "answer": "when auth_error_ratio_pct stays above 15 for 7 minutes",
+      "must_contain": [
+        "15",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/error-rate/error-code",
+      "doc": "data/corpus/runbooks/auth-error-rate.md",
+      "section": "Auth: elevated error rate > Diagnosis",
+      "question": "Which error code does auth log for elevated error rate?",
+      "answer": "AUT-ERR-823",
+      "must_contain": [
+        "AUT-ERR-823"
+      ]
+    },
+    {
+      "id": "rb/auth/error-rate/config",
+      "doc": "data/corpus/runbooks/auth-error-rate.md",
+      "section": "Auth: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for auth elevated error rate?",
+      "answer": "set circuit_breaker_threshold=24",
+      "must_contain": [
+        "circuit_breaker_threshold=24"
+      ]
+    },
+    {
+      "id": "rb/auth/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/auth-connection-pool.md",
+      "section": "Auth: connection pool exhaustion > Diagnosis",
+      "question": "When should auth connection pool exhaustion move to mitigation?",
+      "answer": "when auth_pool_wait_ms stays above 387 for 6 minutes",
+      "must_contain": [
+        "387",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/auth-connection-pool.md",
+      "section": "Auth: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does auth log for connection pool exhaustion?",
+      "answer": "AUT-POOL-112",
+      "must_contain": [
+        "AUT-POOL-112"
+      ]
+    },
+    {
+      "id": "rb/auth/connection-pool/config",
+      "doc": "data/corpus/runbooks/auth-connection-pool.md",
+      "section": "Auth: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for auth connection pool exhaustion?",
+      "answer": "set pool_checkout_timeout_ms=550",
+      "must_contain": [
+        "pool_checkout_timeout_ms=550"
+      ]
+    },
+    {
+      "id": "rb/auth/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/auth-memory-pressure.md",
+      "section": "Auth: memory pressure and OOM kills > Diagnosis",
+      "question": "When should auth memory pressure and OOM kills move to mitigation?",
+      "answer": "when auth_rss_pct_of_limit stays above 97 for 8 minutes",
+      "must_contain": [
+        "97",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/auth-memory-pressure.md",
+      "section": "Auth: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does auth log for memory pressure and OOM kills?",
+      "answer": "AUT-MEM-724",
+      "must_contain": [
+        "AUT-MEM-724"
+      ]
+    },
+    {
+      "id": "rb/auth/memory-pressure/config",
+      "doc": "data/corpus/runbooks/auth-memory-pressure.md",
+      "section": "Auth: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for auth memory pressure and OOM kills?",
+      "answer": "set gc_target_pct=22",
+      "must_contain": [
+        "gc_target_pct=22"
+      ]
+    },
+    {
+      "id": "rb/auth/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/auth-cpu-saturation.md",
+      "section": "Auth: CPU saturation > Diagnosis",
+      "question": "When should auth CPU saturation move to mitigation?",
+      "answer": "when auth_cpu_util_pct stays above 87 for 10 minutes",
+      "must_contain": [
+        "87",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/auth-cpu-saturation.md",
+      "section": "Auth: CPU saturation > Diagnosis",
+      "question": "Which error code does auth log for CPU saturation?",
+      "answer": "AUT-CPU-206",
+      "must_contain": [
+        "AUT-CPU-206"
+      ]
+    },
+    {
+      "id": "rb/auth/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/auth-cpu-saturation.md",
+      "section": "Auth: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for auth CPU saturation?",
+      "answer": "set worker_threads=42",
+      "must_contain": [
+        "worker_threads=42"
+      ]
+    },
+    {
+      "id": "rb/auth/disk-full/threshold",
+      "doc": "data/corpus/runbooks/auth-disk-full.md",
+      "section": "Auth: disk full > Diagnosis",
+      "question": "When should auth disk full move to mitigation?",
+      "answer": "when auth_disk_used_pct stays above 83 for 8 minutes",
+      "must_contain": [
+        "83",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/disk-full/error-code",
+      "doc": "data/corpus/runbooks/auth-disk-full.md",
+      "section": "Auth: disk full > Diagnosis",
+      "question": "Which error code does auth log for disk full?",
+      "answer": "AUT-DISK-715",
+      "must_contain": [
+        "AUT-DISK-715"
+      ]
+    },
+    {
+      "id": "rb/auth/disk-full/config",
+      "doc": "data/corpus/runbooks/auth-disk-full.md",
+      "section": "Auth: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for auth disk full?",
+      "answer": "set log_level=8",
+      "must_contain": [
+        "log_level=8"
+      ]
+    },
+    {
+      "id": "rb/auth/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/auth-dependency-timeout.md",
+      "section": "Auth: dependency timeouts > Diagnosis",
+      "question": "When should auth dependency timeouts move to mitigation?",
+      "answer": "when auth_upstream_timeout_pct stays above 4 for 10 minutes",
+      "must_contain": [
+        "4",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/auth-dependency-timeout.md",
+      "section": "Auth: dependency timeouts > Diagnosis",
+      "question": "Which error code does auth log for dependency timeouts?",
+      "answer": "AUT-DEP-252",
+      "must_contain": [
+        "AUT-DEP-252"
+      ]
+    },
+    {
+      "id": "rb/auth/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/auth-dependency-timeout.md",
+      "section": "Auth: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for auth dependency timeouts?",
+      "answer": "set retry_max_attempts=18",
+      "must_contain": [
+        "retry_max_attempts=18"
+      ]
+    },
+    {
+      "id": "rb/auth/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/auth-bad-deploy.md",
+      "section": "Auth: regression after a deploy > Diagnosis",
+      "question": "When should auth regression after a deploy move to mitigation?",
+      "answer": "when auth_post_deploy_error_pct stays above 8 for 12 minutes",
+      "must_contain": [
+        "8",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/auth-bad-deploy.md",
+      "section": "Auth: regression after a deploy > Diagnosis",
+      "question": "Which error code does auth log for regression after a deploy?",
+      "answer": "AUT-DEPLOY-419",
+      "must_contain": [
+        "AUT-DEPLOY-419"
+      ]
+    },
+    {
+      "id": "rb/auth/bad-deploy/config",
+      "doc": "data/corpus/runbooks/auth-bad-deploy.md",
+      "section": "Auth: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for auth regression after a deploy?",
+      "answer": "set canary_error_threshold_pct=11",
+      "must_contain": [
+        "canary_error_threshold_pct=11"
+      ]
+    },
+    {
+      "id": "rb/auth/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/auth-cert-expiry.md",
+      "section": "Auth: TLS certificate expiry > Diagnosis",
+      "question": "When should auth TLS certificate expiry move to mitigation?",
+      "answer": "when auth_cert_days_left stays above 11 for 8 minutes",
+      "must_contain": [
+        "11",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/auth-cert-expiry.md",
+      "section": "Auth: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does auth log for TLS certificate expiry?",
+      "answer": "AUT-TLS-250",
+      "must_contain": [
+        "AUT-TLS-250"
+      ]
+    },
+    {
+      "id": "rb/auth/cert-expiry/config",
+      "doc": "data/corpus/runbooks/auth-cert-expiry.md",
+      "section": "Auth: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for auth TLS certificate expiry?",
+      "answer": "set ocsp_stapling=36",
+      "must_contain": [
+        "ocsp_stapling=36"
+      ]
+    },
+    {
+      "id": "rb/auth/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/auth-queue-backlog.md",
+      "section": "Auth: queue backlog > Diagnosis",
+      "question": "When should auth queue backlog move to mitigation?",
+      "answer": "when auth_consumer_lag_msgs stays above 26894 for 8 minutes",
+      "must_contain": [
+        "26894",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/auth/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/auth-queue-backlog.md",
+      "section": "Auth: queue backlog > Diagnosis",
+      "question": "Which error code does auth log for queue backlog?",
+      "answer": "AUT-QUEUE-890",
+      "must_contain": [
+        "AUT-QUEUE-890"
+      ]
+    },
+    {
+      "id": "rb/auth/queue-backlog/config",
+      "doc": "data/corpus/runbooks/auth-queue-backlog.md",
+      "section": "Auth: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for auth queue backlog?",
+      "answer": "set consumer_max_poll_records=36",
+      "must_contain": [
+        "consumer_max_poll_records=36"
+      ]
+    },
+    {
+      "id": "rb/payments/high-latency/threshold",
+      "doc": "data/corpus/runbooks/payments-high-latency.md",
+      "section": "Payments: high p99 latency > Diagnosis",
+      "question": "When should payments high p99 latency move to mitigation?",
+      "answer": "when payments_p99_latency_ms stays above 2275 for 10 minutes",
+      "must_contain": [
+        "2275",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/high-latency/error-code",
+      "doc": "data/corpus/runbooks/payments-high-latency.md",
+      "section": "Payments: high p99 latency > Diagnosis",
+      "question": "Which error code does payments log for high p99 latency?",
+      "answer": "PAY-LAT-857",
+      "must_contain": [
+        "PAY-LAT-857"
+      ]
+    },
+    {
+      "id": "rb/payments/high-latency/config",
+      "doc": "data/corpus/runbooks/payments-high-latency.md",
+      "section": "Payments: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for payments high p99 latency?",
+      "answer": "set request_timeout_ms=140",
+      "must_contain": [
+        "request_timeout_ms=140"
+      ]
+    },
+    {
+      "id": "rb/payments/error-rate/threshold",
+      "doc": "data/corpus/runbooks/payments-error-rate.md",
+      "section": "Payments: elevated error rate > Diagnosis",
+      "question": "When should payments elevated error rate move to mitigation?",
+      "answer": "when payments_error_ratio_pct stays above 9 for 7 minutes",
+      "must_contain": [
+        "9",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/error-rate/error-code",
+      "doc": "data/corpus/runbooks/payments-error-rate.md",
+      "section": "Payments: elevated error rate > Diagnosis",
+      "question": "Which error code does payments log for elevated error rate?",
+      "answer": "PAY-ERR-298",
+      "must_contain": [
+        "PAY-ERR-298"
+      ]
+    },
+    {
+      "id": "rb/payments/error-rate/config",
+      "doc": "data/corpus/runbooks/payments-error-rate.md",
+      "section": "Payments: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for payments elevated error rate?",
+      "answer": "set max_inflight_requests=40",
+      "must_contain": [
+        "max_inflight_requests=40"
+      ]
+    },
+    {
+      "id": "rb/payments/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/payments-connection-pool.md",
+      "section": "Payments: connection pool exhaustion > Diagnosis",
+      "question": "When should payments connection pool exhaustion move to mitigation?",
+      "answer": "when payments_pool_wait_ms stays above 382 for 12 minutes",
+      "must_contain": [
+        "382",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/payments-connection-pool.md",
+      "section": "Payments: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does payments log for connection pool exhaustion?",
+      "answer": "PAY-POOL-301",
+      "must_contain": [
+        "PAY-POOL-301"
+      ]
+    },
+    {
+      "id": "rb/payments/connection-pool/config",
+      "doc": "data/corpus/runbooks/payments-connection-pool.md",
+      "section": "Payments: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for payments connection pool exhaustion?",
+      "answer": "set pool_checkout_timeout_ms=150",
+      "must_contain": [
+        "pool_checkout_timeout_ms=150"
+      ]
+    },
+    {
+      "id": "rb/payments/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/payments-memory-pressure.md",
+      "section": "Payments: memory pressure and OOM kills > Diagnosis",
+      "question": "When should payments memory pressure and OOM kills move to mitigation?",
+      "answer": "when payments_rss_pct_of_limit stays above 92 for 6 minutes",
+      "must_contain": [
+        "92",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/payments-memory-pressure.md",
+      "section": "Payments: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does payments log for memory pressure and OOM kills?",
+      "answer": "PAY-MEM-589",
+      "must_contain": [
+        "PAY-MEM-589"
+      ]
+    },
+    {
+      "id": "rb/payments/memory-pressure/config",
+      "doc": "data/corpus/runbooks/payments-memory-pressure.md",
+      "section": "Payments: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for payments memory pressure and OOM kills?",
+      "answer": "set cache_max_entries=29",
+      "must_contain": [
+        "cache_max_entries=29"
+      ]
+    },
+    {
+      "id": "rb/payments/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/payments-cpu-saturation.md",
+      "section": "Payments: CPU saturation > Diagnosis",
+      "question": "When should payments CPU saturation move to mitigation?",
+      "answer": "when payments_cpu_util_pct stays above 77 for 5 minutes",
+      "must_contain": [
+        "77",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/payments-cpu-saturation.md",
+      "section": "Payments: CPU saturation > Diagnosis",
+      "question": "Which error code does payments log for CPU saturation?",
+      "answer": "PAY-CPU-274",
+      "must_contain": [
+        "PAY-CPU-274"
+      ]
+    },
+    {
+      "id": "rb/payments/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/payments-cpu-saturation.md",
+      "section": "Payments: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for payments CPU saturation?",
+      "answer": "set autoscale_max_replicas=3",
+      "must_contain": [
+        "autoscale_max_replicas=3"
+      ]
+    },
+    {
+      "id": "rb/payments/disk-full/threshold",
+      "doc": "data/corpus/runbooks/payments-disk-full.md",
+      "section": "Payments: disk full > Diagnosis",
+      "question": "When should payments disk full move to mitigation?",
+      "answer": "when payments_disk_used_pct stays above 84 for 5 minutes",
+      "must_contain": [
+        "84",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/disk-full/error-code",
+      "doc": "data/corpus/runbooks/payments-disk-full.md",
+      "section": "Payments: disk full > Diagnosis",
+      "question": "Which error code does payments log for disk full?",
+      "answer": "PAY-DISK-121",
+      "must_contain": [
+        "PAY-DISK-121"
+      ]
+    },
+    {
+      "id": "rb/payments/disk-full/config",
+      "doc": "data/corpus/runbooks/payments-disk-full.md",
+      "section": "Payments: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for payments disk full?",
+      "answer": "set log_level=53",
+      "must_contain": [
+        "log_level=53"
+      ]
+    },
+    {
+      "id": "rb/payments/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/payments-dependency-timeout.md",
+      "section": "Payments: dependency timeouts > Diagnosis",
+      "question": "When should payments dependency timeouts move to mitigation?",
+      "answer": "when payments_upstream_timeout_pct stays above 4 for 3 minutes",
+      "must_contain": [
+        "4",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/payments-dependency-timeout.md",
+      "section": "Payments: dependency timeouts > Diagnosis",
+      "question": "Which error code does payments log for dependency timeouts?",
+      "answer": "PAY-DEP-357",
+      "must_contain": [
+        "PAY-DEP-357"
+      ]
+    },
+    {
+      "id": "rb/payments/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/payments-dependency-timeout.md",
+      "section": "Payments: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for payments dependency timeouts?",
+      "answer": "set upstream_timeout_ms=200",
+      "must_contain": [
+        "upstream_timeout_ms=200"
+      ]
+    },
+    {
+      "id": "rb/payments/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/payments-bad-deploy.md",
+      "section": "Payments: regression after a deploy > Diagnosis",
+      "question": "When should payments regression after a deploy move to mitigation?",
+      "answer": "when payments_post_deploy_error_pct stays above 1 for 8 minutes",
+      "must_contain": [
+        "1",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/payments-bad-deploy.md",
+      "section": "Payments: regression after a deploy > Diagnosis",
+      "question": "Which error code does payments log for regression after a deploy?",
+      "answer": "PAY-DEPLOY-569",
+      "must_contain": [
+        "PAY-DEPLOY-569"
+      ]
+    },
+    {
+      "id": "rb/payments/bad-deploy/config",
+      "doc": "data/corpus/runbooks/payments-bad-deploy.md",
+      "section": "Payments: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for payments regression after a deploy?",
+      "answer": "set feature_flag_default=39",
+      "must_contain": [
+        "feature_flag_default=39"
+      ]
+    },
+    {
+      "id": "rb/payments/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/payments-cert-expiry.md",
+      "section": "Payments: TLS certificate expiry > Diagnosis",
+      "question": "When should payments TLS certificate expiry move to mitigation?",
+      "answer": "when payments_cert_days_left stays above 10 for 5 minutes",
+      "must_contain": [
+        "10",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/payments-cert-expiry.md",
+      "section": "Payments: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does payments log for TLS certificate expiry?",
+      "answer": "PAY-TLS-723",
+      "must_contain": [
+        "PAY-TLS-723"
+      ]
+    },
+    {
+      "id": "rb/payments/cert-expiry/config",
+      "doc": "data/corpus/runbooks/payments-cert-expiry.md",
+      "section": "Payments: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for payments TLS certificate expiry?",
+      "answer": "set cert_renew_before_days=51",
+      "must_contain": [
+        "cert_renew_before_days=51"
+      ]
+    },
+    {
+      "id": "rb/payments/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/payments-queue-backlog.md",
+      "section": "Payments: queue backlog > Diagnosis",
+      "question": "When should payments queue backlog move to mitigation?",
+      "answer": "when payments_consumer_lag_msgs stays above 47727 for 12 minutes",
+      "must_contain": [
+        "47727",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/payments/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/payments-queue-backlog.md",
+      "section": "Payments: queue backlog > Diagnosis",
+      "question": "Which error code does payments log for queue backlog?",
+      "answer": "PAY-QUEUE-903",
+      "must_contain": [
+        "PAY-QUEUE-903"
+      ]
+    },
+    {
+      "id": "rb/payments/queue-backlog/config",
+      "doc": "data/corpus/runbooks/payments-queue-backlog.md",
+      "section": "Payments: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for payments queue backlog?",
+      "answer": "set consumer_max_poll_records=58",
+      "must_contain": [
+        "consumer_max_poll_records=58"
+      ]
+    },
+    {
+      "id": "rb/card-auth/high-latency/threshold",
+      "doc": "data/corpus/runbooks/card-auth-high-latency.md",
+      "section": "Card auth: high p99 latency > Diagnosis",
+      "question": "When should card-auth high p99 latency move to mitigation?",
+      "answer": "when card_auth_p99_latency_ms stays above 1639 for 12 minutes",
+      "must_contain": [
+        "1639",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/high-latency/error-code",
+      "doc": "data/corpus/runbooks/card-auth-high-latency.md",
+      "section": "Card auth: high p99 latency > Diagnosis",
+      "question": "Which error code does card-auth log for high p99 latency?",
+      "answer": "CAR-LAT-675",
+      "must_contain": [
+        "CAR-LAT-675"
+      ]
+    },
+    {
+      "id": "rb/card-auth/high-latency/config",
+      "doc": "data/corpus/runbooks/card-auth-high-latency.md",
+      "section": "Card auth: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth high p99 latency?",
+      "answer": "set request_timeout_ms=500",
+      "must_contain": [
+        "request_timeout_ms=500"
+      ]
+    },
+    {
+      "id": "rb/card-auth/error-rate/threshold",
+      "doc": "data/corpus/runbooks/card-auth-error-rate.md",
+      "section": "Card auth: elevated error rate > Diagnosis",
+      "question": "When should card-auth elevated error rate move to mitigation?",
+      "answer": "when card_auth_error_ratio_pct stays above 9 for 12 minutes",
+      "must_contain": [
+        "9",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/error-rate/error-code",
+      "doc": "data/corpus/runbooks/card-auth-error-rate.md",
+      "section": "Card auth: elevated error rate > Diagnosis",
+      "question": "Which error code does card-auth log for elevated error rate?",
+      "answer": "CAR-ERR-619",
+      "must_contain": [
+        "CAR-ERR-619"
+      ]
+    },
+    {
+      "id": "rb/card-auth/error-rate/config",
+      "doc": "data/corpus/runbooks/card-auth-error-rate.md",
+      "section": "Card auth: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth elevated error rate?",
+      "answer": "set retry_budget_pct=46",
+      "must_contain": [
+        "retry_budget_pct=46"
+      ]
+    },
+    {
+      "id": "rb/card-auth/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/card-auth-connection-pool.md",
+      "section": "Card auth: connection pool exhaustion > Diagnosis",
+      "question": "When should card-auth connection pool exhaustion move to mitigation?",
+      "answer": "when card_auth_pool_wait_ms stays above 274 for 10 minutes",
+      "must_contain": [
+        "274",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/card-auth-connection-pool.md",
+      "section": "Card auth: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does card-auth log for connection pool exhaustion?",
+      "answer": "CAR-POOL-552",
+      "must_contain": [
+        "CAR-POOL-552"
+      ]
+    },
+    {
+      "id": "rb/card-auth/connection-pool/config",
+      "doc": "data/corpus/runbooks/card-auth-connection-pool.md",
+      "section": "Card auth: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth connection pool exhaustion?",
+      "answer": "set pool_checkout_timeout_ms=60",
+      "must_contain": [
+        "pool_checkout_timeout_ms=60"
+      ]
+    },
+    {
+      "id": "rb/card-auth/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/card-auth-memory-pressure.md",
+      "section": "Card auth: memory pressure and OOM kills > Diagnosis",
+      "question": "When should card-auth memory pressure and OOM kills move to mitigation?",
+      "answer": "when card_auth_rss_pct_of_limit stays above 84 for 8 minutes",
+      "must_contain": [
+        "84",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/card-auth-memory-pressure.md",
+      "section": "Card auth: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does card-auth log for memory pressure and OOM kills?",
+      "answer": "CAR-MEM-246",
+      "must_contain": [
+        "CAR-MEM-246"
+      ]
+    },
+    {
+      "id": "rb/card-auth/memory-pressure/config",
+      "doc": "data/corpus/runbooks/card-auth-memory-pressure.md",
+      "section": "Card auth: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth memory pressure and OOM kills?",
+      "answer": "set max_request_body_kb=58",
+      "must_contain": [
+        "max_request_body_kb=58"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/card-auth-cpu-saturation.md",
+      "section": "Card auth: CPU saturation > Diagnosis",
+      "question": "When should card-auth CPU saturation move to mitigation?",
+      "answer": "when card_auth_cpu_util_pct stays above 80 for 6 minutes",
+      "must_contain": [
+        "80",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/card-auth-cpu-saturation.md",
+      "section": "Card auth: CPU saturation > Diagnosis",
+      "question": "Which error code does card-auth log for CPU saturation?",
+      "answer": "CAR-CPU-265",
+      "must_contain": [
+        "CAR-CPU-265"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/card-auth-cpu-saturation.md",
+      "section": "Card auth: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth CPU saturation?",
+      "answer": "set cache_ttl_s=29",
+      "must_contain": [
+        "cache_ttl_s=29"
+      ]
+    },
+    {
+      "id": "rb/card-auth/disk-full/threshold",
+      "doc": "data/corpus/runbooks/card-auth-disk-full.md",
+      "section": "Card auth: disk full > Diagnosis",
+      "question": "When should card-auth disk full move to mitigation?",
+      "answer": "when card_auth_disk_used_pct stays above 82 for 8 minutes",
+      "must_contain": [
+        "82",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/disk-full/error-code",
+      "doc": "data/corpus/runbooks/card-auth-disk-full.md",
+      "section": "Card auth: disk full > Diagnosis",
+      "question": "Which error code does card-auth log for disk full?",
+      "answer": "CAR-DISK-119",
+      "must_contain": [
+        "CAR-DISK-119"
+      ]
+    },
+    {
+      "id": "rb/card-auth/disk-full/config",
+      "doc": "data/corpus/runbooks/card-auth-disk-full.md",
+      "section": "Card auth: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth disk full?",
+      "answer": "set retention_days=37",
+      "must_contain": [
+        "retention_days=37"
+      ]
+    },
+    {
+      "id": "rb/card-auth/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/card-auth-dependency-timeout.md",
+      "section": "Card auth: dependency timeouts > Diagnosis",
+      "question": "When should card-auth dependency timeouts move to mitigation?",
+      "answer": "when card_auth_upstream_timeout_pct stays above 9 for 4 minutes",
+      "must_contain": [
+        "9",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/card-auth-dependency-timeout.md",
+      "section": "Card auth: dependency timeouts > Diagnosis",
+      "question": "Which error code does card-auth log for dependency timeouts?",
+      "answer": "CAR-DEP-215",
+      "must_contain": [
+        "CAR-DEP-215"
+      ]
+    },
+    {
+      "id": "rb/card-auth/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/card-auth-dependency-timeout.md",
+      "section": "Card auth: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth dependency timeouts?",
+      "answer": "set upstream_timeout_ms=640",
+      "must_contain": [
+        "upstream_timeout_ms=640"
+      ]
+    },
+    {
+      "id": "rb/card-auth/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/card-auth-bad-deploy.md",
+      "section": "Card auth: regression after a deploy > Diagnosis",
+      "question": "When should card-auth regression after a deploy move to mitigation?",
+      "answer": "when card_auth_post_deploy_error_pct stays above 3 for 10 minutes",
+      "must_contain": [
+        "3",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/card-auth-bad-deploy.md",
+      "section": "Card auth: regression after a deploy > Diagnosis",
+      "question": "Which error code does card-auth log for regression after a deploy?",
+      "answer": "CAR-DEPLOY-969",
+      "must_contain": [
+        "CAR-DEPLOY-969"
+      ]
+    },
+    {
+      "id": "rb/card-auth/bad-deploy/config",
+      "doc": "data/corpus/runbooks/card-auth-bad-deploy.md",
+      "section": "Card auth: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth regression after a deploy?",
+      "answer": "set feature_flag_default=54",
+      "must_contain": [
+        "feature_flag_default=54"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/card-auth-cert-expiry.md",
+      "section": "Card auth: TLS certificate expiry > Diagnosis",
+      "question": "When should card-auth TLS certificate expiry move to mitigation?",
+      "answer": "when card_auth_cert_days_left stays above 4 for 7 minutes",
+      "must_contain": [
+        "4",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/card-auth-cert-expiry.md",
+      "section": "Card auth: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does card-auth log for TLS certificate expiry?",
+      "answer": "CAR-TLS-158",
+      "must_contain": [
+        "CAR-TLS-158"
+      ]
+    },
+    {
+      "id": "rb/card-auth/cert-expiry/config",
+      "doc": "data/corpus/runbooks/card-auth-cert-expiry.md",
+      "section": "Card auth: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth TLS certificate expiry?",
+      "answer": "set ocsp_stapling=13",
+      "must_contain": [
+        "ocsp_stapling=13"
+      ]
+    },
+    {
+      "id": "rb/card-auth/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/card-auth-queue-backlog.md",
+      "section": "Card auth: queue backlog > Diagnosis",
+      "question": "When should card-auth queue backlog move to mitigation?",
+      "answer": "when card_auth_consumer_lag_msgs stays above 84715 for 6 minutes",
+      "must_contain": [
+        "84715",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/card-auth/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/card-auth-queue-backlog.md",
+      "section": "Card auth: queue backlog > Diagnosis",
+      "question": "Which error code does card-auth log for queue backlog?",
+      "answer": "CAR-QUEUE-168",
+      "must_contain": [
+        "CAR-QUEUE-168"
+      ]
+    },
+    {
+      "id": "rb/card-auth/queue-backlog/config",
+      "doc": "data/corpus/runbooks/card-auth-queue-backlog.md",
+      "section": "Card auth: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for card-auth queue backlog?",
+      "answer": "set consumer_concurrency=57",
+      "must_contain": [
+        "consumer_concurrency=57"
+      ]
+    },
+    {
+      "id": "rb/ledger/high-latency/threshold",
+      "doc": "data/corpus/runbooks/ledger-high-latency.md",
+      "section": "Ledger: high p99 latency > Diagnosis",
+      "question": "When should ledger high p99 latency move to mitigation?",
+      "answer": "when ledger_p99_latency_ms stays above 688 for 6 minutes",
+      "must_contain": [
+        "688",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/high-latency/error-code",
+      "doc": "data/corpus/runbooks/ledger-high-latency.md",
+      "section": "Ledger: high p99 latency > Diagnosis",
+      "question": "Which error code does ledger log for high p99 latency?",
+      "answer": "LED-LAT-212",
+      "must_contain": [
+        "LED-LAT-212"
+      ]
+    },
+    {
+      "id": "rb/ledger/high-latency/config",
+      "doc": "data/corpus/runbooks/ledger-high-latency.md",
+      "section": "Ledger: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for ledger high p99 latency?",
+      "answer": "set request_timeout_ms=180",
+      "must_contain": [
+        "request_timeout_ms=180"
+      ]
+    },
+    {
+      "id": "rb/ledger/error-rate/threshold",
+      "doc": "data/corpus/runbooks/ledger-error-rate.md",
+      "section": "Ledger: elevated error rate > Diagnosis",
+      "question": "When should ledger elevated error rate move to mitigation?",
+      "answer": "when ledger_error_ratio_pct stays above 6 for 12 minutes",
+      "must_contain": [
+        "6",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/error-rate/error-code",
+      "doc": "data/corpus/runbooks/ledger-error-rate.md",
+      "section": "Ledger: elevated error rate > Diagnosis",
+      "question": "Which error code does ledger log for elevated error rate?",
+      "answer": "LED-ERR-612",
+      "must_contain": [
+        "LED-ERR-612"
+      ]
+    },
+    {
+      "id": "rb/ledger/error-rate/config",
+      "doc": "data/corpus/runbooks/ledger-error-rate.md",
+      "section": "Ledger: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for ledger elevated error rate?",
+      "answer": "set max_inflight_requests=13",
+      "must_contain": [
+        "max_inflight_requests=13"
+      ]
+    },
+    {
+      "id": "rb/ledger/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/ledger-connection-pool.md",
+      "section": "Ledger: connection pool exhaustion > Diagnosis",
+      "question": "When should ledger connection pool exhaustion move to mitigation?",
+      "answer": "when ledger_pool_wait_ms stays above 900 for 6 minutes",
+      "must_contain": [
+        "900",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/ledger-connection-pool.md",
+      "section": "Ledger: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does ledger log for connection pool exhaustion?",
+      "answer": "LED-POOL-626",
+      "must_contain": [
+        "LED-POOL-626"
+      ]
+    },
+    {
+      "id": "rb/ledger/connection-pool/config",
+      "doc": "data/corpus/runbooks/ledger-connection-pool.md",
+      "section": "Ledger: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for ledger connection pool exhaustion?",
+      "answer": "set pool_checkout_timeout_ms=170",
+      "must_contain": [
+        "pool_checkout_timeout_ms=170"
+      ]
+    },
+    {
+      "id": "rb/ledger/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/ledger-memory-pressure.md",
+      "section": "Ledger: memory pressure and OOM kills > Diagnosis",
+      "question": "When should ledger memory pressure and OOM kills move to mitigation?",
+      "answer": "when ledger_rss_pct_of_limit stays above 96 for 7 minutes",
+      "must_contain": [
+        "96",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/ledger-memory-pressure.md",
+      "section": "Ledger: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does ledger log for memory pressure and OOM kills?",
+      "answer": "LED-MEM-804",
+      "must_contain": [
+        "LED-MEM-804"
+      ]
+    },
+    {
+      "id": "rb/ledger/memory-pressure/config",
+      "doc": "data/corpus/runbooks/ledger-memory-pressure.md",
+      "section": "Ledger: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for ledger memory pressure and OOM kills?",
+      "answer": "set cache_max_entries=64",
+      "must_contain": [
+        "cache_max_entries=64"
+      ]
+    },
+    {
+      "id": "rb/ledger/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/ledger-cpu-saturation.md",
+      "section": "Ledger: CPU saturation > Diagnosis",
+      "question": "When should ledger CPU saturation move to mitigation?",
+      "answer": "when ledger_cpu_util_pct stays above 86 for 3 minutes",
+      "must_contain": [
+        "86",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/ledger-cpu-saturation.md",
+      "section": "Ledger: CPU saturation > Diagnosis",
+      "question": "Which error code does ledger log for CPU saturation?",
+      "answer": "LED-CPU-957",
+      "must_contain": [
+        "LED-CPU-957"
+      ]
+    },
+    {
+      "id": "rb/ledger/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/ledger-cpu-saturation.md",
+      "section": "Ledger: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for ledger CPU saturation?",
+      "answer": "set autoscale_max_replicas=2",
+      "must_contain": [
+        "autoscale_max_replicas=2"
+      ]
+    },
+    {
+      "id": "rb/ledger/disk-full/threshold",
+      "doc": "data/corpus/runbooks/ledger-disk-full.md",
+      "section": "Ledger: disk full > Diagnosis",
+      "question": "When should ledger disk full move to mitigation?",
+      "answer": "when ledger_disk_used_pct stays above 89 for 6 minutes",
+      "must_contain": [
+        "89",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/disk-full/error-code",
+      "doc": "data/corpus/runbooks/ledger-disk-full.md",
+      "section": "Ledger: disk full > Diagnosis",
+      "question": "Which error code does ledger log for disk full?",
+      "answer": "LED-DISK-809",
+      "must_contain": [
+        "LED-DISK-809"
+      ]
+    },
+    {
+      "id": "rb/ledger/disk-full/config",
+      "doc": "data/corpus/runbooks/ledger-disk-full.md",
+      "section": "Ledger: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for ledger disk full?",
+      "answer": "set retention_days=4",
+      "must_contain": [
+        "retention_days=4"
+      ]
+    },
+    {
+      "id": "rb/ledger/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/ledger-dependency-timeout.md",
+      "section": "Ledger: dependency timeouts > Diagnosis",
+      "question": "When should ledger dependency timeouts move to mitigation?",
+      "answer": "when ledger_upstream_timeout_pct stays above 6 for 8 minutes",
+      "must_contain": [
+        "6",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/ledger-dependency-timeout.md",
+      "section": "Ledger: dependency timeouts > Diagnosis",
+      "question": "Which error code does ledger log for dependency timeouts?",
+      "answer": "LED-DEP-660",
+      "must_contain": [
+        "LED-DEP-660"
+      ]
+    },
+    {
+      "id": "rb/ledger/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/ledger-dependency-timeout.md",
+      "section": "Ledger: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for ledger dependency timeouts?",
+      "answer": "set circuit_breaker_threshold=17",
+      "must_contain": [
+        "circuit_breaker_threshold=17"
+      ]
+    },
+    {
+      "id": "rb/ledger/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/ledger-bad-deploy.md",
+      "section": "Ledger: regression after a deploy > Diagnosis",
+      "question": "When should ledger regression after a deploy move to mitigation?",
+      "answer": "when ledger_post_deploy_error_pct stays above 7 for 4 minutes",
+      "must_contain": [
+        "7",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/ledger-bad-deploy.md",
+      "section": "Ledger: regression after a deploy > Diagnosis",
+      "question": "Which error code does ledger log for regression after a deploy?",
+      "answer": "LED-DEPLOY-586",
+      "must_contain": [
+        "LED-DEPLOY-586"
+      ]
+    },
+    {
+      "id": "rb/ledger/bad-deploy/config",
+      "doc": "data/corpus/runbooks/ledger-bad-deploy.md",
+      "section": "Ledger: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for ledger regression after a deploy?",
+      "answer": "set deploy_batch_size=34",
+      "must_contain": [
+        "deploy_batch_size=34"
+      ]
+    },
+    {
+      "id": "rb/ledger/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/ledger-cert-expiry.md",
+      "section": "Ledger: TLS certificate expiry > Diagnosis",
+      "question": "When should ledger TLS certificate expiry move to mitigation?",
+      "answer": "when ledger_cert_days_left stays above 4 for 5 minutes",
+      "must_contain": [
+        "4",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/ledger-cert-expiry.md",
+      "section": "Ledger: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does ledger log for TLS certificate expiry?",
+      "answer": "LED-TLS-509",
+      "must_contain": [
+        "LED-TLS-509"
+      ]
+    },
+    {
+      "id": "rb/ledger/cert-expiry/config",
+      "doc": "data/corpus/runbooks/ledger-cert-expiry.md",
+      "section": "Ledger: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for ledger TLS certificate expiry?",
+      "answer": "set ocsp_stapling=4",
+      "must_contain": [
+        "ocsp_stapling=4"
+      ]
+    },
+    {
+      "id": "rb/ledger/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/ledger-queue-backlog.md",
+      "section": "Ledger: queue backlog > Diagnosis",
+      "question": "When should ledger queue backlog move to mitigation?",
+      "answer": "when ledger_consumer_lag_msgs stays above 83192 for 10 minutes",
+      "must_contain": [
+        "83192",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/ledger/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/ledger-queue-backlog.md",
+      "section": "Ledger: queue backlog > Diagnosis",
+      "question": "Which error code does ledger log for queue backlog?",
+      "answer": "LED-QUEUE-882",
+      "must_contain": [
+        "LED-QUEUE-882"
+      ]
+    },
+    {
+      "id": "rb/ledger/queue-backlog/config",
+      "doc": "data/corpus/runbooks/ledger-queue-backlog.md",
+      "section": "Ledger: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for ledger queue backlog?",
+      "answer": "set consumer_concurrency=48",
+      "must_contain": [
+        "consumer_concurrency=48"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/high-latency/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-high-latency.md",
+      "section": "Postgres primary: high p99 latency > Diagnosis",
+      "question": "When should postgres-primary high p99 latency move to mitigation?",
+      "answer": "when postgres_primary_p99_latency_ms stays above 2102 for 5 minutes",
+      "must_contain": [
+        "2102",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/high-latency/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-high-latency.md",
+      "section": "Postgres primary: high p99 latency > Diagnosis",
+      "question": "Which error code does postgres-primary log for high p99 latency?",
+      "answer": "POS-LAT-636",
+      "must_contain": [
+        "POS-LAT-636"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/high-latency/config",
+      "doc": "data/corpus/runbooks/postgres-primary-high-latency.md",
+      "section": "Postgres primary: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary high p99 latency?",
+      "answer": "set query_timeout_ms=380",
+      "must_contain": [
+        "query_timeout_ms=380"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/error-rate/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-error-rate.md",
+      "section": "Postgres primary: elevated error rate > Diagnosis",
+      "question": "When should postgres-primary elevated error rate move to mitigation?",
+      "answer": "when postgres_primary_error_ratio_pct stays above 3 for 10 minutes",
+      "must_contain": [
+        "3",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/error-rate/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-error-rate.md",
+      "section": "Postgres primary: elevated error rate > Diagnosis",
+      "question": "Which error code does postgres-primary log for elevated error rate?",
+      "answer": "POS-ERR-955",
+      "must_contain": [
+        "POS-ERR-955"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/error-rate/config",
+      "doc": "data/corpus/runbooks/postgres-primary-error-rate.md",
+      "section": "Postgres primary: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary elevated error rate?",
+      "answer": "set circuit_breaker_threshold=37",
+      "must_contain": [
+        "circuit_breaker_threshold=37"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-connection-pool.md",
+      "section": "Postgres primary: connection pool exhaustion > Diagnosis",
+      "question": "When should postgres-primary connection pool exhaustion move to mitigation?",
+      "answer": "when postgres_primary_pool_wait_ms stays above 420 for 3 minutes",
+      "must_contain": [
+        "420",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-connection-pool.md",
+      "section": "Postgres primary: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does postgres-primary log for connection pool exhaustion?",
+      "answer": "POS-POOL-567",
+      "must_contain": [
+        "POS-POOL-567"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/connection-pool/config",
+      "doc": "data/corpus/runbooks/postgres-primary-connection-pool.md",
+      "section": "Postgres primary: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary connection pool exhaustion?",
+      "answer": "set pool_max_size=49",
+      "must_contain": [
+        "pool_max_size=49"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-memory-pressure.md",
+      "section": "Postgres primary: memory pressure and OOM kills > Diagnosis",
+      "question": "When should postgres-primary memory pressure and OOM kills move to mitigation?",
+      "answer": "when postgres_primary_rss_pct_of_limit stays above 82 for 7 minutes",
+      "must_contain": [
+        "82",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-memory-pressure.md",
+      "section": "Postgres primary: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does postgres-primary log for memory pressure and OOM kills?",
+      "answer": "POS-MEM-340",
+      "must_contain": [
+        "POS-MEM-340"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/memory-pressure/config",
+      "doc": "data/corpus/runbooks/postgres-primary-memory-pressure.md",
+      "section": "Postgres primary: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary memory pressure and OOM kills?",
+      "answer": "set gc_target_pct=50",
+      "must_contain": [
+        "gc_target_pct=50"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-cpu-saturation.md",
+      "section": "Postgres primary: CPU saturation > Diagnosis",
+      "question": "When should postgres-primary CPU saturation move to mitigation?",
+      "answer": "when postgres_primary_cpu_util_pct stays above 90 for 7 minutes",
+      "must_contain": [
+        "90",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-cpu-saturation.md",
+      "section": "Postgres primary: CPU saturation > Diagnosis",
+      "question": "Which error code does postgres-primary log for CPU saturation?",
+      "answer": "POS-CPU-885",
+      "must_contain": [
+        "POS-CPU-885"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/postgres-primary-cpu-saturation.md",
+      "section": "Postgres primary: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary CPU saturation?",
+      "answer": "set autoscale_max_replicas=41",
+      "must_contain": [
+        "autoscale_max_replicas=41"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/disk-full/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-disk-full.md",
+      "section": "Postgres primary: disk full > Diagnosis",
+      "question": "When should postgres-primary disk full move to mitigation?",
+      "answer": "when postgres_primary_disk_used_pct stays above 89 for 5 minutes",
+      "must_contain": [
+        "89",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/disk-full/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-disk-full.md",
+      "section": "Postgres primary: disk full > Diagnosis",
+      "question": "Which error code does postgres-primary log for disk full?",
+      "answer": "POS-DISK-112",
+      "must_contain": [
+        "POS-DISK-112"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/disk-full/config",
+      "doc": "data/corpus/runbooks/postgres-primary-disk-full.md",
+      "section": "Postgres primary: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary disk full?",
+      "answer": "set retention_days=5",
+      "must_contain": [
+        "retention_days=5"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-dependency-timeout.md",
+      "section": "Postgres primary: dependency timeouts > Diagnosis",
+      "question": "When should postgres-primary dependency timeouts move to mitigation?",
+      "answer": "when postgres_primary_upstream_timeout_pct stays above 5 for 7 minutes",
+      "must_contain": [
+        "5",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-dependency-timeout.md",
+      "section": "Postgres primary: dependency timeouts > Diagnosis",
+      "question": "Which error code does postgres-primary log for dependency timeouts?",
+      "answer": "POS-DEP-575",
+      "must_contain": [
+        "POS-DEP-575"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/postgres-primary-dependency-timeout.md",
+      "section": "Postgres primary: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary dependency timeouts?",
+      "answer": "set circuit_breaker_threshold=31",
+      "must_contain": [
+        "circuit_breaker_threshold=31"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-bad-deploy.md",
+      "section": "Postgres primary: regression after a deploy > Diagnosis",
+      "question": "When should postgres-primary regression after a deploy move to mitigation?",
+      "answer": "when postgres_primary_post_deploy_error_pct stays above 8 for 4 minutes",
+      "must_contain": [
+        "8",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-bad-deploy.md",
+      "section": "Postgres primary: regression after a deploy > Diagnosis",
+      "question": "Which error code does postgres-primary log for regression after a deploy?",
+      "answer": "POS-DEPLOY-939",
+      "must_contain": [
+        "POS-DEPLOY-939"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/bad-deploy/config",
+      "doc": "data/corpus/runbooks/postgres-primary-bad-deploy.md",
+      "section": "Postgres primary: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary regression after a deploy?",
+      "answer": "set feature_flag_default=63",
+      "must_contain": [
+        "feature_flag_default=63"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-cert-expiry.md",
+      "section": "Postgres primary: TLS certificate expiry > Diagnosis",
+      "question": "When should postgres-primary TLS certificate expiry move to mitigation?",
+      "answer": "when postgres_primary_cert_days_left stays above 5 for 7 minutes",
+      "must_contain": [
+        "5",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-cert-expiry.md",
+      "section": "Postgres primary: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does postgres-primary log for TLS certificate expiry?",
+      "answer": "POS-TLS-468",
+      "must_contain": [
+        "POS-TLS-468"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/cert-expiry/config",
+      "doc": "data/corpus/runbooks/postgres-primary-cert-expiry.md",
+      "section": "Postgres primary: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary TLS certificate expiry?",
+      "answer": "set cert_renew_before_days=40",
+      "must_contain": [
+        "cert_renew_before_days=40"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/postgres-primary-queue-backlog.md",
+      "section": "Postgres primary: queue backlog > Diagnosis",
+      "question": "When should postgres-primary queue backlog move to mitigation?",
+      "answer": "when postgres_primary_consumer_lag_msgs stays above 68719 for 10 minutes",
+      "must_contain": [
+        "68719",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/postgres-primary-queue-backlog.md",
+      "section": "Postgres primary: queue backlog > Diagnosis",
+      "question": "Which error code does postgres-primary log for queue backlog?",
+      "answer": "POS-QUEUE-125",
+      "must_contain": [
+        "POS-QUEUE-125"
+      ]
+    },
+    {
+      "id": "rb/postgres-primary/queue-backlog/config",
+      "doc": "data/corpus/runbooks/postgres-primary-queue-backlog.md",
+      "section": "Postgres primary: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for postgres-primary queue backlog?",
+      "answer": "set consumer_max_poll_records=2",
+      "must_contain": [
+        "consumer_max_poll_records=2"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/high-latency/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-high-latency.md",
+      "section": "Redis cache: high p99 latency > Diagnosis",
+      "question": "When should redis-cache high p99 latency move to mitigation?",
+      "answer": "when redis_cache_p99_latency_ms stays above 1370 for 8 minutes",
+      "must_contain": [
+        "1370",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/high-latency/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-high-latency.md",
+      "section": "Redis cache: high p99 latency > Diagnosis",
+      "question": "Which error code does redis-cache log for high p99 latency?",
+      "answer": "RED-LAT-223",
+      "must_contain": [
+        "RED-LAT-223"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/high-latency/config",
+      "doc": "data/corpus/runbooks/redis-cache-high-latency.md",
+      "section": "Redis cache: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache high p99 latency?",
+      "answer": "set worker_threads=2",
+      "must_contain": [
+        "worker_threads=2"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/error-rate/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-error-rate.md",
+      "section": "Redis cache: elevated error rate > Diagnosis",
+      "question": "When should redis-cache elevated error rate move to mitigation?",
+      "answer": "when redis_cache_error_ratio_pct stays above 6 for 8 minutes",
+      "must_contain": [
+        "6",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/error-rate/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-error-rate.md",
+      "section": "Redis cache: elevated error rate > Diagnosis",
+      "question": "Which error code does redis-cache log for elevated error rate?",
+      "answer": "RED-ERR-166",
+      "must_contain": [
+        "RED-ERR-166"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/error-rate/config",
+      "doc": "data/corpus/runbooks/redis-cache-error-rate.md",
+      "section": "Redis cache: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache elevated error rate?",
+      "answer": "set circuit_breaker_threshold=26",
+      "must_contain": [
+        "circuit_breaker_threshold=26"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-connection-pool.md",
+      "section": "Redis cache: connection pool exhaustion > Diagnosis",
+      "question": "When should redis-cache connection pool exhaustion move to mitigation?",
+      "answer": "when redis_cache_pool_wait_ms stays above 254 for 3 minutes",
+      "must_contain": [
+        "254",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-connection-pool.md",
+      "section": "Redis cache: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does redis-cache log for connection pool exhaustion?",
+      "answer": "RED-POOL-954",
+      "must_contain": [
+        "RED-POOL-954"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/connection-pool/config",
+      "doc": "data/corpus/runbooks/redis-cache-connection-pool.md",
+      "section": "Redis cache: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache connection pool exhaustion?",
+      "answer": "set statement_timeout_ms=200",
+      "must_contain": [
+        "statement_timeout_ms=200"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-memory-pressure.md",
+      "section": "Redis cache: memory pressure and OOM kills > Diagnosis",
+      "question": "When should redis-cache memory pressure and OOM kills move to mitigation?",
+      "answer": "when redis_cache_rss_pct_of_limit stays above 91 for 10 minutes",
+      "must_contain": [
+        "91",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-memory-pressure.md",
+      "section": "Redis cache: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does redis-cache log for memory pressure and OOM kills?",
+      "answer": "RED-MEM-129",
+      "must_contain": [
+        "RED-MEM-129"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/memory-pressure/config",
+      "doc": "data/corpus/runbooks/redis-cache-memory-pressure.md",
+      "section": "Redis cache: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache memory pressure and OOM kills?",
+      "answer": "set gc_target_pct=27",
+      "must_contain": [
+        "gc_target_pct=27"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-cpu-saturation.md",
+      "section": "Redis cache: CPU saturation > Diagnosis",
+      "question": "When should redis-cache CPU saturation move to mitigation?",
+      "answer": "when redis_cache_cpu_util_pct stays above 95 for 7 minutes",
+      "must_contain": [
+        "95",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-cpu-saturation.md",
+      "section": "Redis cache: CPU saturation > Diagnosis",
+      "question": "Which error code does redis-cache log for CPU saturation?",
+      "answer": "RED-CPU-597",
+      "must_contain": [
+        "RED-CPU-597"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/redis-cache-cpu-saturation.md",
+      "section": "Redis cache: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache CPU saturation?",
+      "answer": "set autoscale_max_replicas=60",
+      "must_contain": [
+        "autoscale_max_replicas=60"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/disk-full/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-disk-full.md",
+      "section": "Redis cache: disk full > Diagnosis",
+      "question": "When should redis-cache disk full move to mitigation?",
+      "answer": "when redis_cache_disk_used_pct stays above 89 for 7 minutes",
+      "must_contain": [
+        "89",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/disk-full/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-disk-full.md",
+      "section": "Redis cache: disk full > Diagnosis",
+      "question": "Which error code does redis-cache log for disk full?",
+      "answer": "RED-DISK-856",
+      "must_contain": [
+        "RED-DISK-856"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/disk-full/config",
+      "doc": "data/corpus/runbooks/redis-cache-disk-full.md",
+      "section": "Redis cache: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache disk full?",
+      "answer": "set temp_dir_max_gb=64",
+      "must_contain": [
+        "temp_dir_max_gb=64"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-dependency-timeout.md",
+      "section": "Redis cache: dependency timeouts > Diagnosis",
+      "question": "When should redis-cache dependency timeouts move to mitigation?",
+      "answer": "when redis_cache_upstream_timeout_pct stays above 9 for 10 minutes",
+      "must_contain": [
+        "9",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-dependency-timeout.md",
+      "section": "Redis cache: dependency timeouts > Diagnosis",
+      "question": "Which error code does redis-cache log for dependency timeouts?",
+      "answer": "RED-DEP-222",
+      "must_contain": [
+        "RED-DEP-222"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/redis-cache-dependency-timeout.md",
+      "section": "Redis cache: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache dependency timeouts?",
+      "answer": "set upstream_timeout_ms=430",
+      "must_contain": [
+        "upstream_timeout_ms=430"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-bad-deploy.md",
+      "section": "Redis cache: regression after a deploy > Diagnosis",
+      "question": "When should redis-cache regression after a deploy move to mitigation?",
+      "answer": "when redis_cache_post_deploy_error_pct stays above 8 for 8 minutes",
+      "must_contain": [
+        "8",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-bad-deploy.md",
+      "section": "Redis cache: regression after a deploy > Diagnosis",
+      "question": "Which error code does redis-cache log for regression after a deploy?",
+      "answer": "RED-DEPLOY-877",
+      "must_contain": [
+        "RED-DEPLOY-877"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/bad-deploy/config",
+      "doc": "data/corpus/runbooks/redis-cache-bad-deploy.md",
+      "section": "Redis cache: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache regression after a deploy?",
+      "answer": "set deploy_batch_size=29",
+      "must_contain": [
+        "deploy_batch_size=29"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-cert-expiry.md",
+      "section": "Redis cache: TLS certificate expiry > Diagnosis",
+      "question": "When should redis-cache TLS certificate expiry move to mitigation?",
+      "answer": "when redis_cache_cert_days_left stays above 8 for 6 minutes",
+      "must_contain": [
+        "8",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-cert-expiry.md",
+      "section": "Redis cache: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does redis-cache log for TLS certificate expiry?",
+      "answer": "RED-TLS-477",
+      "must_contain": [
+        "RED-TLS-477"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/cert-expiry/config",
+      "doc": "data/corpus/runbooks/redis-cache-cert-expiry.md",
+      "section": "Redis cache: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache TLS certificate expiry?",
+      "answer": "set tls_min_version=53",
+      "must_contain": [
+        "tls_min_version=53"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/redis-cache-queue-backlog.md",
+      "section": "Redis cache: queue backlog > Diagnosis",
+      "question": "When should redis-cache queue backlog move to mitigation?",
+      "answer": "when redis_cache_consumer_lag_msgs stays above 73703 for 6 minutes",
+      "must_contain": [
+        "73703",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/redis-cache-queue-backlog.md",
+      "section": "Redis cache: queue backlog > Diagnosis",
+      "question": "Which error code does redis-cache log for queue backlog?",
+      "answer": "RED-QUEUE-485",
+      "must_contain": [
+        "RED-QUEUE-485"
+      ]
+    },
+    {
+      "id": "rb/redis-cache/queue-backlog/config",
+      "doc": "data/corpus/runbooks/redis-cache-queue-backlog.md",
+      "section": "Redis cache: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for redis-cache queue backlog?",
+      "answer": "set consumer_concurrency=23",
+      "must_contain": [
+        "consumer_concurrency=23"
+      ]
+    },
+    {
+      "id": "rb/notifications/high-latency/threshold",
+      "doc": "data/corpus/runbooks/notifications-high-latency.md",
+      "section": "Notifications: high p99 latency > Diagnosis",
+      "question": "When should notifications high p99 latency move to mitigation?",
+      "answer": "when notifications_p99_latency_ms stays above 789 for 7 minutes",
+      "must_contain": [
+        "789",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/high-latency/error-code",
+      "doc": "data/corpus/runbooks/notifications-high-latency.md",
+      "section": "Notifications: high p99 latency > Diagnosis",
+      "question": "Which error code does notifications log for high p99 latency?",
+      "answer": "NOT-LAT-354",
+      "must_contain": [
+        "NOT-LAT-354"
+      ]
+    },
+    {
+      "id": "rb/notifications/high-latency/config",
+      "doc": "data/corpus/runbooks/notifications-high-latency.md",
+      "section": "Notifications: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for notifications high p99 latency?",
+      "answer": "set worker_threads=27",
+      "must_contain": [
+        "worker_threads=27"
+      ]
+    },
+    {
+      "id": "rb/notifications/error-rate/threshold",
+      "doc": "data/corpus/runbooks/notifications-error-rate.md",
+      "section": "Notifications: elevated error rate > Diagnosis",
+      "question": "When should notifications elevated error rate move to mitigation?",
+      "answer": "when notifications_error_ratio_pct stays above 8 for 12 minutes",
+      "must_contain": [
+        "8",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/error-rate/error-code",
+      "doc": "data/corpus/runbooks/notifications-error-rate.md",
+      "section": "Notifications: elevated error rate > Diagnosis",
+      "question": "Which error code does notifications log for elevated error rate?",
+      "answer": "NOT-ERR-701",
+      "must_contain": [
+        "NOT-ERR-701"
+      ]
+    },
+    {
+      "id": "rb/notifications/error-rate/config",
+      "doc": "data/corpus/runbooks/notifications-error-rate.md",
+      "section": "Notifications: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for notifications elevated error rate?",
+      "answer": "set circuit_breaker_threshold=2",
+      "must_contain": [
+        "circuit_breaker_threshold=2"
+      ]
+    },
+    {
+      "id": "rb/notifications/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/notifications-connection-pool.md",
+      "section": "Notifications: connection pool exhaustion > Diagnosis",
+      "question": "When should notifications connection pool exhaustion move to mitigation?",
+      "answer": "when notifications_pool_wait_ms stays above 379 for 5 minutes",
+      "must_contain": [
+        "379",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/notifications-connection-pool.md",
+      "section": "Notifications: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does notifications log for connection pool exhaustion?",
+      "answer": "NOT-POOL-255",
+      "must_contain": [
+        "NOT-POOL-255"
+      ]
+    },
+    {
+      "id": "rb/notifications/connection-pool/config",
+      "doc": "data/corpus/runbooks/notifications-connection-pool.md",
+      "section": "Notifications: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for notifications connection pool exhaustion?",
+      "answer": "set statement_timeout_ms=640",
+      "must_contain": [
+        "statement_timeout_ms=640"
+      ]
+    },
+    {
+      "id": "rb/notifications/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/notifications-memory-pressure.md",
+      "section": "Notifications: memory pressure and OOM kills > Diagnosis",
+      "question": "When should notifications memory pressure and OOM kills move to mitigation?",
+      "answer": "when notifications_rss_pct_of_limit stays above 97 for 3 minutes",
+      "must_contain": [
+        "97",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/notifications-memory-pressure.md",
+      "section": "Notifications: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does notifications log for memory pressure and OOM kills?",
+      "answer": "NOT-MEM-101",
+      "must_contain": [
+        "NOT-MEM-101"
+      ]
+    },
+    {
+      "id": "rb/notifications/memory-pressure/config",
+      "doc": "data/corpus/runbooks/notifications-memory-pressure.md",
+      "section": "Notifications: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for notifications memory pressure and OOM kills?",
+      "answer": "set cache_max_entries=16",
+      "must_contain": [
+        "cache_max_entries=16"
+      ]
+    },
+    {
+      "id": "rb/notifications/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/notifications-cpu-saturation.md",
+      "section": "Notifications: CPU saturation > Diagnosis",
+      "question": "When should notifications CPU saturation move to mitigation?",
+      "answer": "when notifications_cpu_util_pct stays above 91 for 10 minutes",
+      "must_contain": [
+        "91",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/notifications-cpu-saturation.md",
+      "section": "Notifications: CPU saturation > Diagnosis",
+      "question": "Which error code does notifications log for CPU saturation?",
+      "answer": "NOT-CPU-815",
+      "must_contain": [
+        "NOT-CPU-815"
+      ]
+    },
+    {
+      "id": "rb/notifications/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/notifications-cpu-saturation.md",
+      "section": "Notifications: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for notifications CPU saturation?",
+      "answer": "set autoscale_max_replicas=8",
+      "must_contain": [
+        "autoscale_max_replicas=8"
+      ]
+    },
+    {
+      "id": "rb/notifications/disk-full/threshold",
+      "doc": "data/corpus/runbooks/notifications-disk-full.md",
+      "section": "Notifications: disk full > Diagnosis",
+      "question": "When should notifications disk full move to mitigation?",
+      "answer": "when notifications_disk_used_pct stays above 87 for 3 minutes",
+      "must_contain": [
+        "87",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/disk-full/error-code",
+      "doc": "data/corpus/runbooks/notifications-disk-full.md",
+      "section": "Notifications: disk full > Diagnosis",
+      "question": "Which error code does notifications log for disk full?",
+      "answer": "NOT-DISK-110",
+      "must_contain": [
+        "NOT-DISK-110"
+      ]
+    },
+    {
+      "id": "rb/notifications/disk-full/config",
+      "doc": "data/corpus/runbooks/notifications-disk-full.md",
+      "section": "Notifications: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for notifications disk full?",
+      "answer": "set temp_dir_max_gb=21",
+      "must_contain": [
+        "temp_dir_max_gb=21"
+      ]
+    },
+    {
+      "id": "rb/notifications/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/notifications-dependency-timeout.md",
+      "section": "Notifications: dependency timeouts > Diagnosis",
+      "question": "When should notifications dependency timeouts move to mitigation?",
+      "answer": "when notifications_upstream_timeout_pct stays above 9 for 6 minutes",
+      "must_contain": [
+        "9",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/notifications-dependency-timeout.md",
+      "section": "Notifications: dependency timeouts > Diagnosis",
+      "question": "Which error code does notifications log for dependency timeouts?",
+      "answer": "NOT-DEP-129",
+      "must_contain": [
+        "NOT-DEP-129"
+      ]
+    },
+    {
+      "id": "rb/notifications/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/notifications-dependency-timeout.md",
+      "section": "Notifications: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for notifications dependency timeouts?",
+      "answer": "set circuit_breaker_threshold=47",
+      "must_contain": [
+        "circuit_breaker_threshold=47"
+      ]
+    },
+    {
+      "id": "rb/notifications/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/notifications-bad-deploy.md",
+      "section": "Notifications: regression after a deploy > Diagnosis",
+      "question": "When should notifications regression after a deploy move to mitigation?",
+      "answer": "when notifications_post_deploy_error_pct stays above 2 for 7 minutes",
+      "must_contain": [
+        "2",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/notifications-bad-deploy.md",
+      "section": "Notifications: regression after a deploy > Diagnosis",
+      "question": "Which error code does notifications log for regression after a deploy?",
+      "answer": "NOT-DEPLOY-333",
+      "must_contain": [
+        "NOT-DEPLOY-333"
+      ]
+    },
+    {
+      "id": "rb/notifications/bad-deploy/config",
+      "doc": "data/corpus/runbooks/notifications-bad-deploy.md",
+      "section": "Notifications: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for notifications regression after a deploy?",
+      "answer": "set feature_flag_default=29",
+      "must_contain": [
+        "feature_flag_default=29"
+      ]
+    },
+    {
+      "id": "rb/notifications/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/notifications-cert-expiry.md",
+      "section": "Notifications: TLS certificate expiry > Diagnosis",
+      "question": "When should notifications TLS certificate expiry move to mitigation?",
+      "answer": "when notifications_cert_days_left stays above 8 for 10 minutes",
+      "must_contain": [
+        "8",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/notifications-cert-expiry.md",
+      "section": "Notifications: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does notifications log for TLS certificate expiry?",
+      "answer": "NOT-TLS-302",
+      "must_contain": [
+        "NOT-TLS-302"
+      ]
+    },
+    {
+      "id": "rb/notifications/cert-expiry/config",
+      "doc": "data/corpus/runbooks/notifications-cert-expiry.md",
+      "section": "Notifications: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for notifications TLS certificate expiry?",
+      "answer": "set cert_renew_before_days=53",
+      "must_contain": [
+        "cert_renew_before_days=53"
+      ]
+    },
+    {
+      "id": "rb/notifications/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/notifications-queue-backlog.md",
+      "section": "Notifications: queue backlog > Diagnosis",
+      "question": "When should notifications queue backlog move to mitigation?",
+      "answer": "when notifications_consumer_lag_msgs stays above 35252 for 12 minutes",
+      "must_contain": [
+        "35252",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/notifications/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/notifications-queue-backlog.md",
+      "section": "Notifications: queue backlog > Diagnosis",
+      "question": "Which error code does notifications log for queue backlog?",
+      "answer": "NOT-QUEUE-326",
+      "must_contain": [
+        "NOT-QUEUE-326"
+      ]
+    },
+    {
+      "id": "rb/notifications/queue-backlog/config",
+      "doc": "data/corpus/runbooks/notifications-queue-backlog.md",
+      "section": "Notifications: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for notifications queue backlog?",
+      "answer": "set consumer_concurrency=50",
+      "must_contain": [
+        "consumer_concurrency=50"
+      ]
+    },
+    {
+      "id": "rb/search/high-latency/threshold",
+      "doc": "data/corpus/runbooks/search-high-latency.md",
+      "section": "Search: high p99 latency > Diagnosis",
+      "question": "When should search high p99 latency move to mitigation?",
+      "answer": "when search_p99_latency_ms stays above 1593 for 10 minutes",
+      "must_contain": [
+        "1593",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/high-latency/error-code",
+      "doc": "data/corpus/runbooks/search-high-latency.md",
+      "section": "Search: high p99 latency > Diagnosis",
+      "question": "Which error code does search log for high p99 latency?",
+      "answer": "SEA-LAT-781",
+      "must_contain": [
+        "SEA-LAT-781"
+      ]
+    },
+    {
+      "id": "rb/search/high-latency/config",
+      "doc": "data/corpus/runbooks/search-high-latency.md",
+      "section": "Search: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for search high p99 latency?",
+      "answer": "set request_timeout_ms=620",
+      "must_contain": [
+        "request_timeout_ms=620"
+      ]
+    },
+    {
+      "id": "rb/search/error-rate/threshold",
+      "doc": "data/corpus/runbooks/search-error-rate.md",
+      "section": "Search: elevated error rate > Diagnosis",
+      "question": "When should search elevated error rate move to mitigation?",
+      "answer": "when search_error_ratio_pct stays above 8 for 3 minutes",
+      "must_contain": [
+        "8",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/error-rate/error-code",
+      "doc": "data/corpus/runbooks/search-error-rate.md",
+      "section": "Search: elevated error rate > Diagnosis",
+      "question": "Which error code does search log for elevated error rate?",
+      "answer": "SEA-ERR-826",
+      "must_contain": [
+        "SEA-ERR-826"
+      ]
+    },
+    {
+      "id": "rb/search/error-rate/config",
+      "doc": "data/corpus/runbooks/search-error-rate.md",
+      "section": "Search: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for search elevated error rate?",
+      "answer": "set retry_budget_pct=13",
+      "must_contain": [
+        "retry_budget_pct=13"
+      ]
+    },
+    {
+      "id": "rb/search/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/search-connection-pool.md",
+      "section": "Search: connection pool exhaustion > Diagnosis",
+      "question": "When should search connection pool exhaustion move to mitigation?",
+      "answer": "when search_pool_wait_ms stays above 319 for 8 minutes",
+      "must_contain": [
+        "319",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/search-connection-pool.md",
+      "section": "Search: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does search log for connection pool exhaustion?",
+      "answer": "SEA-POOL-295",
+      "must_contain": [
+        "SEA-POOL-295"
+      ]
+    },
+    {
+      "id": "rb/search/connection-pool/config",
+      "doc": "data/corpus/runbooks/search-connection-pool.md",
+      "section": "Search: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for search connection pool exhaustion?",
+      "answer": "set pool_max_size=43",
+      "must_contain": [
+        "pool_max_size=43"
+      ]
+    },
+    {
+      "id": "rb/search/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/search-memory-pressure.md",
+      "section": "Search: memory pressure and OOM kills > Diagnosis",
+      "question": "When should search memory pressure and OOM kills move to mitigation?",
+      "answer": "when search_rss_pct_of_limit stays above 94 for 5 minutes",
+      "must_contain": [
+        "94",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/search-memory-pressure.md",
+      "section": "Search: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does search log for memory pressure and OOM kills?",
+      "answer": "SEA-MEM-211",
+      "must_contain": [
+        "SEA-MEM-211"
+      ]
+    },
+    {
+      "id": "rb/search/memory-pressure/config",
+      "doc": "data/corpus/runbooks/search-memory-pressure.md",
+      "section": "Search: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for search memory pressure and OOM kills?",
+      "answer": "set cache_max_entries=7",
+      "must_contain": [
+        "cache_max_entries=7"
+      ]
+    },
+    {
+      "id": "rb/search/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/search-cpu-saturation.md",
+      "section": "Search: CPU saturation > Diagnosis",
+      "question": "When should search CPU saturation move to mitigation?",
+      "answer": "when search_cpu_util_pct stays above 86 for 7 minutes",
+      "must_contain": [
+        "86",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/search-cpu-saturation.md",
+      "section": "Search: CPU saturation > Diagnosis",
+      "question": "Which error code does search log for CPU saturation?",
+      "answer": "SEA-CPU-941",
+      "must_contain": [
+        "SEA-CPU-941"
+      ]
+    },
+    {
+      "id": "rb/search/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/search-cpu-saturation.md",
+      "section": "Search: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for search CPU saturation?",
+      "answer": "set worker_threads=7",
+      "must_contain": [
+        "worker_threads=7"
+      ]
+    },
+    {
+      "id": "rb/search/disk-full/threshold",
+      "doc": "data/corpus/runbooks/search-disk-full.md",
+      "section": "Search: disk full > Diagnosis",
+      "question": "When should search disk full move to mitigation?",
+      "answer": "when search_disk_used_pct stays above 90 for 8 minutes",
+      "must_contain": [
+        "90",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/disk-full/error-code",
+      "doc": "data/corpus/runbooks/search-disk-full.md",
+      "section": "Search: disk full > Diagnosis",
+      "question": "Which error code does search log for disk full?",
+      "answer": "SEA-DISK-855",
+      "must_contain": [
+        "SEA-DISK-855"
+      ]
+    },
+    {
+      "id": "rb/search/disk-full/config",
+      "doc": "data/corpus/runbooks/search-disk-full.md",
+      "section": "Search: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for search disk full?",
+      "answer": "set retention_days=3",
+      "must_contain": [
+        "retention_days=3"
+      ]
+    },
+    {
+      "id": "rb/search/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/search-dependency-timeout.md",
+      "section": "Search: dependency timeouts > Diagnosis",
+      "question": "When should search dependency timeouts move to mitigation?",
+      "answer": "when search_upstream_timeout_pct stays above 1 for 12 minutes",
+      "must_contain": [
+        "1",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/search-dependency-timeout.md",
+      "section": "Search: dependency timeouts > Diagnosis",
+      "question": "Which error code does search log for dependency timeouts?",
+      "answer": "SEA-DEP-164",
+      "must_contain": [
+        "SEA-DEP-164"
+      ]
+    },
+    {
+      "id": "rb/search/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/search-dependency-timeout.md",
+      "section": "Search: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for search dependency timeouts?",
+      "answer": "set upstream_timeout_ms=180",
+      "must_contain": [
+        "upstream_timeout_ms=180"
+      ]
+    },
+    {
+      "id": "rb/search/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/search-bad-deploy.md",
+      "section": "Search: regression after a deploy > Diagnosis",
+      "question": "When should search regression after a deploy move to mitigation?",
+      "answer": "when search_post_deploy_error_pct stays above 1 for 7 minutes",
+      "must_contain": [
+        "1",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/search-bad-deploy.md",
+      "section": "Search: regression after a deploy > Diagnosis",
+      "question": "Which error code does search log for regression after a deploy?",
+      "answer": "SEA-DEPLOY-864",
+      "must_contain": [
+        "SEA-DEPLOY-864"
+      ]
+    },
+    {
+      "id": "rb/search/bad-deploy/config",
+      "doc": "data/corpus/runbooks/search-bad-deploy.md",
+      "section": "Search: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for search regression after a deploy?",
+      "answer": "set feature_flag_default=46",
+      "must_contain": [
+        "feature_flag_default=46"
+      ]
+    },
+    {
+      "id": "rb/search/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/search-cert-expiry.md",
+      "section": "Search: TLS certificate expiry > Diagnosis",
+      "question": "When should search TLS certificate expiry move to mitigation?",
+      "answer": "when search_cert_days_left stays above 4 for 12 minutes",
+      "must_contain": [
+        "4",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/search-cert-expiry.md",
+      "section": "Search: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does search log for TLS certificate expiry?",
+      "answer": "SEA-TLS-832",
+      "must_contain": [
+        "SEA-TLS-832"
+      ]
+    },
+    {
+      "id": "rb/search/cert-expiry/config",
+      "doc": "data/corpus/runbooks/search-cert-expiry.md",
+      "section": "Search: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for search TLS certificate expiry?",
+      "answer": "set tls_min_version=63",
+      "must_contain": [
+        "tls_min_version=63"
+      ]
+    },
+    {
+      "id": "rb/search/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/search-queue-backlog.md",
+      "section": "Search: queue backlog > Diagnosis",
+      "question": "When should search queue backlog move to mitigation?",
+      "answer": "when search_consumer_lag_msgs stays above 6141 for 7 minutes",
+      "must_contain": [
+        "6141",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/search/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/search-queue-backlog.md",
+      "section": "Search: queue backlog > Diagnosis",
+      "question": "Which error code does search log for queue backlog?",
+      "answer": "SEA-QUEUE-942",
+      "must_contain": [
+        "SEA-QUEUE-942"
+      ]
+    },
+    {
+      "id": "rb/search/queue-backlog/config",
+      "doc": "data/corpus/runbooks/search-queue-backlog.md",
+      "section": "Search: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for search queue backlog?",
+      "answer": "set dlq_after_attempts=51",
+      "must_contain": [
+        "dlq_after_attempts=51"
+      ]
+    },
+    {
+      "id": "rb/inventory/high-latency/threshold",
+      "doc": "data/corpus/runbooks/inventory-high-latency.md",
+      "section": "Inventory: high p99 latency > Diagnosis",
+      "question": "When should inventory high p99 latency move to mitigation?",
+      "answer": "when inventory_p99_latency_ms stays above 1648 for 6 minutes",
+      "must_contain": [
+        "1648",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/high-latency/error-code",
+      "doc": "data/corpus/runbooks/inventory-high-latency.md",
+      "section": "Inventory: high p99 latency > Diagnosis",
+      "question": "Which error code does inventory log for high p99 latency?",
+      "answer": "INV-LAT-501",
+      "must_contain": [
+        "INV-LAT-501"
+      ]
+    },
+    {
+      "id": "rb/inventory/high-latency/config",
+      "doc": "data/corpus/runbooks/inventory-high-latency.md",
+      "section": "Inventory: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for inventory high p99 latency?",
+      "answer": "set request_timeout_ms=170",
+      "must_contain": [
+        "request_timeout_ms=170"
+      ]
+    },
+    {
+      "id": "rb/inventory/error-rate/threshold",
+      "doc": "data/corpus/runbooks/inventory-error-rate.md",
+      "section": "Inventory: elevated error rate > Diagnosis",
+      "question": "When should inventory elevated error rate move to mitigation?",
+      "answer": "when inventory_error_ratio_pct stays above 8 for 4 minutes",
+      "must_contain": [
+        "8",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/error-rate/error-code",
+      "doc": "data/corpus/runbooks/inventory-error-rate.md",
+      "section": "Inventory: elevated error rate > Diagnosis",
+      "question": "Which error code does inventory log for elevated error rate?",
+      "answer": "INV-ERR-173",
+      "must_contain": [
+        "INV-ERR-173"
+      ]
+    },
+    {
+      "id": "rb/inventory/error-rate/config",
+      "doc": "data/corpus/runbooks/inventory-error-rate.md",
+      "section": "Inventory: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for inventory elevated error rate?",
+      "answer": "set circuit_breaker_threshold=41",
+      "must_contain": [
+        "circuit_breaker_threshold=41"
+      ]
+    },
+    {
+      "id": "rb/inventory/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/inventory-connection-pool.md",
+      "section": "Inventory: connection pool exhaustion > Diagnosis",
+      "question": "When should inventory connection pool exhaustion move to mitigation?",
+      "answer": "when inventory_pool_wait_ms stays above 389 for 5 minutes",
+      "must_contain": [
+        "389",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/inventory-connection-pool.md",
+      "section": "Inventory: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does inventory log for connection pool exhaustion?",
+      "answer": "INV-POOL-526",
+      "must_contain": [
+        "INV-POOL-526"
+      ]
+    },
+    {
+      "id": "rb/inventory/connection-pool/config",
+      "doc": "data/corpus/runbooks/inventory-connection-pool.md",
+      "section": "Inventory: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for inventory connection pool exhaustion?",
+      "answer": "set pool_checkout_timeout_ms=410",
+      "must_contain": [
+        "pool_checkout_timeout_ms=410"
+      ]
+    },
+    {
+      "id": "rb/inventory/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/inventory-memory-pressure.md",
+      "section": "Inventory: memory pressure and OOM kills > Diagnosis",
+      "question": "When should inventory memory pressure and OOM kills move to mitigation?",
+      "answer": "when inventory_rss_pct_of_limit stays above 89 for 7 minutes",
+      "must_contain": [
+        "89",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/inventory-memory-pressure.md",
+      "section": "Inventory: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does inventory log for memory pressure and OOM kills?",
+      "answer": "INV-MEM-680",
+      "must_contain": [
+        "INV-MEM-680"
+      ]
+    },
+    {
+      "id": "rb/inventory/memory-pressure/config",
+      "doc": "data/corpus/runbooks/inventory-memory-pressure.md",
+      "section": "Inventory: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for inventory memory pressure and OOM kills?",
+      "answer": "set max_request_body_kb=25",
+      "must_contain": [
+        "max_request_body_kb=25"
+      ]
+    },
+    {
+      "id": "rb/inventory/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/inventory-cpu-saturation.md",
+      "section": "Inventory: CPU saturation > Diagnosis",
+      "question": "When should inventory CPU saturation move to mitigation?",
+      "answer": "when inventory_cpu_util_pct stays above 82 for 5 minutes",
+      "must_contain": [
+        "82",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/inventory-cpu-saturation.md",
+      "section": "Inventory: CPU saturation > Diagnosis",
+      "question": "Which error code does inventory log for CPU saturation?",
+      "answer": "INV-CPU-388",
+      "must_contain": [
+        "INV-CPU-388"
+      ]
+    },
+    {
+      "id": "rb/inventory/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/inventory-cpu-saturation.md",
+      "section": "Inventory: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for inventory CPU saturation?",
+      "answer": "set cache_ttl_s=14",
+      "must_contain": [
+        "cache_ttl_s=14"
+      ]
+    },
+    {
+      "id": "rb/inventory/disk-full/threshold",
+      "doc": "data/corpus/runbooks/inventory-disk-full.md",
+      "section": "Inventory: disk full > Diagnosis",
+      "question": "When should inventory disk full move to mitigation?",
+      "answer": "when inventory_disk_used_pct stays above 94 for 3 minutes",
+      "must_contain": [
+        "94",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/disk-full/error-code",
+      "doc": "data/corpus/runbooks/inventory-disk-full.md",
+      "section": "Inventory: disk full > Diagnosis",
+      "question": "Which error code does inventory log for disk full?",
+      "answer": "INV-DISK-204",
+      "must_contain": [
+        "INV-DISK-204"
+      ]
+    },
+    {
+      "id": "rb/inventory/disk-full/config",
+      "doc": "data/corpus/runbooks/inventory-disk-full.md",
+      "section": "Inventory: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for inventory disk full?",
+      "answer": "set log_level=32",
+      "must_contain": [
+        "log_level=32"
+      ]
+    },
+    {
+      "id": "rb/inventory/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/inventory-dependency-timeout.md",
+      "section": "Inventory: dependency timeouts > Diagnosis",
+      "question": "When should inventory dependency timeouts move to mitigation?",
+      "answer": "when inventory_upstream_timeout_pct stays above 1 for 6 minutes",
+      "must_contain": [
+        "1",
+        "6 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/inventory-dependency-timeout.md",
+      "section": "Inventory: dependency timeouts > Diagnosis",
+      "question": "Which error code does inventory log for dependency timeouts?",
+      "answer": "INV-DEP-714",
+      "must_contain": [
+        "INV-DEP-714"
+      ]
+    },
+    {
+      "id": "rb/inventory/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/inventory-dependency-timeout.md",
+      "section": "Inventory: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for inventory dependency timeouts?",
+      "answer": "set retry_max_attempts=14",
+      "must_contain": [
+        "retry_max_attempts=14"
+      ]
+    },
+    {
+      "id": "rb/inventory/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/inventory-bad-deploy.md",
+      "section": "Inventory: regression after a deploy > Diagnosis",
+      "question": "When should inventory regression after a deploy move to mitigation?",
+      "answer": "when inventory_post_deploy_error_pct stays above 2 for 8 minutes",
+      "must_contain": [
+        "2",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/inventory-bad-deploy.md",
+      "section": "Inventory: regression after a deploy > Diagnosis",
+      "question": "Which error code does inventory log for regression after a deploy?",
+      "answer": "INV-DEPLOY-322",
+      "must_contain": [
+        "INV-DEPLOY-322"
+      ]
+    },
+    {
+      "id": "rb/inventory/bad-deploy/config",
+      "doc": "data/corpus/runbooks/inventory-bad-deploy.md",
+      "section": "Inventory: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for inventory regression after a deploy?",
+      "answer": "set canary_error_threshold_pct=25",
+      "must_contain": [
+        "canary_error_threshold_pct=25"
+      ]
+    },
+    {
+      "id": "rb/inventory/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/inventory-cert-expiry.md",
+      "section": "Inventory: TLS certificate expiry > Diagnosis",
+      "question": "When should inventory TLS certificate expiry move to mitigation?",
+      "answer": "when inventory_cert_days_left stays above 3 for 8 minutes",
+      "must_contain": [
+        "3",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/inventory-cert-expiry.md",
+      "section": "Inventory: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does inventory log for TLS certificate expiry?",
+      "answer": "INV-TLS-518",
+      "must_contain": [
+        "INV-TLS-518"
+      ]
+    },
+    {
+      "id": "rb/inventory/cert-expiry/config",
+      "doc": "data/corpus/runbooks/inventory-cert-expiry.md",
+      "section": "Inventory: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for inventory TLS certificate expiry?",
+      "answer": "set ocsp_stapling=25",
+      "must_contain": [
+        "ocsp_stapling=25"
+      ]
+    },
+    {
+      "id": "rb/inventory/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/inventory-queue-backlog.md",
+      "section": "Inventory: queue backlog > Diagnosis",
+      "question": "When should inventory queue backlog move to mitigation?",
+      "answer": "when inventory_consumer_lag_msgs stays above 13293 for 10 minutes",
+      "must_contain": [
+        "13293",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/inventory/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/inventory-queue-backlog.md",
+      "section": "Inventory: queue backlog > Diagnosis",
+      "question": "Which error code does inventory log for queue backlog?",
+      "answer": "INV-QUEUE-203",
+      "must_contain": [
+        "INV-QUEUE-203"
+      ]
+    },
+    {
+      "id": "rb/inventory/queue-backlog/config",
+      "doc": "data/corpus/runbooks/inventory-queue-backlog.md",
+      "section": "Inventory: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for inventory queue backlog?",
+      "answer": "set consumer_concurrency=44",
+      "must_contain": [
+        "consumer_concurrency=44"
+      ]
+    },
+    {
+      "id": "rb/orders/high-latency/threshold",
+      "doc": "data/corpus/runbooks/orders-high-latency.md",
+      "section": "Orders: high p99 latency > Diagnosis",
+      "question": "When should orders high p99 latency move to mitigation?",
+      "answer": "when orders_p99_latency_ms stays above 2024 for 7 minutes",
+      "must_contain": [
+        "2024",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/high-latency/error-code",
+      "doc": "data/corpus/runbooks/orders-high-latency.md",
+      "section": "Orders: high p99 latency > Diagnosis",
+      "question": "Which error code does orders log for high p99 latency?",
+      "answer": "ORD-LAT-519",
+      "must_contain": [
+        "ORD-LAT-519"
+      ]
+    },
+    {
+      "id": "rb/orders/high-latency/config",
+      "doc": "data/corpus/runbooks/orders-high-latency.md",
+      "section": "Orders: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for orders high p99 latency?",
+      "answer": "set worker_threads=44",
+      "must_contain": [
+        "worker_threads=44"
+      ]
+    },
+    {
+      "id": "rb/orders/error-rate/threshold",
+      "doc": "data/corpus/runbooks/orders-error-rate.md",
+      "section": "Orders: elevated error rate > Diagnosis",
+      "question": "When should orders elevated error rate move to mitigation?",
+      "answer": "when orders_error_ratio_pct stays above 8 for 3 minutes",
+      "must_contain": [
+        "8",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/error-rate/error-code",
+      "doc": "data/corpus/runbooks/orders-error-rate.md",
+      "section": "Orders: elevated error rate > Diagnosis",
+      "question": "Which error code does orders log for elevated error rate?",
+      "answer": "ORD-ERR-984",
+      "must_contain": [
+        "ORD-ERR-984"
+      ]
+    },
+    {
+      "id": "rb/orders/error-rate/config",
+      "doc": "data/corpus/runbooks/orders-error-rate.md",
+      "section": "Orders: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for orders elevated error rate?",
+      "answer": "set circuit_breaker_threshold=43",
+      "must_contain": [
+        "circuit_breaker_threshold=43"
+      ]
+    },
+    {
+      "id": "rb/orders/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/orders-connection-pool.md",
+      "section": "Orders: connection pool exhaustion > Diagnosis",
+      "question": "When should orders connection pool exhaustion move to mitigation?",
+      "answer": "when orders_pool_wait_ms stays above 583 for 4 minutes",
+      "must_contain": [
+        "583",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/orders-connection-pool.md",
+      "section": "Orders: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does orders log for connection pool exhaustion?",
+      "answer": "ORD-POOL-940",
+      "must_contain": [
+        "ORD-POOL-940"
+      ]
+    },
+    {
+      "id": "rb/orders/connection-pool/config",
+      "doc": "data/corpus/runbooks/orders-connection-pool.md",
+      "section": "Orders: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for orders connection pool exhaustion?",
+      "answer": "set pool_max_size=27",
+      "must_contain": [
+        "pool_max_size=27"
+      ]
+    },
+    {
+      "id": "rb/orders/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/orders-memory-pressure.md",
+      "section": "Orders: memory pressure and OOM kills > Diagnosis",
+      "question": "When should orders memory pressure and OOM kills move to mitigation?",
+      "answer": "when orders_rss_pct_of_limit stays above 81 for 5 minutes",
+      "must_contain": [
+        "81",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/orders-memory-pressure.md",
+      "section": "Orders: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does orders log for memory pressure and OOM kills?",
+      "answer": "ORD-MEM-756",
+      "must_contain": [
+        "ORD-MEM-756"
+      ]
+    },
+    {
+      "id": "rb/orders/memory-pressure/config",
+      "doc": "data/corpus/runbooks/orders-memory-pressure.md",
+      "section": "Orders: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for orders memory pressure and OOM kills?",
+      "answer": "set max_request_body_kb=7",
+      "must_contain": [
+        "max_request_body_kb=7"
+      ]
+    },
+    {
+      "id": "rb/orders/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/orders-cpu-saturation.md",
+      "section": "Orders: CPU saturation > Diagnosis",
+      "question": "When should orders CPU saturation move to mitigation?",
+      "answer": "when orders_cpu_util_pct stays above 80 for 5 minutes",
+      "must_contain": [
+        "80",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/orders-cpu-saturation.md",
+      "section": "Orders: CPU saturation > Diagnosis",
+      "question": "Which error code does orders log for CPU saturation?",
+      "answer": "ORD-CPU-168",
+      "must_contain": [
+        "ORD-CPU-168"
+      ]
+    },
+    {
+      "id": "rb/orders/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/orders-cpu-saturation.md",
+      "section": "Orders: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for orders CPU saturation?",
+      "answer": "set autoscale_max_replicas=26",
+      "must_contain": [
+        "autoscale_max_replicas=26"
+      ]
+    },
+    {
+      "id": "rb/orders/disk-full/threshold",
+      "doc": "data/corpus/runbooks/orders-disk-full.md",
+      "section": "Orders: disk full > Diagnosis",
+      "question": "When should orders disk full move to mitigation?",
+      "answer": "when orders_disk_used_pct stays above 81 for 10 minutes",
+      "must_contain": [
+        "81",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/disk-full/error-code",
+      "doc": "data/corpus/runbooks/orders-disk-full.md",
+      "section": "Orders: disk full > Diagnosis",
+      "question": "Which error code does orders log for disk full?",
+      "answer": "ORD-DISK-188",
+      "must_contain": [
+        "ORD-DISK-188"
+      ]
+    },
+    {
+      "id": "rb/orders/disk-full/config",
+      "doc": "data/corpus/runbooks/orders-disk-full.md",
+      "section": "Orders: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for orders disk full?",
+      "answer": "set temp_dir_max_gb=41",
+      "must_contain": [
+        "temp_dir_max_gb=41"
+      ]
+    },
+    {
+      "id": "rb/orders/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/orders-dependency-timeout.md",
+      "section": "Orders: dependency timeouts > Diagnosis",
+      "question": "When should orders dependency timeouts move to mitigation?",
+      "answer": "when orders_upstream_timeout_pct stays above 8 for 5 minutes",
+      "must_contain": [
+        "8",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/orders-dependency-timeout.md",
+      "section": "Orders: dependency timeouts > Diagnosis",
+      "question": "Which error code does orders log for dependency timeouts?",
+      "answer": "ORD-DEP-678",
+      "must_contain": [
+        "ORD-DEP-678"
+      ]
+    },
+    {
+      "id": "rb/orders/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/orders-dependency-timeout.md",
+      "section": "Orders: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for orders dependency timeouts?",
+      "answer": "set upstream_timeout_ms=40",
+      "must_contain": [
+        "upstream_timeout_ms=40"
+      ]
+    },
+    {
+      "id": "rb/orders/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/orders-bad-deploy.md",
+      "section": "Orders: regression after a deploy > Diagnosis",
+      "question": "When should orders regression after a deploy move to mitigation?",
+      "answer": "when orders_post_deploy_error_pct stays above 4 for 3 minutes",
+      "must_contain": [
+        "4",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/orders-bad-deploy.md",
+      "section": "Orders: regression after a deploy > Diagnosis",
+      "question": "Which error code does orders log for regression after a deploy?",
+      "answer": "ORD-DEPLOY-675",
+      "must_contain": [
+        "ORD-DEPLOY-675"
+      ]
+    },
+    {
+      "id": "rb/orders/bad-deploy/config",
+      "doc": "data/corpus/runbooks/orders-bad-deploy.md",
+      "section": "Orders: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for orders regression after a deploy?",
+      "answer": "set feature_flag_default=4",
+      "must_contain": [
+        "feature_flag_default=4"
+      ]
+    },
+    {
+      "id": "rb/orders/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/orders-cert-expiry.md",
+      "section": "Orders: TLS certificate expiry > Diagnosis",
+      "question": "When should orders TLS certificate expiry move to mitigation?",
+      "answer": "when orders_cert_days_left stays above 13 for 10 minutes",
+      "must_contain": [
+        "13",
+        "10 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/orders-cert-expiry.md",
+      "section": "Orders: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does orders log for TLS certificate expiry?",
+      "answer": "ORD-TLS-415",
+      "must_contain": [
+        "ORD-TLS-415"
+      ]
+    },
+    {
+      "id": "rb/orders/cert-expiry/config",
+      "doc": "data/corpus/runbooks/orders-cert-expiry.md",
+      "section": "Orders: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for orders TLS certificate expiry?",
+      "answer": "set ocsp_stapling=17",
+      "must_contain": [
+        "ocsp_stapling=17"
+      ]
+    },
+    {
+      "id": "rb/orders/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/orders-queue-backlog.md",
+      "section": "Orders: queue backlog > Diagnosis",
+      "question": "When should orders queue backlog move to mitigation?",
+      "answer": "when orders_consumer_lag_msgs stays above 8063 for 3 minutes",
+      "must_contain": [
+        "8063",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/orders/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/orders-queue-backlog.md",
+      "section": "Orders: queue backlog > Diagnosis",
+      "question": "Which error code does orders log for queue backlog?",
+      "answer": "ORD-QUEUE-733",
+      "must_contain": [
+        "ORD-QUEUE-733"
+      ]
+    },
+    {
+      "id": "rb/orders/queue-backlog/config",
+      "doc": "data/corpus/runbooks/orders-queue-backlog.md",
+      "section": "Orders: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for orders queue backlog?",
+      "answer": "set consumer_concurrency=31",
+      "must_contain": [
+        "consumer_concurrency=31"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/high-latency/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-high-latency.md",
+      "section": "Kafka broker: high p99 latency > Diagnosis",
+      "question": "When should kafka-broker high p99 latency move to mitigation?",
+      "answer": "when kafka_broker_p99_latency_ms stays above 2259 for 12 minutes",
+      "must_contain": [
+        "2259",
+        "12 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/high-latency/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-high-latency.md",
+      "section": "Kafka broker: high p99 latency > Diagnosis",
+      "question": "Which error code does kafka-broker log for high p99 latency?",
+      "answer": "KAF-LAT-509",
+      "must_contain": [
+        "KAF-LAT-509"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/high-latency/config",
+      "doc": "data/corpus/runbooks/kafka-broker-high-latency.md",
+      "section": "Kafka broker: high p99 latency > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker high p99 latency?",
+      "answer": "set request_timeout_ms=60",
+      "must_contain": [
+        "request_timeout_ms=60"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/error-rate/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-error-rate.md",
+      "section": "Kafka broker: elevated error rate > Diagnosis",
+      "question": "When should kafka-broker elevated error rate move to mitigation?",
+      "answer": "when kafka_broker_error_ratio_pct stays above 2 for 5 minutes",
+      "must_contain": [
+        "2",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/error-rate/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-error-rate.md",
+      "section": "Kafka broker: elevated error rate > Diagnosis",
+      "question": "Which error code does kafka-broker log for elevated error rate?",
+      "answer": "KAF-ERR-184",
+      "must_contain": [
+        "KAF-ERR-184"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/error-rate/config",
+      "doc": "data/corpus/runbooks/kafka-broker-error-rate.md",
+      "section": "Kafka broker: elevated error rate > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker elevated error rate?",
+      "answer": "set max_inflight_requests=22",
+      "must_contain": [
+        "max_inflight_requests=22"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/connection-pool/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-connection-pool.md",
+      "section": "Kafka broker: connection pool exhaustion > Diagnosis",
+      "question": "When should kafka-broker connection pool exhaustion move to mitigation?",
+      "answer": "when kafka_broker_pool_wait_ms stays above 176 for 4 minutes",
+      "must_contain": [
+        "176",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/connection-pool/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-connection-pool.md",
+      "section": "Kafka broker: connection pool exhaustion > Diagnosis",
+      "question": "Which error code does kafka-broker log for connection pool exhaustion?",
+      "answer": "KAF-POOL-728",
+      "must_contain": [
+        "KAF-POOL-728"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/connection-pool/config",
+      "doc": "data/corpus/runbooks/kafka-broker-connection-pool.md",
+      "section": "Kafka broker: connection pool exhaustion > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker connection pool exhaustion?",
+      "answer": "set statement_timeout_ms=460",
+      "must_contain": [
+        "statement_timeout_ms=460"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/memory-pressure/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-memory-pressure.md",
+      "section": "Kafka broker: memory pressure and OOM kills > Diagnosis",
+      "question": "When should kafka-broker memory pressure and OOM kills move to mitigation?",
+      "answer": "when kafka_broker_rss_pct_of_limit stays above 82 for 8 minutes",
+      "must_contain": [
+        "82",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/memory-pressure/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-memory-pressure.md",
+      "section": "Kafka broker: memory pressure and OOM kills > Diagnosis",
+      "question": "Which error code does kafka-broker log for memory pressure and OOM kills?",
+      "answer": "KAF-MEM-725",
+      "must_contain": [
+        "KAF-MEM-725"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/memory-pressure/config",
+      "doc": "data/corpus/runbooks/kafka-broker-memory-pressure.md",
+      "section": "Kafka broker: memory pressure and OOM kills > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker memory pressure and OOM kills?",
+      "answer": "set max_request_body_kb=12",
+      "must_contain": [
+        "max_request_body_kb=12"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cpu-saturation/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-cpu-saturation.md",
+      "section": "Kafka broker: CPU saturation > Diagnosis",
+      "question": "When should kafka-broker CPU saturation move to mitigation?",
+      "answer": "when kafka_broker_cpu_util_pct stays above 93 for 7 minutes",
+      "must_contain": [
+        "93",
+        "7 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cpu-saturation/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-cpu-saturation.md",
+      "section": "Kafka broker: CPU saturation > Diagnosis",
+      "question": "Which error code does kafka-broker log for CPU saturation?",
+      "answer": "KAF-CPU-730",
+      "must_contain": [
+        "KAF-CPU-730"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cpu-saturation/config",
+      "doc": "data/corpus/runbooks/kafka-broker-cpu-saturation.md",
+      "section": "Kafka broker: CPU saturation > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker CPU saturation?",
+      "answer": "set cache_ttl_s=17",
+      "must_contain": [
+        "cache_ttl_s=17"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/disk-full/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-disk-full.md",
+      "section": "Kafka broker: disk full > Diagnosis",
+      "question": "When should kafka-broker disk full move to mitigation?",
+      "answer": "when kafka_broker_disk_used_pct stays above 88 for 8 minutes",
+      "must_contain": [
+        "88",
+        "8 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/disk-full/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-disk-full.md",
+      "section": "Kafka broker: disk full > Diagnosis",
+      "question": "Which error code does kafka-broker log for disk full?",
+      "answer": "KAF-DISK-485",
+      "must_contain": [
+        "KAF-DISK-485"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/disk-full/config",
+      "doc": "data/corpus/runbooks/kafka-broker-disk-full.md",
+      "section": "Kafka broker: disk full > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker disk full?",
+      "answer": "set log_level=52",
+      "must_contain": [
+        "log_level=52"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/dependency-timeout/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+      "section": "Kafka broker: dependency timeouts > Diagnosis",
+      "question": "When should kafka-broker dependency timeouts move to mitigation?",
+      "answer": "when kafka_broker_upstream_timeout_pct stays above 9 for 4 minutes",
+      "must_contain": [
+        "9",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/dependency-timeout/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+      "section": "Kafka broker: dependency timeouts > Diagnosis",
+      "question": "Which error code does kafka-broker log for dependency timeouts?",
+      "answer": "KAF-DEP-358",
+      "must_contain": [
+        "KAF-DEP-358"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/dependency-timeout/config",
+      "doc": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+      "section": "Kafka broker: dependency timeouts > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker dependency timeouts?",
+      "answer": "set retry_max_attempts=42",
+      "must_contain": [
+        "retry_max_attempts=42"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/bad-deploy/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-bad-deploy.md",
+      "section": "Kafka broker: regression after a deploy > Diagnosis",
+      "question": "When should kafka-broker regression after a deploy move to mitigation?",
+      "answer": "when kafka_broker_post_deploy_error_pct stays above 6 for 4 minutes",
+      "must_contain": [
+        "6",
+        "4 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/bad-deploy/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-bad-deploy.md",
+      "section": "Kafka broker: regression after a deploy > Diagnosis",
+      "question": "Which error code does kafka-broker log for regression after a deploy?",
+      "answer": "KAF-DEPLOY-552",
+      "must_contain": [
+        "KAF-DEPLOY-552"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/bad-deploy/config",
+      "doc": "data/corpus/runbooks/kafka-broker-bad-deploy.md",
+      "section": "Kafka broker: regression after a deploy > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker regression after a deploy?",
+      "answer": "set canary_error_threshold_pct=13",
+      "must_contain": [
+        "canary_error_threshold_pct=13"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cert-expiry/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-cert-expiry.md",
+      "section": "Kafka broker: TLS certificate expiry > Diagnosis",
+      "question": "When should kafka-broker TLS certificate expiry move to mitigation?",
+      "answer": "when kafka_broker_cert_days_left stays above 14 for 3 minutes",
+      "must_contain": [
+        "14",
+        "3 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cert-expiry/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-cert-expiry.md",
+      "section": "Kafka broker: TLS certificate expiry > Diagnosis",
+      "question": "Which error code does kafka-broker log for TLS certificate expiry?",
+      "answer": "KAF-TLS-865",
+      "must_contain": [
+        "KAF-TLS-865"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/cert-expiry/config",
+      "doc": "data/corpus/runbooks/kafka-broker-cert-expiry.md",
+      "section": "Kafka broker: TLS certificate expiry > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker TLS certificate expiry?",
+      "answer": "set cert_renew_before_days=16",
+      "must_contain": [
+        "cert_renew_before_days=16"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/queue-backlog/threshold",
+      "doc": "data/corpus/runbooks/kafka-broker-queue-backlog.md",
+      "section": "Kafka broker: queue backlog > Diagnosis",
+      "question": "When should kafka-broker queue backlog move to mitigation?",
+      "answer": "when kafka_broker_consumer_lag_msgs stays above 11262 for 5 minutes",
+      "must_contain": [
+        "11262",
+        "5 minutes"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/queue-backlog/error-code",
+      "doc": "data/corpus/runbooks/kafka-broker-queue-backlog.md",
+      "section": "Kafka broker: queue backlog > Diagnosis",
+      "question": "Which error code does kafka-broker log for queue backlog?",
+      "answer": "KAF-QUEUE-600",
+      "must_contain": [
+        "KAF-QUEUE-600"
+      ]
+    },
+    {
+      "id": "rb/kafka-broker/queue-backlog/config",
+      "doc": "data/corpus/runbooks/kafka-broker-queue-backlog.md",
+      "section": "Kafka broker: queue backlog > Mitigation",
+      "question": "What config change is the last mitigation step for kafka-broker queue backlog?",
+      "answer": "set consumer_max_poll_records=41",
+      "must_contain": [
+        "consumer_max_poll_records=41"
+      ]
+    },
+    {
+      "id": "pm/2026-10-19-auth-cert-expiry",
+      "doc": "data/corpus/postmortems/2026-10-19-auth-cert-expiry.md",
+      "section": "Postmortem: auth TLS certificate expiry (2026-10-19) > Root cause",
+      "question": "What caused the auth TLS certificate expiry incident on 2026-10-19?",
+      "answer": "redis-cache pinned an intermediate certificate that the CA rotated.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-07-inventory-cert-expiry",
+      "doc": "data/corpus/postmortems/2026-10-07-inventory-cert-expiry.md",
+      "section": "Postmortem: inventory TLS certificate expiry (2026-10-07) > Root cause",
+      "question": "What caused the inventory TLS certificate expiry incident on 2026-10-07?",
+      "answer": "The renewal job for inventory failed for 4366 days because its DNS challenge record was deleted.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-30-kafka-broker-cert-expiry",
+      "doc": "data/corpus/postmortems/2026-10-30-kafka-broker-cert-expiry.md",
+      "section": "Postmortem: kafka-broker TLS certificate expiry (2026-10-30) > Root cause",
+      "question": "What caused the kafka-broker TLS certificate expiry incident on 2026-10-30?",
+      "answer": "The renewal job for kafka-broker failed for 3718 days because its DNS challenge record was deleted.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-25-card-auth-memory-pressure",
+      "doc": "data/corpus/postmortems/2026-10-25-card-auth-memory-pressure.md",
+      "section": "Postmortem: card-auth memory pressure and OOM kills (2026-10-25) > Root cause",
+      "question": "What caused the card-auth memory pressure and OOM kills incident on 2026-10-25?",
+      "answer": "redis-cache buffered whole export files in memory after a change in 6.38.7.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "memory-pressure",
+        "component": "redis-cache"
+      },
+      "deploy": {
+        "service": "redis-cache",
+        "version": "6.38.7",
+        "deployed_at": "10:48",
+        "date": "2026-10-25"
+      }
+    },
+    {
+      "id": "pm/2026-10-30-payments-high-latency",
+      "doc": "data/corpus/postmortems/2026-10-30-payments-high-latency.md",
+      "section": "Postmortem: payments high p99 latency (2026-10-30) > Root cause",
+      "question": "What caused the payments high p99 latency incident on 2026-10-30?",
+      "answer": "A slow query plan in payments after statistics went stale made p99 climb to 2989 ms.",
+      "must_contain": [
+        "payments"
+      ],
+      "cause": {
+        "category": "high-latency",
+        "component": "payments"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-17-postgres-primary-disk-full",
+      "doc": "data/corpus/postmortems/2026-10-17-postgres-primary-disk-full.md",
+      "section": "Postmortem: postgres-primary disk full (2026-10-17) > Root cause",
+      "question": "What caused the postgres-primary disk full incident on 2026-10-17?",
+      "answer": "The retention job for postgres-primary had failed for 408 hours after a cron syntax change.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "disk-full",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-30-payments-dependency-timeout",
+      "doc": "data/corpus/postmortems/2026-10-30-payments-dependency-timeout.md",
+      "section": "Postmortem: payments dependency timeouts (2026-10-30) > Root cause",
+      "question": "What caused the payments dependency timeouts incident on 2026-10-30?",
+      "answer": "ledger timed out because its connection to card-auth pinned to a single failing node.",
+      "must_contain": [
+        "ledger"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "ledger"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-10-18-postgres-primary-error-rate",
+      "doc": "data/corpus/postmortems/2026-10-18-postgres-primary-error-rate.md",
+      "section": "Postmortem: postgres-primary elevated error rate (2026-10-18) > Root cause",
+      "question": "What caused the postgres-primary elevated error rate incident on 2026-10-18?",
+      "answer": "A credential for postgres-primary was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-12-05-notifications-cpu-saturation",
+      "doc": "data/corpus/postmortems/2025-12-05-notifications-cpu-saturation.md",
+      "section": "Postmortem: notifications CPU saturation (2025-12-05) > Root cause",
+      "question": "What caused the notifications CPU saturation incident on 2025-12-05?",
+      "answer": "kafka-broker recomputed a full price table per request after a cache key change in 8.15.16.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "cpu-saturation",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-02-17-ledger-cpu-saturation",
+      "doc": "data/corpus/postmortems/2026-02-17-ledger-cpu-saturation.md",
+      "section": "Postmortem: ledger CPU saturation (2026-02-17) > Root cause",
+      "question": "What caused the ledger CPU saturation incident on 2026-02-17?",
+      "answer": "ledger recomputed a full price table per request after a cache key change in 2.17.6.",
+      "must_contain": [
+        "ledger"
+      ],
+      "cause": {
+        "category": "cpu-saturation",
+        "component": "ledger"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-02-07-orders-error-rate",
+      "doc": "data/corpus/postmortems/2026-02-07-orders-error-rate.md",
+      "section": "Postmortem: orders elevated error rate (2026-02-07) > Root cause",
+      "question": "What caused the orders elevated error rate incident on 2026-02-07?",
+      "answer": "2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-08-07-search-disk-full",
+      "doc": "data/corpus/postmortems/2026-08-07-search-disk-full.md",
+      "section": "Postmortem: search disk full (2026-08-07) > Root cause",
+      "question": "What caused the search disk full incident on 2026-08-07?",
+      "answer": "The retention job for redis-cache had failed for 143 hours after a cron syntax change.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "disk-full",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-11-10-redis-cache-dependency-timeout",
+      "doc": "data/corpus/postmortems/2025-11-10-redis-cache-dependency-timeout.md",
+      "section": "Postmortem: redis-cache dependency timeouts (2025-11-10) > Root cause",
+      "question": "What caused the redis-cache dependency timeouts incident on 2025-11-10?",
+      "answer": "redis-cache timed out because its connection to its database pinned to a single failing node.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-08-24-search-connection-pool",
+      "doc": "data/corpus/postmortems/2025-08-24-search-connection-pool.md",
+      "section": "Postmortem: search connection pool exhaustion (2025-08-24) > Root cause",
+      "question": "What caused the search connection pool exhaustion incident on 2025-08-24?",
+      "answer": "5.24.8 of search opened a transaction before calling an external API, holding connections for up to 3502 ms.",
+      "must_contain": [
+        "search"
+      ],
+      "cause": {
+        "category": "connection-pool",
+        "component": "search"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-07-29-payments-cert-expiry",
+      "doc": "data/corpus/postmortems/2025-07-29-payments-cert-expiry.md",
+      "section": "Postmortem: payments TLS certificate expiry (2025-07-29) > Root cause",
+      "question": "What caused the payments TLS certificate expiry incident on 2025-07-29?",
+      "answer": "payments pinned an intermediate certificate that the CA rotated.",
+      "must_contain": [
+        "payments"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "payments"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-10-19-kafka-broker-bad-deploy",
+      "doc": "data/corpus/postmortems/2025-10-19-kafka-broker-bad-deploy.md",
+      "section": "Postmortem: kafka-broker regression after a deploy (2025-10-19) > Root cause",
+      "question": "What caused the kafka-broker regression after a deploy incident on 2025-10-19?",
+      "answer": "2.16.13 of kafka-broker read a column that the migration hadn't added in production yet.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-05-24-redis-cache-dependency-timeout",
+      "doc": "data/corpus/postmortems/2025-05-24-redis-cache-dependency-timeout.md",
+      "section": "Postmortem: redis-cache dependency timeouts (2025-05-24) > Root cause",
+      "question": "What caused the redis-cache dependency timeouts incident on 2025-05-24?",
+      "answer": "redis-cache timed out because its connection to its database pinned to a single failing node.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-04-05-ledger-dependency-timeout",
+      "doc": "data/corpus/postmortems/2026-04-05-ledger-dependency-timeout.md",
+      "section": "Postmortem: ledger dependency timeouts (2026-04-05) > Root cause",
+      "question": "What caused the ledger dependency timeouts incident on 2026-04-05?",
+      "answer": "A config change in 1.18.9 cut the timeout to postgres-primary to below its normal p99.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-07-01-redis-cache-cert-expiry",
+      "doc": "data/corpus/postmortems/2025-07-01-redis-cache-cert-expiry.md",
+      "section": "Postmortem: redis-cache TLS certificate expiry (2025-07-01) > Root cause",
+      "question": "What caused the redis-cache TLS certificate expiry incident on 2025-07-01?",
+      "answer": "The renewal job for redis-cache failed for 900 days because its DNS challenge record was deleted.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-06-16-redis-cache-error-rate",
+      "doc": "data/corpus/postmortems/2025-06-16-redis-cache-error-rate.md",
+      "section": "Postmortem: redis-cache elevated error rate (2025-06-16) > Root cause",
+      "question": "What caused the redis-cache elevated error rate incident on 2025-06-16?",
+      "answer": "A credential for redis-cache was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-06-04-inventory-queue-backlog",
+      "doc": "data/corpus/postmortems/2025-06-04-inventory-queue-backlog.md",
+      "section": "Postmortem: inventory queue backlog (2025-06-04) > Root cause",
+      "question": "What caused the inventory queue backlog incident on 2025-06-04?",
+      "answer": "7.35.3 of postgres-primary made an external call per message, cutting throughput by two thirds.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "queue-backlog",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-09-19-kafka-broker-connection-pool",
+      "doc": "data/corpus/postmortems/2025-09-19-kafka-broker-connection-pool.md",
+      "section": "Postmortem: kafka-broker connection pool exhaustion (2025-09-19) > Root cause",
+      "question": "What caused the kafka-broker connection pool exhaustion incident on 2025-09-19?",
+      "answer": "9.31.14 of kafka-broker opened a transaction before calling an external API, holding connections for up to 2093 ms.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "connection-pool",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-05-27-auth-disk-full",
+      "doc": "data/corpus/postmortems/2025-05-27-auth-disk-full.md",
+      "section": "Postmortem: auth disk full (2025-05-27) > Root cause",
+      "question": "What caused the auth disk full incident on 2025-05-27?",
+      "answer": "The retention job for postgres-primary had failed for 3720 hours after a cron syntax change.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "disk-full",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-04-16-kafka-broker-high-latency",
+      "doc": "data/corpus/postmortems/2026-04-16-kafka-broker-high-latency.md",
+      "section": "Postmortem: kafka-broker high p99 latency (2026-04-16) > Root cause",
+      "question": "What caused the kafka-broker high p99 latency incident on 2026-04-16?",
+      "answer": "kafka-broker held a lock across a network call introduced in 7.10.18, serializing writes.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "high-latency",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-09-08-ledger-queue-backlog",
+      "doc": "data/corpus/postmortems/2025-09-08-ledger-queue-backlog.md",
+      "section": "Postmortem: ledger queue backlog (2025-09-08) > Root cause",
+      "question": "What caused the ledger queue backlog incident on 2025-09-08?",
+      "answer": "8.34.2 of postgres-primary made an external call per message, cutting throughput by two thirds.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "queue-backlog",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-07-16-redis-cache-cert-expiry",
+      "doc": "data/corpus/postmortems/2025-07-16-redis-cache-cert-expiry.md",
+      "section": "Postmortem: redis-cache TLS certificate expiry (2025-07-16) > Root cause",
+      "question": "What caused the redis-cache TLS certificate expiry incident on 2025-07-16?",
+      "answer": "redis-cache pinned an intermediate certificate that the CA rotated.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-08-31-auth-bad-deploy",
+      "doc": "data/corpus/postmortems/2025-08-31-auth-bad-deploy.md",
+      "section": "Postmortem: auth regression after a deploy (2025-08-31) > Root cause",
+      "question": "What caused the auth regression after a deploy incident on 2025-08-31?",
+      "answer": "3.16.1 of postgres-primary read a column that the migration hadn't added in production yet.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-07-19-payments-bad-deploy",
+      "doc": "data/corpus/postmortems/2025-07-19-payments-bad-deploy.md",
+      "section": "Postmortem: payments regression after a deploy (2025-07-19) > Root cause",
+      "question": "What caused the payments regression after a deploy incident on 2025-07-19?",
+      "answer": "4.11.1 of card-auth renamed a config key, so production fell back to a default of 2108.",
+      "must_contain": [
+        "card-auth"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "card-auth"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-07-26-ledger-dependency-timeout",
+      "doc": "data/corpus/postmortems/2026-07-26-ledger-dependency-timeout.md",
+      "section": "Postmortem: ledger dependency timeouts (2026-07-26) > Root cause",
+      "question": "What caused the ledger dependency timeouts incident on 2026-07-26?",
+      "answer": "postgres-primary timed out because its connection to postgres-primary pinned to a single failing node.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-07-16-auth-disk-full",
+      "doc": "data/corpus/postmortems/2026-07-16-auth-disk-full.md",
+      "section": "Postmortem: auth disk full (2026-07-16) > Root cause",
+      "question": "What caused the auth disk full incident on 2026-07-16?",
+      "answer": "Debug logging enabled during an earlier incident in postgres-primary was never turned off and filled the disk.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "disk-full",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-07-11-notifications-error-rate",
+      "doc": "data/corpus/postmortems/2026-07-11-notifications-error-rate.md",
+      "section": "Postmortem: notifications elevated error rate (2026-07-11) > Root cause",
+      "question": "What caused the notifications elevated error rate incident on 2026-07-11?",
+      "answer": "A credential for notifications was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "notifications"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "notifications"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-02-13-search-connection-pool",
+      "doc": "data/corpus/postmortems/2026-02-13-search-connection-pool.md",
+      "section": "Postmortem: search connection pool exhaustion (2026-02-13) > Root cause",
+      "question": "What caused the search connection pool exhaustion incident on 2026-02-13?",
+      "answer": "5.11.11 of redis-cache opened a transaction before calling an external API, holding connections for up to 3577 ms.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "connection-pool",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-06-16-inventory-cpu-saturation",
+      "doc": "data/corpus/postmortems/2026-06-16-inventory-cpu-saturation.md",
+      "section": "Postmortem: inventory CPU saturation (2026-06-16) > Root cause",
+      "question": "What caused the inventory CPU saturation incident on 2026-06-16?",
+      "answer": "postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "cpu-saturation",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-07-28-search-error-rate",
+      "doc": "data/corpus/postmortems/2026-07-28-search-error-rate.md",
+      "section": "Postmortem: search elevated error rate (2026-07-28) > Root cause",
+      "question": "What caused the search elevated error rate incident on 2026-07-28?",
+      "answer": "A credential for search was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "search"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "search"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-17-kafka-broker-memory-pressure",
+      "doc": "data/corpus/postmortems/2026-05-17-kafka-broker-memory-pressure.md",
+      "section": "Postmortem: kafka-broker memory pressure and OOM kills (2026-05-17) > Root cause",
+      "question": "What caused the kafka-broker memory pressure and OOM kills incident on 2026-05-17?",
+      "answer": "A cache added in 8.33.7 of kafka-broker had no eviction, growing to 3650 MB per pod.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "memory-pressure",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-10-20-card-auth-connection-pool",
+      "doc": "data/corpus/postmortems/2025-10-20-card-auth-connection-pool.md",
+      "section": "Postmortem: card-auth connection pool exhaustion (2025-10-20) > Root cause",
+      "question": "What caused the card-auth connection pool exhaustion incident on 2025-10-20?",
+      "answer": "A retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "connection-pool",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-23-orders-disk-full",
+      "doc": "data/corpus/postmortems/2026-05-23-orders-disk-full.md",
+      "section": "Postmortem: orders disk full (2026-05-23) > Root cause",
+      "question": "What caused the orders disk full incident on 2026-05-23?",
+      "answer": "Debug logging enabled during an earlier incident in orders was never turned off and filled the disk.",
+      "must_contain": [
+        "orders"
+      ],
+      "cause": {
+        "category": "disk-full",
+        "component": "orders"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-22-inventory-error-rate",
+      "doc": "data/corpus/postmortems/2026-05-22-inventory-error-rate.md",
+      "section": "Postmortem: inventory elevated error rate (2026-05-22) > Root cause",
+      "question": "What caused the inventory elevated error rate incident on 2026-05-22?",
+      "answer": "7.15.1 of inventory sent a null currency on refunds, which the validation layer rejected.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-09-13-card-auth-error-rate",
+      "doc": "data/corpus/postmortems/2025-09-13-card-auth-error-rate.md",
+      "section": "Postmortem: card-auth elevated error rate (2025-09-13) > Root cause",
+      "question": "What caused the card-auth elevated error rate incident on 2025-09-13?",
+      "answer": "A credential for redis-cache was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-05-notifications-cpu-saturation",
+      "doc": "data/corpus/postmortems/2026-05-05-notifications-cpu-saturation.md",
+      "section": "Postmortem: notifications CPU saturation (2026-05-05) > Root cause",
+      "question": "What caused the notifications CPU saturation incident on 2026-05-05?",
+      "answer": "notifications recomputed a full price table per request after a cache key change in 1.10.17.",
+      "must_contain": [
+        "notifications"
+      ],
+      "cause": {
+        "category": "cpu-saturation",
+        "component": "notifications"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-13-kafka-broker-bad-deploy",
+      "doc": "data/corpus/postmortems/2026-05-13-kafka-broker-bad-deploy.md",
+      "section": "Postmortem: kafka-broker regression after a deploy (2026-05-13) > Root cause",
+      "question": "What caused the kafka-broker regression after a deploy incident on 2026-05-13?",
+      "answer": "3.26.3 of kafka-broker renamed a config key, so production fell back to a default of 47.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-11-27-search-cert-expiry",
+      "doc": "data/corpus/postmortems/2025-11-27-search-cert-expiry.md",
+      "section": "Postmortem: search TLS certificate expiry (2025-11-27) > Root cause",
+      "question": "What caused the search TLS certificate expiry incident on 2025-11-27?",
+      "answer": "inventory pinned an intermediate certificate that the CA rotated.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "cert-expiry",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-04-27-inventory-bad-deploy",
+      "doc": "data/corpus/postmortems/2026-04-27-inventory-bad-deploy.md",
+      "section": "Postmortem: inventory regression after a deploy (2026-04-27) > Root cause",
+      "question": "What caused the inventory regression after a deploy incident on 2026-04-27?",
+      "answer": "9.39.13 of postgres-primary renamed a config key, so production fell back to a default of 4250.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-03-06-redis-cache-bad-deploy",
+      "doc": "data/corpus/postmortems/2026-03-06-redis-cache-bad-deploy.md",
+      "section": "Postmortem: redis-cache regression after a deploy (2026-03-06) > Root cause",
+      "question": "What caused the redis-cache regression after a deploy incident on 2026-03-06?",
+      "answer": "6.33.2 of redis-cache renamed a config key, so production fell back to a default of 1410.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-08-28-redis-cache-connection-pool",
+      "doc": "data/corpus/postmortems/2026-08-28-redis-cache-connection-pool.md",
+      "section": "Postmortem: redis-cache connection pool exhaustion (2026-08-28) > Root cause",
+      "question": "What caused the redis-cache connection pool exhaustion incident on 2026-08-28?",
+      "answer": "A retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "connection-pool",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-03-01-inventory-memory-pressure",
+      "doc": "data/corpus/postmortems/2026-03-01-inventory-memory-pressure.md",
+      "section": "Postmortem: inventory memory pressure and OOM kills (2026-03-01) > Root cause",
+      "question": "What caused the inventory memory pressure and OOM kills incident on 2026-03-01?",
+      "answer": "A cache added in 3.33.16 of inventory had no eviction, growing to 885 MB per pod.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "memory-pressure",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-07-15-orders-error-rate",
+      "doc": "data/corpus/postmortems/2025-07-15-orders-error-rate.md",
+      "section": "Postmortem: orders elevated error rate (2025-07-15) > Root cause",
+      "question": "What caused the orders elevated error rate incident on 2025-07-15?",
+      "answer": "4.28.19 of inventory sent a null currency on refunds, which the validation layer rejected.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-21-redis-cache-queue-backlog",
+      "doc": "data/corpus/postmortems/2026-05-21-redis-cache-queue-backlog.md",
+      "section": "Postmortem: redis-cache queue backlog (2026-05-21) > Root cause",
+      "question": "What caused the redis-cache queue backlog incident on 2026-05-21?",
+      "answer": "4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "queue-backlog",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-10-29-postgres-primary-dependency-timeout",
+      "doc": "data/corpus/postmortems/2025-10-29-postgres-primary-dependency-timeout.md",
+      "section": "Postmortem: postgres-primary dependency timeouts (2025-10-29) > Root cause",
+      "question": "What caused the postgres-primary dependency timeouts incident on 2025-10-29?",
+      "answer": "A config change in 7.22.17 cut the timeout to its database to below its normal p99.",
+      "must_contain": [
+        "postgres-primary"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "postgres-primary"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-01-31-search-bad-deploy",
+      "doc": "data/corpus/postmortems/2026-01-31-search-bad-deploy.md",
+      "section": "Postmortem: search regression after a deploy (2026-01-31) > Root cause",
+      "question": "What caused the search regression after a deploy incident on 2026-01-31?",
+      "answer": "6.13.12 of inventory read a column that the migration hadn't added in production yet.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-09-16-search-cpu-saturation",
+      "doc": "data/corpus/postmortems/2025-09-16-search-cpu-saturation.md",
+      "section": "Postmortem: search CPU saturation (2025-09-16) > Root cause",
+      "question": "What caused the search CPU saturation incident on 2025-09-16?",
+      "answer": "A regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning CPU at 3206%.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "cpu-saturation",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-05-06-kafka-broker-dependency-timeout",
+      "doc": "data/corpus/postmortems/2026-05-06-kafka-broker-dependency-timeout.md",
+      "section": "Postmortem: kafka-broker dependency timeouts (2026-05-06) > Root cause",
+      "question": "What caused the kafka-broker dependency timeouts incident on 2026-05-06?",
+      "answer": "A config change in 8.40.20 cut the timeout to its database to below its normal p99.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "dependency-timeout",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-03-04-kafka-broker-high-latency",
+      "doc": "data/corpus/postmortems/2026-03-04-kafka-broker-high-latency.md",
+      "section": "Postmortem: kafka-broker high p99 latency (2026-03-04) > Root cause",
+      "question": "What caused the kafka-broker high p99 latency incident on 2026-03-04?",
+      "answer": "A slow query plan in kafka-broker after statistics went stale made p99 climb to 2494 ms.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "high-latency",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-09-08-orders-error-rate",
+      "doc": "data/corpus/postmortems/2026-09-08-orders-error-rate.md",
+      "section": "Postmortem: orders elevated error rate (2026-09-08) > Root cause",
+      "question": "What caused the orders elevated error rate incident on 2026-09-08?",
+      "answer": "A credential for inventory was rotated without restarting consumers, so every call was refused.",
+      "must_contain": [
+        "inventory"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "inventory"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-12-23-orders-memory-pressure",
+      "doc": "data/corpus/postmortems/2025-12-23-orders-memory-pressure.md",
+      "section": "Postmortem: orders memory pressure and OOM kills (2025-12-23) > Root cause",
+      "question": "What caused the orders memory pressure and OOM kills incident on 2025-12-23?",
+      "answer": "A cache added in 3.22.11 of orders had no eviction, growing to 3384 MB per pod.",
+      "must_contain": [
+        "orders"
+      ],
+      "cause": {
+        "category": "memory-pressure",
+        "component": "orders"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2025-12-21-orders-error-rate",
+      "doc": "data/corpus/postmortems/2025-12-21-orders-error-rate.md",
+      "section": "Postmortem: orders elevated error rate (2025-12-21) > Root cause",
+      "question": "What caused the orders elevated error rate incident on 2025-12-21?",
+      "answer": "3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.",
+      "must_contain": [
+        "payments"
+      ],
+      "cause": {
+        "category": "error-rate",
+        "component": "payments"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-03-26-notifications-queue-backlog",
+      "doc": "data/corpus/postmortems/2026-03-26-notifications-queue-backlog.md",
+      "section": "Postmortem: notifications queue backlog (2026-03-26) > Root cause",
+      "question": "What caused the notifications queue backlog incident on 2026-03-26?",
+      "answer": "A poison message in notifications's topic blocked partition 3989 for 40 minutes.",
+      "must_contain": [
+        "notifications"
+      ],
+      "cause": {
+        "category": "queue-backlog",
+        "component": "notifications"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-09-15-kafka-broker-high-latency",
+      "doc": "data/corpus/postmortems/2026-09-15-kafka-broker-high-latency.md",
+      "section": "Postmortem: kafka-broker high p99 latency (2026-09-15) > Root cause",
+      "question": "What caused the kafka-broker high p99 latency incident on 2026-09-15?",
+      "answer": "A slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms.",
+      "must_contain": [
+        "kafka-broker"
+      ],
+      "cause": {
+        "category": "high-latency",
+        "component": "kafka-broker"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-02-23-card-auth-bad-deploy",
+      "doc": "data/corpus/postmortems/2026-02-23-card-auth-bad-deploy.md",
+      "section": "Postmortem: card-auth regression after a deploy (2026-02-23) > Root cause",
+      "question": "What caused the card-auth regression after a deploy incident on 2026-02-23?",
+      "answer": "5.38.18 of card-auth read a column that the migration hadn't added in production yet.",
+      "must_contain": [
+        "card-auth"
+      ],
+      "cause": {
+        "category": "bad-deploy",
+        "component": "card-auth"
+      },
+      "deploy": null
+    },
+    {
+      "id": "pm/2026-01-07-auth-high-latency",
+      "doc": "data/corpus/postmortems/2026-01-07-auth-high-latency.md",
+      "section": "Postmortem: auth high p99 latency (2026-01-07) > Root cause",
+      "question": "What caused the auth high p99 latency incident on 2026-01-07?",
+      "answer": "A slow query plan in redis-cache after statistics went stale made p99 climb to 1456 ms.",
+      "must_contain": [
+        "redis-cache"
+      ],
+      "cause": {
+        "category": "high-latency",
+        "component": "redis-cache"
+      },
+      "deploy": null
+    }
+  ]
+}

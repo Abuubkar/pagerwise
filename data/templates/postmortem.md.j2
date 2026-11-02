@@ -1,0 +1,45 @@
+---
+service: {{ service.name }}
+updated_at: {{ updated_at }}
+incident_date: {{ incident_date }}
+---
+# Postmortem: {{ title }} ({{ incident_date }})
+
+## Summary
+
+On {{ incident_date }}, {{ service.name }} {{ mode.impact_verb }} for {{ duration }} minutes. {{ summary_cause }}
+The incident was {{ severity }} and was opened by `{{ alert }}`.
+
+## Impact
+
+- {{ failed_pct }}% of {{ service.name }} requests failed or timed out at the peak.
+{% if callers %}
+- Callers affected: {{ callers | join(", ") }}.
+{% endif %}
+- {{ customers }} customers saw errors; {{ tickets }} support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+{% for t, line in timeline %}
+- **{{ t }}** {{ line }}
+{% endfor %}
+
+## Root cause
+
+{{ root_cause }}
+
+Category: {{ mode.title }}. Component: {{ component }}.
+
+## Contributing factors
+
+{% for factor in factors %}
+- {{ factor }}
+{% endfor %}
+
+## Action items
+
+{% for item in actions %}
+- {{ item.ticket }} ({{ item.team }}): {{ item.text }}
+{% endfor %}

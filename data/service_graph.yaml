@@ -1,0 +1,96 @@
+# The simulated 12-service system. One source for service names, who calls whom, and what each service alerts on:
+# the simulator, the seeded corpus and (slice 4b) alert clustering all read this file.
+#
+# depends_on: services this one calls. A failure usually shows up first in a dependency and then in its callers,
+# so clustering treats services one hop apart as related.
+# weight: share of simulated alert traffic. rules: (alertname, severity, summary template).
+
+services:
+  api-gateway:
+    tier: edge
+    team: platform
+    depends_on: [auth, payments, orders, search]
+    weight: 14
+    rules:
+      - [GatewayHigh5xxRate, critical, "5xx rate {pct}% on {instance}"]
+      - [GatewayLatencyHigh, warning, "p99 {ms} ms on {instance}"]
+  auth:
+    tier: core
+    team: identity
+    depends_on: [redis-cache, postgres-primary]
+    weight: 6
+    rules:
+      - [AuthTokenErrors, warning, "token validation errors {pct}% on {instance}"]
+  payments:
+    tier: core
+    team: payments
+    depends_on: [card-auth, ledger, kafka-broker]
+    weight: 18
+    rules:
+      - [PaymentsP99LatencyHigh, critical, "payments p99 {ms} ms on {instance}"]
+      - [PaymentsAcquirerTimeouts, critical, "acquirer timeouts {pct}% on {instance}"]
+  card-auth:
+    tier: core
+    team: payments
+    depends_on: [redis-cache]
+    weight: 8
+    rules:
+      - [CardAuthDeclineSpike, warning, "decline rate {pct}% on {instance}"]
+  ledger:
+    tier: core
+    team: ledger
+    depends_on: [postgres-primary, kafka-broker]
+    weight: 16
+    rules:
+      - [LedgerWriteErrors, critical, "write errors {pct}% on {instance}"]
+      - [LedgerPoolExhausted, critical, "connection pool waiting={n} on {instance}"]
+  postgres-primary:
+    tier: data
+    team: platform
+    depends_on: []
+    weight: 10
+    rules:
+      - [PostgresReplicationLag, warning, "replica lag {ms} ms on {instance}"]
+      - [PostgresFailover, critical, "primary failed over to {instance}"]
+  redis-cache:
+    tier: data
+    team: platform
+    depends_on: []
+    weight: 5
+    rules:
+      - [RedisEvictionsHigh, warning, "evictions {n}/s on {instance}"]
+  notifications:
+    tier: supporting
+    team: growth
+    depends_on: [kafka-broker]
+    weight: 4
+    rules:
+      - [NotificationQueueBacklog, warning, "backlog {n} messages on {instance}"]
+  search:
+    tier: supporting
+    team: discovery
+    depends_on: [inventory, redis-cache]
+    weight: 5
+    rules:
+      - [SearchLatencyHigh, warning, "query p95 {ms} ms on {instance}"]
+  inventory:
+    tier: supporting
+    team: discovery
+    depends_on: [postgres-primary]
+    weight: 4
+    rules:
+      - [InventorySyncStale, info, "last sync {n}s ago on {instance}"]
+  orders:
+    tier: core
+    team: commerce
+    depends_on: [payments, inventory, notifications, postgres-primary]
+    weight: 7
+    rules:
+      - [OrdersCheckoutErrors, critical, "checkout errors {pct}% on {instance}"]
+  kafka-broker:
+    tier: data
+    team: platform
+    depends_on: []
+    weight: 3
+    rules:
+      - [BrokerUnderReplicated, warning, "{n} under-replicated partitions on {instance}"]

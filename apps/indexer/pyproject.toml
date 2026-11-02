@@ -1,0 +1,16 @@
+[project]
+name = "pagerwise-indexer"
+version = "0.1.0"
+description = "Imports runbooks and postmortems from the docs API: chunk, embed, store"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28.1",
+    "pagerwise-api",
+]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+pagerwise-api = { workspace = true }

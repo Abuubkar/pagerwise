@@ -16,6 +16,8 @@ members = [
     "pagerwise-client",
     "pagerwise-client-sse",
     "pagerwise-consumer",
+    "pagerwise-docs-mock",
+    "pagerwise-indexer",
     "pagerwise-kafka",
     "pagerwise-simulator",
 ]
@@ -378,6 +380,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/88/7f/731ff914b0255d3d065f45fd4e626d4b8c95dbcbaada049f337a6ac16410/docker-7.2.0.tar.gz", hash = "sha256:cebb93773d334f778e023a7ee352a8d6e13ab1bd3b863a4d4a59dec897df43ac", size = 118731, upload-time = "2026-07-09T14:53:46.39Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/75/23/529140fe1aab80fc6992f93a706deec709140a6397439139a054e1515c45/docker-7.2.0-py3-none-any.whl", hash = "sha256:a3f45fdeb9165e2d25d9a1d02ddf3bc70fb572cf5ebbf9b58558c22caf29b71f", size = 148775, upload-time = "2026-07-09T14:53:45.224Z" },
+]
+
+[[package]]
+name = "faker"
+version = "40.44.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/22/965c7b822f4c80f6e003c696d5fa01b48eea6cc7852d61aec8779519b346/faker-40.44.0.tar.gz", hash = "sha256:97245a3756dcaf35418b89bea9f03ae6881557db0032bf048744c2aaee2a9108", size = 2034259, upload-time = "2026-10-28T17:06:41.048Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/58/9e/3da962809aefa00ddf457d1b11bba41d7766373a0ad9e537fa0804604361/faker-40.44.0-py3-none-any.whl", hash = "sha256:db808a3ec33fe9ce5caf40b9fb61f85f46e429a56966f765209272adec83e4c6", size = 2069747, upload-time = "2026-10-28T17:06:39.109Z" },
 ]
 
 [[package]]
@@ -1159,13 +1173,17 @@ source = { virtual = "." }
 dependencies = [
     { name = "pagerwise-api" },
     { name = "pagerwise-consumer" },
+    { name = "pagerwise-docs-mock" },
+    { name = "pagerwise-indexer" },
     { name = "pagerwise-simulator" },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "datamodel-code-generator" },
+    { name = "faker" },
     { name = "hypothesis" },
+    { name = "jinja2" },
     { name = "openapi-python-client" },
     { name = "pagerwise-client-sse" },
     { name = "pytest" },
@@ -1176,13 +1194,17 @@ dev = [
 requires-dist = [
     { name = "pagerwise-api", editable = "apps/api" },
     { name = "pagerwise-consumer", editable = "apps/consumer" },
+    { name = "pagerwise-docs-mock", editable = "apps/docs_mock" },
+    { name = "pagerwise-indexer", editable = "apps/indexer" },
     { name = "pagerwise-simulator", editable = "apps/simulator" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "datamodel-code-generator", specifier = ">=0.87.0" },
+    { name = "faker", specifier = ">=40.44.0" },
     { name = "hypothesis", specifier = ">=6.170.14" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "openapi-python-client", specifier = ">=0.29.1" },
     { name = "pagerwise-client-sse", editable = "packages/client-sse" },
     { name = "pytest", specifier = ">=9.2.0" },
@@ -1224,7 +1246,7 @@ requires-dist = [
 
 [[package]]
 name = "pagerwise-client"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "packages/clients/python" }
 dependencies = [
     { name = "attrs" },
@@ -1264,6 +1286,36 @@ requires-dist = [
 ]
 
 [[package]]
+name = "pagerwise-docs-mock"
+version = "0.1.0"
+source = { editable = "apps/docs_mock" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "uvicorn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.162.0" },
+    { name = "uvicorn", specifier = ">=0.54.0" },
+]
+
+[[package]]
+name = "pagerwise-indexer"
+version = "0.1.0"
+source = { editable = "apps/indexer" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pagerwise-api" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pagerwise-api", editable = "apps/api" },
+]
+
+[[package]]
 name = "pagerwise-kafka"
 version = "0.1.0"
 source = { editable = "packages/kafka" }
@@ -1284,10 +1336,14 @@ version = "0.1.0"
 source = { editable = "apps/simulator" }
 dependencies = [
     { name = "pagerwise-kafka" },
+    { name = "pyyaml" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pagerwise-kafka", editable = "packages/kafka" }]
+requires-dist = [
+    { name = "pagerwise-kafka", editable = "packages/kafka" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+]
 
 [[package]]
 name = "pathspec"
