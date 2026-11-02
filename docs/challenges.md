@@ -194,3 +194,26 @@ about a past incident, gave a clean brief: "since deploys are unavailable … we
 copy; `make contract-check` can't see SSE event schemas (no operation references them). The generated Python client
 rejected the first postmortem citation of the live run.
 - *Did:* fixed the contract; a unit test now parses every event payload the API builds with the generated client.
+
+## Slice 6a: golden set, retrieval and clustering evals, v2 embeddings
+
+**The first golden set made clustering look perfect.** F1 1.000, because every golden incident was one alert rule
+on one service: the service-graph rule was never exercised.
+- *Did:* about 40% of incidents also page a neighbouring service. F1 dropped to 0.847, which is the real number.
+
+**A lower similarity bar for neighbours can't group cascades.** Measured on dev: cascade alerts score 0.56–0.69
+against their incident, unrelated neighbour incidents 0.59–0.76.
+- *Did:* kept clustering as is, recalibrated the gate (to 0.84, after first proposing 0.85, which the baseline
+  itself missed by 0.003). Cross-service grouping needs topology and timing signals; real data first.
+
+**Recall@8 0.6–0.7 was one pattern, and the reranker made it worse.** The gold runbook's second chunk didn't restate
+the symptoms, so it ranked low; the cross-encoder, scoring each chunk alone, pushed it further down.
+- *Did:* sibling chunks (Recall@8 1.00 on both splits); reranker off (no metric changed, ~490 ms saved).
+
+**My own tooling was wrong twice; the baseline check caught both.** `make eval` still forced v1 after the default
+became v2, and the baseline treated a faster clustering run (fewer seconds) as a quality drop.
+- *Did:* the Makefile passes `--embedding` only when given; the baseline guards an explicit list of quality
+  metrics.
+
+**Full-text search contributes nothing on incident queries** (0.00 on both metrics): `websearch_to_tsquery` ANDs
+every word. Noted in ADR 0009; OR-of-terms is the next thing to try.

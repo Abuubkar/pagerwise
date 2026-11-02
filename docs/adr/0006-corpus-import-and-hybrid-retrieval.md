@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: accepted; reranker default superseded by ADR 0009 (off: no gain with v2 + sibling chunks)
 date: 2026-11-02
 ---
 

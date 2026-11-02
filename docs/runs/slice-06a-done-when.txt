@@ -1,0 +1,90 @@
+# Slice 6a done-when, 2026-11-02. No LLM involved. Dev split unless marked; defaults after this slice: embedding v2
+# (bge-base), sibling chunks on, reranker off. Every run's full results are in evals/results/; reports in evals/archive/.
+
+## v1 vs v2 (before sibling chunks, reranker on the top 10), from evals/results/*-dev-v1|v2|dual.json and *-test-*
+| split | embedding | Recall@8 | MRR@10 | MRR@10 before rerank | hybrid without rerank: Recall@8 / MRR@10 |
+|---|---|---|---|---|---|
+| dev | v1 | 0.660 | 1.000 | 0.940 | 0.740 / 0.940 |
+| dev | v2 | 0.700 | 1.000 | 1.000 | 0.740 / 1.000 |
+| dev | dual | 0.700 | 1.000 | 0.980 | 0.720 / 0.980 |
+| test | v1 | 0.567 | 1.000 | 0.878 | 0.633 / 0.878 |
+| test | v2 | 0.600 | 1.000 | 1.000 | 0.633 / 1.000 |
+
+## v2 + sibling chunks, reranker on vs off
+| split | reranker | Recall@8 | MRR@10 | retrieval p95 |
+|---|---|---|---|---|
+| dev | MiniLM top 10 | 1.000 | 1.000 | 533 ms |
+| dev | off | 1.000 | 1.000 | 33 ms |
+| test | MiniLM top 10 | 1.000 | 1.000 | 523 ms |
+| test | off | 1.000 | 1.000 | 32 ms |
+
+## Clustering threshold check (dev only): cosine of cascade alerts to their incident vs unrelated neighbours
+cascade (should join): n=13, 0.556-0.686 (median 0.606); unrelated neighbour incidents <10 min apart: n=20, 0.590-0.755 (median 0.644)
+
+## Final dev run (make eval): evals/REPORT.md
+
+# Eval report: dev split, embedding v2
+
+Run 20261102T180752 at 2026-11-02T18:07:52+00:00, reranker Xenova/ms-marco-MiniLM-L-6-v2 on the top 0.
+
+## Gates
+
+| metric | value | gate | |
+|---|---|---|---|
+| retrieval.recall_at_8 | 1.000 | >= 0.9 | pass |
+| retrieval.mrr_at_10 | 1.000 | >= 0.7 | pass |
+| retrieval.latency_p95_ms | 38.200 | <= 250 | pass |
+| clustering.f1 | 0.847 | >= 0.84 | pass |
+
+## Retrieval ablation
+
+25 answerable cases; latency over 500 queries.
+
+| stage | Recall@8 | MRR@10 | p95 ms (cumulative) |
+|---|---|---|---|
+| full-text only | 0.000 | 0.000 | 4 |
+| vector only | 0.740 | 1.000 | 6 |
+| hybrid (RRF) | 0.740 | 1.000 | 39 |
+| hybrid + rerank | 0.740 | 1.000 | 39 |
+| final (+ sibling chunks) | 1.000 | 1.000 | 38 |
+
+### Retrieval cases short of perfect (0 of 25)
+
+
+## Clustering
+
+508 alerts from 41 cases became 53 incidents (in 4.4s). Pairwise precision 0.983, recall 0.743, F1 0.847.
+
+- Split across several incidents (13): ans-06 (notifications) into 2, ans-09 (payments) into 2, ans-10 (kafka-broker) into 2, ans-14 (kafka-broker) into 2, ans-21 (inventory) into 2, ans-23 (search) into 2, ans-26 (orders) into 2, ans-27 (payments) into 2, ans-32 (api-gateway) into 3, ans-34 (kafka-broker) into 2, ans-36 (api-gateway) into 2, ans-38 (ledger) into 2, deg-09 (search) into 2
+- Merged with another case (4): ans-14 (kafka-broker) with ans-32, ans-23 (search) with deg-09, ans-32 (api-gateway) with ans-14, deg-09 (search) with ans-23
+
+## Final test run (make eval-test)
+
+## Gates
+
+| metric | value | gate | |
+|---|---|---|---|
+| retrieval.recall_at_8 | 1.000 | >= 0.9 | pass |
+| retrieval.mrr_at_10 | 1.000 | >= 0.7 | pass |
+| retrieval.latency_p95_ms | 35.400 | <= 250 | pass |
+| clustering.f1 | 0.912 | >= 0.85 | pass |
+
+## Retrieval ablation
+## Retrieval ablation
+
+15 answerable cases; latency over 500 queries.
+
+| stage | Recall@8 | MRR@10 | p95 ms (cumulative) |
+|---|---|---|---|
+| full-text only | 0.000 | 0.000 | 4 |
+| vector only | 0.633 | 1.000 | 6 |
+| hybrid (RRF) | 0.633 | 1.000 | 33 |
+| hybrid + rerank | 0.633 | 1.000 | 33 |
+| final (+ sibling chunks) | 1.000 | 1.000 | 35 |
+
+## Clustering
+
+287 alerts from 24 cases became 32 incidents (in 2.7s). Pairwise precision 1.000, recall 0.838, F1 0.912.
+
+- Split across several incidents (8): ans-02 (notifications) into 2, ans-13 (search) into 2, ans-19 (auth) into 2, ans-20 (notifications) into 2, ans-25 (orders) into 2, ans-37 (kafka-broker) into 2, deg-04 (auth) into 2, deg-06 (orders) into 2
+- Merged with another case (0): none
