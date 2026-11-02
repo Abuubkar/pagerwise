@@ -1,0 +1,64 @@
+== Create 3 incidents (run 133768)
+  01a19a52-f7c4-75c3-a60e-cb67769ca098  sev2  payments   Card authorizations timing out at 6% [smoke 133768]
+  01a19a52-f7d4-751c-9c3a-124c0f47b328  sev2  payments   Payments p99 above 800 ms [smoke 133768]
+  01a19a52-f7d9-7404-8da4-5958dd563fb7  sev1  ledger     Ledger writes failing with SQLSTATE 25006 [smoke 133768]
+
+== Page through incidents, 2 at a time (newest first)
+  page 1: Ledger writes failing with SQLSTATE 25006 [smoke 133768] | Payments p99 above 800 ms [smoke 133768]
+  page 2: Card authorizations timing out at 6% [smoke 133768] | Ledger writes failing with SQLSTATE 25006 [smoke 3b229f]
+  all 3 seen in 2 pages, newest first
+
+== Triage Ledger writes failing with SQLSTATE 25006 [smoke 133768]
+  202 triage_id=01a19a52-f7ee-7332-b823-8b7465fb8ad1; a second POST -> 409 triage_in_progress triage_id=01a19a52-f7ee-7332-b823-8b7465fb8ad1
+
+== Stream (tokens inline; other events on their own lines)
+
+## Likely cause
+Ledger writes fail because connections opened before the Postgres primary failover still point to the old node, which was demoted to a replica [C1]
+    >> citation C1 in likely_cause: data/runbooks/ledger-read-only-write-errors.md
+[C4]
+    >> citation C4 in likely_cause: data/runbooks/postgres-primary-failover.md
+. The error code `25006` confirms that ledger is attempting writes on a read-only transaction in a cluster where the leader has changed [C1].
+
+## Blast radius
+
+    >> section_complete likely_cause
+The ledger service and all users performing write operations (such as payments charges) are affected by the inability to execute INSERTs [C1]
+    >> citation C1 in blast_radius: data/runbooks/ledger-read-only-write-errors.md
+[C6]
+    >> citation C6 in blast_radius: data/runbooks/payments-high-p99-latency.md
+. The postgres-primary service itself is operational but with a new leader, while clients with long-lived connection pools like ledger continue to fail until they reconnect [C4]
+    >> citation C4 in blast_radius: data/runbooks/postgres-primary-failover.md
+.
+
+## First steps
+
+    >> section_complete blast_radius
+1. Confirm the failover has finished and a new primary is accepting writes (see the postgres-primary runbook) [C4]
+    >> citation C4 in first_steps: data/runbooks/postgres-primary-failover.md
+.
+2. Recycle the ledger connection pools so every pod reconnects to the new primary right away: `kubectl -n ledger exec deploy/ledger -- ledgerctl pool recycle --all-pods` [C1]
+    >> citation C1 in first_steps: data/runbooks/ledger-read-only-write-errors.md
+.
+3. Watch the write error rate. It should drop to zero within one minute of the recycle [C1].
+
+## Similar incidents
+
+    >> section_complete first_steps
+None in the evidence.
+    >> section_complete similar_incidents
+
+    >> done: verdict=CAUSE_IDENTIFIED model=qwen3.5:9b-q4_K_M prompt=triage/2 usage={'prompt_tokens': 3551, 'output_tokens': 251, 'ttft_ms': 21469, 'total_ms': 36131}
+       likely_cause: 2 citations (C1, C4)
+       blast_radius: 3 citations (C1, C6, C4)
+       first_steps: 2 citations (C4, C1)
+       similar_incidents: 0 citations (-)
+
+  events: {'TokenEvent': 251, 'CitationEvent': 7, 'SectionCompleteEvent': 4, 'TriageBrief': 1}
+  first token after 21.8s, stream ended after 36.5s
+
+== GraphQL: the same incidents
+  01a19a52-f7d9-7404-8da4-5958dd563fb7  sev1  Ledger writes failing with SQLSTATE 25006 [smoke 133768]
+  01a19a52-f7d4-751c-9c3a-124c0f47b328  sev2  Payments p99 above 800 ms [smoke 133768]
+  01a19a52-f7c4-75c3-a60e-cb67769ca098  sev2  Card authorizations timing out at 6% [smoke 133768]
+  same 3 incidents, same order as REST

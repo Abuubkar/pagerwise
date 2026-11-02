@@ -29,3 +29,32 @@ as written; recorded as an at-risk assumption in ADR 0001 for slices 5–6.
 **Six runbooks are one retrieval window.** They make 8 chunks, and top-8 retrieval returns all of them, so slice 1
 tests grounding and abstention, not retrieval. The cosine order is still sensible (the planted fact's chunk ranks
 first at distance 0.114; the off-topic question's best match is 0.366). Retrieval is measured from slice 4.
+
+## Slice 2: contracts and streamed triage
+
+**A streamed 404 came back as an empty 200.** The stream endpoint looked up the triage on its first line, but a
+generator endpoint has already sent `200` and its headers by the time its body runs, so the problem was lost.
+- *Did:* the lookup-and-claim moved into a FastAPI dependency, which runs before the response starts.
+- *Alternatives:* return a plain `StreamingResponse` from a normal function (loses FastAPI's SSE encoding and
+  keep-alives); check twice (once in a dependency, once in the body).
+
+**The 409 path crashed with `MissingGreenlet`.** After catching the unique-index violation and rolling back, the
+code read `incident.version` again; the rollback had expired it, and the lazy reload isn't allowed under asyncio.
+- *Did:* read the version into a local before committing. Found by the smoke script's second POST.
+
+**`section_complete` arrived after the next section's first word.** Token events were emitted a whole stream
+piece at a time, so a piece like `"\nThe"` went out before the scanner noticed the heading line had ended.
+- *Did:* token events are split at event boundaries; a test checks the order and that tokens concatenate to the
+  model's exact text for pieces of 1, 3, 7 and 50 characters.
+
+**The model filled "Similar incidents" with the incident itself.** With no postmortems in the evidence,
+`triage/1` echoed the incident description under that heading. `parse_brief` rejected it (`format_invalid`,
+`similar_incidents: no citations`), as it should.
+- *Did:* `triage/2` says plainly that the incident description is not evidence and that a runbook is not a past
+  incident. The next run wrote "None in the evidence." One example, not an eval: slice 6 measures format
+  validity over the golden set.
+
+**FastAPI emits OpenAPI 3.2's `itemSchema` in a 3.1 document** for SSE routes, and labels the route's 404/409
+problems `text/event-stream`.
+- *Did:* the OpenAPI hook rewrites the stream to `type: string`, moves problems to `application/problem+json`, and
+  adds each event payload as a component (ADR 0004).
