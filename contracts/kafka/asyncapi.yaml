@@ -1,0 +1,166 @@
+asyncapi: 3.1.0
+info:
+  title: Pagerwise alert ingestion
+  version: 0.3.0
+  description: |
+    Alerts enter Pagerwise on `alerts.v1`. Delivery is at-least-once and every consumer write is idempotent on
+    `event_id`, so a message seen twice changes nothing the second time.
+
+    A message that fails transiently is republished, not retried in place, so its partition never waits on it:
+    `alerts.v1` -> `alerts.retry.30s` -> `alerts.retry.5m` -> `alerts.dlq`. A malformed message goes straight to
+    `alerts.dlq`. A retry topic's message is not processed before its publish time plus the topic's delay; the
+    consumer pauses that partition until then. Dead letters are also stored in Postgres (`dead_letters`) and can be
+    republished with `POST /v1/admin/dlq/replay`.
+
+defaultContentType: application/json
+
+servers:
+  local:
+    host: localhost:19092
+    protocol: kafka
+    description: Redpanda from docker-compose.yml. Inside the compose network it is redpanda:9092.
+
+channels:
+  alerts:
+    address: alerts.v1
+    description: Every alert, keyed by service so one service's alerts keep their order. 12 partitions.
+    messages:
+      alert: {$ref: '#/components/messages/Alert'}
+    bindings:
+      kafka: {partitions: 12, replicas: 1, bindingVersion: '0.5.0'}
+  alertsRetry30s:
+    address: alerts.retry.30s
+    description: First retry, processed no sooner than 30 s after it was published. 12 partitions.
+    messages:
+      alert: {$ref: '#/components/messages/RetriedAlert'}
+    bindings:
+      kafka: {partitions: 12, replicas: 1, bindingVersion: '0.5.0'}
+  alertsRetry5m:
+    address: alerts.retry.5m
+    description: Second retry, processed no sooner than 5 minutes after it was published. 12 partitions.
+    messages:
+      alert: {$ref: '#/components/messages/RetriedAlert'}
+    bindings:
+      kafka: {partitions: 12, replicas: 1, bindingVersion: '0.5.0'}
+  alertsDlq:
+    address: alerts.dlq
+    description: |
+      Messages that were malformed or failed three times. The payload is the original bytes, which may not be
+      valid JSON. One partition, so a range of DLQ offsets is unambiguous for replay.
+    messages:
+      deadLetter: {$ref: '#/components/messages/DeadLetter'}
+    bindings:
+      kafka: {partitions: 1, replicas: 1, bindingVersion: '0.5.0'}
+
+operations:
+  publishAlert:
+    action: send
+    channel: {$ref: '#/channels/alerts'}
+    summary: Producers (the simulator, DLQ replay) publish alerts, validated against AlertV1 before sending.
+    messages:
+      - $ref: '#/channels/alerts/messages/alert'
+  consumeAlerts:
+    action: receive
+    channel: {$ref: '#/channels/alerts'}
+    summary: The consumer stores each alert in alert_events and commits offsets only after the database commit.
+    messages:
+      - $ref: '#/channels/alerts/messages/alert'
+    bindings:
+      kafka:
+        groupId: {type: string, enum: [pagerwise-consumer]}
+        bindingVersion: '0.5.0'
+  publishRetry30s:
+    action: send
+    channel: {$ref: '#/channels/alertsRetry30s'}
+    summary: The consumer republishes an alert that failed transiently on alerts.v1.
+    messages:
+      - $ref: '#/channels/alertsRetry30s/messages/alert'
+  consumeRetry30s:
+    action: receive
+    channel: {$ref: '#/channels/alertsRetry30s'}
+    messages:
+      - $ref: '#/channels/alertsRetry30s/messages/alert'
+    bindings:
+      kafka:
+        groupId: {type: string, enum: [pagerwise-consumer]}
+        bindingVersion: '0.5.0'
+  publishRetry5m:
+    action: send
+    channel: {$ref: '#/channels/alertsRetry5m'}
+    summary: The consumer republishes an alert that failed again on alerts.retry.30s.
+    messages:
+      - $ref: '#/channels/alertsRetry5m/messages/alert'
+  consumeRetry5m:
+    action: receive
+    channel: {$ref: '#/channels/alertsRetry5m'}
+    messages:
+      - $ref: '#/channels/alertsRetry5m/messages/alert'
+    bindings:
+      kafka:
+        groupId: {type: string, enum: [pagerwise-consumer]}
+        bindingVersion: '0.5.0'
+  publishDeadLetter:
+    action: send
+    channel: {$ref: '#/channels/alertsDlq'}
+    summary: The consumer dead-letters a malformed alert, or one that failed on alerts.retry.5m.
+    messages:
+      - $ref: '#/channels/alertsDlq/messages/deadLetter'
+
+components:
+  messages:
+    Alert:
+      name: Alert
+      title: An alert firing
+      payload: {$ref: './alert.v1.json'}
+      headers:
+        type: object
+        properties:
+          x-replayed-from:
+            type: string
+            description: Set on a message republished by a DLQ replay; the DLQ offset it came from.
+      bindings:
+        kafka:
+          key: {type: string, description: The service name, same as payload.service.}
+          bindingVersion: '0.5.0'
+    RetriedAlert:
+      name: RetriedAlert
+      title: An alert being retried
+      payload: {$ref: './alert.v1.json'}
+      headers: {$ref: '#/components/schemas/FailureHeaders'}
+      bindings:
+        kafka:
+          key: {type: string, description: The service name, unchanged from the original message.}
+          bindingVersion: '0.5.0'
+    DeadLetter:
+      name: DeadLetter
+      title: A message that won't be processed
+      contentType: application/octet-stream
+      payload:
+        type: string
+        format: binary
+        description: The original message bytes, unchanged.
+      headers: {$ref: '#/components/schemas/FailureHeaders'}
+      bindings:
+        kafka:
+          key: {type: string, description: The original message key, if any.}
+          bindingVersion: '0.5.0'
+  schemas:
+    FailureHeaders:
+      type: object
+      description: Set by the consumer on every failure; other headers on the original message are kept.
+      required: [x-attempt, x-first-failed-at, x-original-topic, x-original-partition, x-original-offset, x-error-class]
+      properties:
+        x-attempt:
+          type: string
+          description: Failures so far, as a decimal string. 1 on alerts.retry.30s, 2 on alerts.retry.5m, up to 3 in the DLQ.
+        x-first-failed-at:
+          type: string
+          description: Unix milliseconds of the first failure; kept across hops.
+        x-original-topic:
+          type: string
+          description: Where the message was first published (alerts.v1). With the next two, identifies it across hops.
+        x-original-partition: {type: string}
+        x-original-offset: {type: string}
+        x-error-class:
+          type: string
+          description: The latest failure's class, e.g. TransientError or PermanentError.

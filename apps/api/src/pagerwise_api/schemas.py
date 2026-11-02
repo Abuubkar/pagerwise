@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 PROBLEMS_URL = "https://github.com/Abuubkar/pagerwise/blob/main/docs/problems.md"
 
@@ -20,6 +20,7 @@ class ProblemCode(enum.StrEnum):
     PROMPT_TOO_LONG = "prompt_too_long"
     FORMAT_INVALID = "format_invalid"
     TRIAGE_ABANDONED = "triage_abandoned"
+    BROKER_UNAVAILABLE = "broker_unavailable"
 
 
 class Problem(BaseModel):
@@ -169,3 +170,39 @@ class AskResponse(BaseModel):
     citations: list[AskCitation]
     problems: list[str] = Field(description="Why a REJECTED answer failed the citation contract.")
     usage: AskUsage
+
+
+REPLAY_MAX = 10_000  # dead letters per replay request
+
+
+class DlqReplayRequest(BaseModel):
+    """Either from_offset and to_offset, or keys."""
+
+    from_offset: int | None = Field(default=None, ge=0, description="First DLQ offset to replay.")
+    to_offset: int | None = Field(
+        default=None, ge=0, description="Last DLQ offset to replay (inclusive); at most 10000 after from_offset."
+    )
+    keys: list[str] | None = Field(
+        default=None, min_length=1, max_length=100,
+        description="Replay every dead letter with one of these message keys (service names).",
+    )
+
+    @model_validator(mode="after")
+    def one_selection(self) -> "DlqReplayRequest":
+        by_range = self.from_offset is not None or self.to_offset is not None
+        if by_range == (self.keys is not None):
+            raise ValueError("give either from_offset and to_offset, or keys")
+        if by_range:
+            if self.from_offset is None or self.to_offset is None:
+                raise ValueError("a range needs both from_offset and to_offset")
+            if not 0 <= self.to_offset - self.from_offset < REPLAY_MAX:
+                raise ValueError(f"to_offset must be from_offset to from_offset + {REPLAY_MAX - 1}")
+        elif any(not 1 <= len(key) <= 255 for key in self.keys or []):
+            raise ValueError("keys must be 1-255 characters")
+        return self
+
+
+class DlqReplayAccepted(BaseModel):
+    replayed: int = Field(description="Messages republished to alerts.v1.")
+    dlq_offsets: list[int] = Field(description="DLQ offsets of the replayed dead letters, in order.")
+

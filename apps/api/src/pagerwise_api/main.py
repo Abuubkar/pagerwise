@@ -14,7 +14,7 @@ from pagerwise_api.db import TriageRun, get_session
 from pagerwise_api.graphql import graphql_router
 from pagerwise_api.schemas import ApiProblem, Problem, ProblemCode
 
-app = FastAPI(title="Pagerwise", version="0.2.0")
+app = FastAPI(title="Pagerwise", version="0.3.0")
 app.include_router(graphql_router, prefix="/graphql", include_in_schema=False)
 
 PROBLEM_JSON = "application/problem+json"
@@ -105,6 +105,12 @@ async def start_triage(incident_id: uuid.UUID, session: Session) -> schemas.Tria
     run = await service.start_triage(session, incident_id)
     return schemas.TriageAccepted(triage_id=run.id, incident_id=run.incident_id, incident_version=run.incident_version,
                                   stream_url=f"/v1/incidents/{incident_id}/triage/stream")
+
+
+@app.post("/v1/admin/dlq/replay", operation_id="replayDeadLetters", status_code=202, responses=_problems(400, 503))
+async def replay_dead_letters(body: schemas.DlqReplayRequest, session: Session) -> schemas.DlqReplayAccepted:
+    offsets = await service.replay_dead_letters(session, body)
+    return schemas.DlqReplayAccepted(replayed=len(offsets), dlq_offsets=offsets)
 
 
 async def _open_triage_stream(incident_id: uuid.UUID, session: Session) -> tuple[TriageRun, bool]:

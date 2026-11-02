@@ -1,0 +1,13 @@
+[project]
+name = "pagerwise-kafka"
+version = "0.1.0"
+description = "Topics, headers, retry routing and the generated alert model shared by Pagerwise's producers and consumers"
+requires-python = ">=3.13"
+dependencies = [
+    "aiokafka>=0.15.0",
+    "pydantic>=2.14.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"

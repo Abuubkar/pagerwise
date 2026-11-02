@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 
 from pgvector.sqlalchemy import VECTOR
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, func, text
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, LargeBinary, SmallInteger, String, UniqueConstraint, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -132,3 +132,45 @@ class TriageRun(Base):
     # Renewed while the model streams; a running run whose heartbeat is stale was abandoned (process died).
     heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AlertEvent(Base):
+    """One alert as consumed from Kafka. event_id comes from the producer, so a redelivered message inserts nothing
+    (ON CONFLICT DO NOTHING). Slice 4 turns this into a table partitioned by day."""
+
+    __tablename__ = "alert_events"
+
+    event_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    source: Mapped[str] = mapped_column(String(64))
+    service: Mapped[str] = mapped_column(String(128), index=True)
+    fingerprint: Mapped[str] = mapped_column(String(128))
+    severity: Mapped[str] = mapped_column(String(16))
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    labels: Mapped[dict[str, str]] = mapped_column(JSONB, server_default="{}")
+    summary: Mapped[str]
+    attempt: Mapped[int] = mapped_column(SmallInteger, server_default="0")  # transient failures before it landed
+    ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DeadLetter(Base):
+    """A message that reached alerts.dlq, kept with its raw bytes (it may not even be JSON) so it can be inspected
+    and replayed. One row per original message, however many times it was redelivered."""
+
+    __tablename__ = "dead_letters"
+    __table_args__ = (UniqueConstraint("original_topic", "original_partition", "original_offset"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
+    original_topic: Mapped[str] = mapped_column(String(255))
+    original_partition: Mapped[int] = mapped_column(Integer)
+    original_offset: Mapped[int] = mapped_column(BigInteger)
+    dlq_offset: Mapped[int] = mapped_column(BigInteger, index=True)
+    key: Mapped[str | None] = mapped_column(String(255), index=True)
+    payload: Mapped[bytes] = mapped_column(LargeBinary)
+    headers: Mapped[dict[str, str]] = mapped_column(JSONB, server_default="{}")
+    error_class: Mapped[str] = mapped_column(String(128))
+    error: Mapped[str]
+    attempt: Mapped[int] = mapped_column(SmallInteger)
+    first_failed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    replayed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    replay_count: Mapped[int] = mapped_column(Integer, server_default="0")
