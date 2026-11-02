@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_USER: pagerwise
+      POSTGRES_PASSWORD: pagerwise
+      POSTGRES_DB: pagerwise
+    ports:
+      - "5435:5432"  # 5432-5434 are used by other local projects (Ledgerline is on 5434)
+    volumes:
+      # Postgres 18 images moved PGDATA under /var/lib/postgresql/18/; mount the parent, not .../data.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pagerwise -d pagerwise"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
