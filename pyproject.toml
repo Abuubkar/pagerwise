@@ -7,18 +7,24 @@ dependencies = ["pagerwise-api"]
 
 [dependency-groups]
 dev = [
+    "openapi-python-client>=0.29.1",
+    "pagerwise-client-sse",
     "pytest>=9.2.0",
+    "testcontainers>=4.15.0",
 ]
 
 [tool.uv]
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api"]
+members = ["apps/api", "packages/clients/python", "packages/client-sse"]
 
 [tool.uv.sources]
 pagerwise-api = { workspace = true }
+pagerwise-client = { workspace = true }
+pagerwise-client-sse = { workspace = true }
 
 [tool.pytest.ini_options]
 testpaths = ["apps/api/tests"]
+markers = ["integration: needs Docker (testcontainers); run with make test-int"]
 addopts = "--strict-markers"

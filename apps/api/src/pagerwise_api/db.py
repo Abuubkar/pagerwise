@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 
 from pgvector.sqlalchemy import VECTOR
-from sqlalchemy import DateTime, ForeignKey, Integer, String, func, text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -75,3 +75,60 @@ class Answer(Base):
     prompt_eval_ms: Mapped[int] = mapped_column(Integer)
     eval_ms: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Incident(Base):
+    """Created by hand for now; alerts open them from slice 4. `version` goes up on every change, and a triage
+    belongs to the version it was run on."""
+
+    __tablename__ = "incidents"
+    __table_args__ = (Index("ix_incidents_opened_at_id", text("opened_at DESC"), text("id DESC")),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
+    title: Mapped[str] = mapped_column(String(300))
+    service: Mapped[str] = mapped_column(String(128))
+    severity: Mapped[str] = mapped_column(String(8))
+    status: Mapped[str] = mapped_column(String(16), server_default="open")
+    summary: Mapped[str] = mapped_column(server_default="")
+    opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TriageRun(Base):
+    """One triage of one incident version. queued -> running -> completed | failed. At most one queued or
+    running run per incident version (partial unique index), which is what turns a second request into a 409."""
+
+    __tablename__ = "triage_runs"
+    __table_args__ = (
+        Index(
+            "uq_triage_runs_active",
+            "incident_id",
+            "incident_version",
+            unique=True,
+            postgresql_where=text("status IN ('queued', 'running')"),
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
+    incident_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
+    incident_version: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(16), server_default="queued")
+    # The tagged evidence the prompt was built from: [{tag, source_type, source_id, chunk_id, heading_path, text}].
+    evidence: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, server_default="[]")
+    raw_text: Mapped[str] = mapped_column(server_default="")
+    brief: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    verdict: Mapped[str | None] = mapped_column(String(32))
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    problems: Mapped[list[str]] = mapped_column(JSONB, server_default="[]")
+    model: Mapped[str | None] = mapped_column(String(128))
+    prompt_version: Mapped[str | None] = mapped_column(String(64))
+    prompt_tokens: Mapped[int | None] = mapped_column(Integer)
+    output_tokens: Mapped[int | None] = mapped_column(Integer)
+    ttft_ms: Mapped[int | None] = mapped_column(Integer)  # stream opened -> first answer token, wall clock
+    total_ms: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Renewed while the model streams; a running run whose heartbeat is stale was abandoned (process died).
+    heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

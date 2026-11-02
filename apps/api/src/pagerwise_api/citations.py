@@ -1,4 +1,7 @@
-"""Checks a model answer against the citation contract in prompts.py. Deterministic: no model involved."""
+"""Checks model output against the citation contracts in prompts.py. Deterministic: no model involved.
+
+Three users of one tag syntax: parse_answer (/v1/ask), parse_brief (the four-section triage brief, checked once the
+stream ends) and TagScanner (emits citation and section events while the brief streams)."""
 
 import re
 from dataclasses import dataclass, field
@@ -10,6 +13,18 @@ TAG_RE = re.compile(r"\[(C\d+)\]")
 TAG_LIKE_RE = re.compile(r"\[\s*C\s*\d[^\]]*\]")
 
 Verdict = Literal["ANSWERED", "INSUFFICIENT_EVIDENCE", "REJECTED"]
+
+
+def scan_tags(text: str, supplied_tags: set[str]) -> tuple[list[str], list[str]]:
+    """(supplied tags in order of first use, problems): unknown and malformed tags are problems."""
+    problems = [f"malformed tag {m}" for m in TAG_LIKE_RE.findall(text) if not TAG_RE.fullmatch(m)]
+    tags: list[str] = []
+    for tag in TAG_RE.findall(text):
+        if tag not in supplied_tags:
+            problems.append(f"unknown tag [{tag}]")
+        elif tag not in tags:
+            tags.append(tag)
+    return tags, list(dict.fromkeys(problems))
 
 
 @dataclass
@@ -24,16 +39,156 @@ def parse_answer(answer: str, supplied_tags: set[str]) -> ParsedAnswer:
     INSUFFICIENT_EVIDENCE anywhere is an abstention, whatever else it says: it names no cause."""
     if INSUFFICIENT_EVIDENCE in answer:
         return ParsedAnswer(verdict="INSUFFICIENT_EVIDENCE", tags=[])
-
-    problems = [f"malformed tag {m}" for m in TAG_LIKE_RE.findall(answer) if not TAG_RE.fullmatch(m)]
-    tags: list[str] = []
-    for tag in TAG_RE.findall(answer):
-        if tag not in supplied_tags:
-            problems.append(f"unknown tag [{tag}]")
-        elif tag not in tags:
-            tags.append(tag)
+    tags, problems = scan_tags(answer, supplied_tags)
     if not tags and not problems:
         problems.append("no citations")
     if problems:
-        return ParsedAnswer(verdict="REJECTED", tags=tags, problems=list(dict.fromkeys(problems)))
+        return ParsedAnswer(verdict="REJECTED", tags=tags, problems=problems)
     return ParsedAnswer(verdict="ANSWERED", tags=tags)
+
+
+# The brief's section contract: these headings, in this order, each exactly once.
+SECTIONS = {
+    "Likely cause": "likely_cause",
+    "Blast radius": "blast_radius",
+    "First steps": "first_steps",
+    "Similar incidents": "similar_incidents",
+}
+NO_SIMILAR = "None in the evidence."
+SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
+
+
+@dataclass
+class ParsedSection:
+    text: str
+    tags: list[str]
+
+
+@dataclass
+class ParsedBrief:
+    verdict: Literal["CAUSE_IDENTIFIED", "INSUFFICIENT_EVIDENCE"] | None  # None when the contract is broken
+    sections: dict[str, ParsedSection]
+    problems: list[str]
+
+
+def parse_brief(text: str, supplied_tags: set[str]) -> ParsedBrief:
+    """The four sections must appear in order with nothing before the first. Likely cause, Blast radius and First
+    steps each either cite at least one supplied tag or are exactly INSUFFICIENT_EVIDENCE; Similar incidents cites
+    or says NO_SIMILAR. No unknown or malformed tags anywhere. The verdict follows Likely cause."""
+    problems: list[str] = []
+    headings = list(SECTION_RE.finditer(text))
+    names = [m.group(1) for m in headings]
+    if names != list(SECTIONS):
+        problems.append(f"sections are {names}, expected {list(SECTIONS)}")
+    if headings and text[: headings[0].start()].strip():
+        problems.append("text before the first section")
+
+    sections: dict[str, ParsedSection] = {}
+    for i, match in enumerate(headings):
+        key = SECTIONS.get(match.group(1))
+        if key is None or key in sections:
+            continue
+        end = headings[i + 1].start() if i + 1 < len(headings) else len(text)
+        body = text[match.end() : end].strip()
+        tags, tag_problems = scan_tags(body, supplied_tags)
+        problems.extend(f"{key}: {p}" for p in tag_problems)
+        sections[key] = ParsedSection(text=body, tags=tags)
+        abstained = body == INSUFFICIENT_EVIDENCE or (key == "similar_incidents" and body == NO_SIMILAR)
+        if not body:
+            problems.append(f"{key}: empty")
+        elif not tags and not abstained and not tag_problems:
+            problems.append(f"{key}: no citations")
+
+    likely = sections.get("likely_cause")
+    verdict: Literal["CAUSE_IDENTIFIED", "INSUFFICIENT_EVIDENCE"] | None = None
+    if not problems and likely is not None:
+        verdict = "INSUFFICIENT_EVIDENCE" if likely.text == INSUFFICIENT_EVIDENCE else "CAUSE_IDENTIFIED"
+    return ParsedBrief(verdict=verdict, sections=sections, problems=problems)
+
+
+@dataclass
+class TokenEvent:
+    text: str
+
+
+@dataclass
+class CitationEvent:
+    tag: str
+    section: str | None  # None if the tag came before any known section heading
+
+
+@dataclass
+class SectionCompleteEvent:
+    section: str
+
+
+ScanEvent = TokenEvent | CitationEvent | SectionCompleteEvent
+
+
+class TagScanner:
+    """Turns streamed text into token, citation and section_complete events, in text order. Model output arrives
+    in arbitrary pieces, so a tag ("[C1" + "2]") or a heading line can be split across them: a citation is emitted
+    once its closing bracket has arrived, and a section is complete once the next heading line has ended (or the
+    stream has). Token events are split at those points and concatenate to exactly what the model wrote."""
+
+    def __init__(self, supplied_tags: set[str]):
+        self.supplied = supplied_tags
+        self.text = ""
+        self.emitted = 0  # text before this offset has gone out as token events
+        self.tag_pos = 0  # tags before this offset have been handled
+        self.line_pos = 0  # complete lines before this offset have been checked for headings
+        self.section: str | None = None
+        self.cited: set[tuple[str | None, str]] = set()
+
+    def feed(self, piece: str) -> list[ScanEvent]:
+        self.text += piece
+        events: list[ScanEvent] = []
+        # Walk complete lines and tags in text order, so a tag lands in the section it was written under.
+        while True:
+            newline = self.text.find("\n", self.line_pos)
+            tag = TAG_RE.search(self.text, self.tag_pos)
+            if tag and (newline == -1 or tag.start() < newline):
+                self.tag_pos = tag.end()
+                found = self._cite(tag.group(1))
+                at = tag.end()
+            elif newline != -1:
+                found = self._line(self.text[self.line_pos : newline])
+                self.line_pos = newline + 1
+                self.tag_pos = max(self.tag_pos, self.line_pos)
+                at = newline + 1
+            else:
+                break
+            if found:
+                events.extend(self._tokens_until(at))
+                events.extend(found)
+        events.extend(self._tokens_until(len(self.text)))
+        return events
+
+    def finish(self) -> list[ScanEvent]:
+        """Call once the stream ends: the last line may have no newline, and the last section is complete."""
+        events = self._line(self.text[self.line_pos :])
+        self.line_pos = len(self.text)
+        if self.section:
+            events.append(SectionCompleteEvent(self.section))
+            self.section = None
+        return events
+
+    def _tokens_until(self, offset: int) -> list[ScanEvent]:
+        if offset <= self.emitted:
+            return []
+        text, self.emitted = self.text[self.emitted : offset], offset
+        return [TokenEvent(text)]
+
+    def _cite(self, tag: str) -> list[ScanEvent]:
+        if tag not in self.supplied or (self.section, tag) in self.cited:
+            return []  # unknown tags are parse_brief's job; repeats in one section are one citation
+        self.cited.add((self.section, tag))
+        return [CitationEvent(tag, self.section)]
+
+    def _line(self, line: str) -> list[ScanEvent]:
+        heading = SECTION_RE.match(line)
+        if not heading or heading.group(1) not in SECTIONS:
+            return []
+        events: list[ScanEvent] = [SectionCompleteEvent(self.section)] if self.section else []
+        self.section = SECTIONS[heading.group(1)]
+        return events
