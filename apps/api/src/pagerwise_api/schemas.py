@@ -206,3 +206,39 @@ class DlqReplayAccepted(BaseModel):
     replayed: int = Field(description="Messages republished to alerts.v1.")
     dlq_offsets: list[int] = Field(description="DLQ offsets of the replayed dead letters, in order.")
 
+
+class SearchHit(BaseModel):
+    chunk_id: uuid.UUID
+    document_path: str
+    source_type: Literal["runbook", "postmortem"]
+    service: str
+    heading_path: str
+    excerpt: str = Field(description="The chunk's first 280 characters.")
+    fts_rank: int | None = Field(default=None, description="Rank in full-text search; null if not in its top 40.")
+    fts_score: float | None = Field(default=None, description="ts_rank_cd; higher is better.")
+    vector_rank: int | None = Field(default=None, description="Rank in vector search; null if not in its top 40.")
+    vector_distance: float | None = Field(default=None, description="Cosine distance; lower is better.")
+    rrf_rank: int
+    rrf_score: float
+    rerank_rank: int | None = None
+    rerank_score: float | None = Field(default=None, description="Cross-encoder logit; only the order is meaningful.")
+
+
+class SearchTimings(BaseModel):
+    """Milliseconds per stage. fts and vector overlap (they run concurrently); searches is both."""
+
+    embed: float
+    fts: float
+    vector: float
+    searches: float
+    fuse: float
+    rerank: float
+    total: float
+
+
+class SearchResponse(BaseModel):
+    query: str
+    candidates: int = Field(description="Fused chunks the reranker scored.")
+    results: list[SearchHit]
+    timings_ms: SearchTimings
+
