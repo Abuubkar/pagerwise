@@ -1,0 +1,63 @@
+# Slice 4a done-when, 2026-11-02. docs_mock started with --fail-rate 0.15 --seed 3 (15% of listing requests get a 503).
+# Store emptied first: TRUNCATE documents, chunks, import_state.
+
+$ uv run python -m pagerwise_indexer
+WARNING pagerwise.indexer: /v1/runbooks?cursor=1.100&page_size=20: HTTP 503; retry 1 in 0.5s
+WARNING pagerwise.indexer: /v1/runbooks?cursor=1.100&page_size=20: HTTP 503; retry 2 in 1.0s
+runbooks     7 pages, 0 not modified (304), 2 retries, 0 restarts; documents: 126 new, 0 changed, 0 unchanged; 237 chunks; 26.8s
+postmortems  3 pages, 0 not modified (304), 0 retries, 0 restarts; documents: 60 new, 0 changed, 0 unchanged; 60 chunks; 6.1s
+
+$ uv run python -m pagerwise_indexer   # again: every page should be a 304
+WARNING pagerwise.indexer: /v1/postmortems?cursor=1.40&page_size=20: HTTP 503; retry 1 in 0.5s
+runbooks     0 pages, 7 not modified (304), 0 retries, 0 restarts; documents: 0 new, 0 changed, 0 unchanged; 0 chunks; 0.1s
+postmortems  0 pages, 3 not modified (304), 1 retries, 0 restarts; documents: 0 new, 0 changed, 0 unchanged; 0 chunks; 0.5s
+
+$ curl -s localhost:8002/_stats   # responses docs_mock sent, by status
+{"200":10,"503":3,"304":10}
+
+$ psql: documents and chunks by source type
+ source_type | documents | chunks 
+-------------+-----------+--------
+ postmortem  |        60 |     60
+ runbook     |       126 |    237
+(2 rows)
+
+
+$ uv run python scripts/search.py "LED-POOL-626"
+Q: LED-POOL-626   (10 fused candidates)
+  final rerank  rrf  fts  vec  type       document > section
+      1      1    1    1   18  runbook    ledger-connection-pool > Ledger: connection pool exhaustion
+      2      2    3    -    2  postmortem 2026-08-28-redis-cache-connection-pool > Postmortem: redis-cache connection pool exhaustion (2026-08-28)
+      3      3    2    -    1  postmortem 2026-02-13-search-connection-pool > Postmortem: search connection pool exhaustion (2026-02-13)
+      4      4    4    -    3  postmortem 2025-10-20-card-auth-connection-pool > Postmortem: card-auth connection pool exhaustion (2025-10-20)
+      5      5    5    -    4  postmortem 2025-08-24-search-connection-pool > Postmortem: search connection pool exhaustion (2025-08-24)
+      6      6    6    -    5  runbook    notifications-connection-pool > Notifications: connection pool exhaustion
+      7      7    8    -    7  runbook    search-connection-pool > Search: connection pool exhaustion
+      8      8   10    -    9  runbook    postgres-primary-connection-pool > Postgres primary: connection pool exhaustion
+  ms: embed 119, fts 23 | vector 28 (concurrent: 30), fuse 10, rerank 502, total 662
+
+$ uv run python scripts/search.py "ledger is running out of database connections, what do I check first?"
+Q: ledger is running out of database connections, what do I check first?   (10 fused candidates)
+  final rerank  rrf  fts  vec  type       document > section
+      1      1    1    2    2  runbook    ledger-connection-pool-exhaustion > Ledger: connection pool exhaustion
+      2      2    3    -    1  runbook    ledger-connection-pool > Ledger: connection pool exhaustion
+      3      3    9    -    8  runbook    ledger-read-only-write-errors > Ledger: writes fail with read-only transaction errors
+      4      4    2    1   20  runbook    payments-high-p99-latency > Payments: high p99 latency
+      5      5   10    -    9  runbook    ledger-connection-pool > Ledger: connection pool exhaustion
+      6      6    4    -    3  postmortem 2026-07-26-ledger-dependency-timeout > Postmortem: ledger dependency timeouts (2026-07-26)
+      7      7    8    -    7  postmortem 2025-09-08-ledger-queue-backlog > Postmortem: ledger queue backlog (2025-09-08)
+      8      8    7    -    6  runbook    ledger-dependency-timeout > Ledger: dependency timeouts
+  ms: embed 5, fts 7 | vector 6 (concurrent: 8), fuse 5, rerank 477, total 495
+
+$ uv run python scripts/search.py "what caused the card-auth OOM kills in October?"
+Q: what caused the card-auth OOM kills in October?   (10 fused candidates)
+  final rerank  rrf  fts  vec  type       document > section
+      1      1    1    -    1  postmortem 2026-10-25-card-auth-memory-pressure > Postmortem: card-auth memory pressure and OOM kills (2026-10-25)
+      2      2    2    -    2  runbook    card-auth-memory-pressure > Card auth: memory pressure and OOM kills
+      3      3    8    -    8  runbook    payments-memory-pressure > Payments: memory pressure and OOM kills
+      4      4    6    -    6  runbook    auth-memory-pressure > Auth: memory pressure and OOM kills
+      5      5    9    -    9  runbook    card-auth-memory-pressure > Card auth: memory pressure and OOM kills
+      6      6    3    -    3  postmortem 2026-02-23-card-auth-bad-deploy > Postmortem: card-auth regression after a deploy (2026-02-23)
+      7      7    5    -    5  postmortem 2025-10-20-card-auth-connection-pool > Postmortem: card-auth connection pool exhaustion (2025-10-20)
+      8      8   10    -   10  runbook    card-auth-queue-backlog > Card auth: queue backlog
+  ms: embed 5, fts 5 | vector 5 (concurrent: 6), fuse 2, rerank 463, total 476
