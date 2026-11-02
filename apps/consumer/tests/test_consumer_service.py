@@ -51,7 +51,7 @@ async def produce(bootstrap: str, valid: int, malformed: int = 0, seed: int = 1)
 
 def start(engine, bootstrap: str, name: str, faults: Fault = no_faults) -> tuple[AlertConsumer, asyncio.Task]:
     consumer = AlertConsumer(engine, bootstrap=bootstrap, group="test", client_id=name, faults=faults,
-                             retry_delays_s=FAST_RETRIES, drain_s=10)
+                             retry_delays_s=FAST_RETRIES, drain_s=10, redis_url=None)
     return consumer, asyncio.create_task(consumer.run())
 
 
