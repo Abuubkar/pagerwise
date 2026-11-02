@@ -484,4 +484,5 @@ def main() -> None:
         asyncio.run(alerts(args.seed, anchor, args.count))
 
 
-main()
+if __name__ == "__main__":
+    main()

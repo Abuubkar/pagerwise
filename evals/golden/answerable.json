@@ -1,0 +1,6055 @@
+{
+ "seed": 11,
+ "cases": [
+  {
+   "id": "ans-01",
+   "kind": "answerable",
+   "service": "redis-cache",
+   "title": "RedisCacheMemoryPressure on redis-cache",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 5.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-0",
+     "fingerprint": "a7df7ebd57541505",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-0"
+    },
+    {
+     "offset_s": 12.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-2",
+     "fingerprint": "c6ac3887deb775a4",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-2"
+    },
+    {
+     "offset_s": 15.2,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-5",
+     "fingerprint": "013026c65a2034c0",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 98 on redis-cache-5"
+    },
+    {
+     "offset_s": 33.7,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-2",
+     "fingerprint": "c6ac3887deb775a4",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 96 on redis-cache-2"
+    },
+    {
+     "offset_s": 38.2,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-3",
+     "fingerprint": "0b53134dad5329d9",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 98 on redis-cache-3"
+    },
+    {
+     "offset_s": 44.1,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-0",
+     "fingerprint": "a7df7ebd57541505",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-0"
+    },
+    {
+     "offset_s": 56.4,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-3",
+     "fingerprint": "0b53134dad5329d9",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 97 on redis-cache-3"
+    },
+    {
+     "offset_s": 60.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-2",
+     "fingerprint": "c6ac3887deb775a4",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-2"
+    },
+    {
+     "offset_s": 71.7,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-5",
+     "fingerprint": "013026c65a2034c0",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 98 on redis-cache-5"
+    },
+    {
+     "offset_s": 75.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-3",
+     "fingerprint": "0b53134dad5329d9",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 98 on redis-cache-3"
+    },
+    {
+     "offset_s": 75.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-0",
+     "fingerprint": "a7df7ebd57541505",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 97 on redis-cache-0"
+    },
+    {
+     "offset_s": 83.2,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-5",
+     "fingerprint": "013026c65a2034c0",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 99 on redis-cache-5"
+    },
+    {
+     "offset_s": 101.4,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-5",
+     "fingerprint": "013026c65a2034c0",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 97 on redis-cache-5"
+    },
+    {
+     "offset_s": 154.7,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-5",
+     "fingerprint": "013026c65a2034c0",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 97 on redis-cache-5"
+    },
+    {
+     "offset_s": 172.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-3",
+     "fingerprint": "0b53134dad5329d9",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 96 on redis-cache-3"
+    },
+    {
+     "offset_s": 175.5,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-0",
+     "fingerprint": "a7df7ebd57541505",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-0"
+    },
+    {
+     "offset_s": 178.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-2",
+     "fingerprint": "c6ac3887deb775a4",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 97 on redis-cache-2"
+    },
+    {
+     "offset_s": 178.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheMemoryPressure",
+     "instance": "redis-cache-2",
+     "fingerprint": "c6ac3887deb775a4",
+     "severity": "critical",
+     "summary": "redis_cache_rss_pct_of_limit at 96 on redis-cache-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "redis-cache"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/redis-cache-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Redis cache: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/redis-cache-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Redis cache: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T10:25:25.233614+00:00",
+   "severity": "sev1",
+   "summary": "redis_cache_rss_pct_of_limit at 95 on redis-cache-0",
+   "split": "test"
+  },
+  {
+   "id": "ans-02",
+   "kind": "answerable",
+   "service": "notifications",
+   "title": "NotificationsConsumerLagHigh on notifications",
+   "category": "queue-backlog",
+   "alerts": [
+    {
+     "offset_s": 5.5,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-0",
+     "fingerprint": "a4214d5991e2d79a",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 327611 on notifications-0"
+    },
+    {
+     "offset_s": 32.0,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-1",
+     "fingerprint": "c733fafe72878385",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 217408 on notifications-1"
+    },
+    {
+     "offset_s": 45.2,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-5",
+     "fingerprint": "6dc91d3f09a85df0",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 391240 on notifications-5"
+    },
+    {
+     "offset_s": 48.2,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-1",
+     "fingerprint": "c733fafe72878385",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 170811 on notifications-1"
+    },
+    {
+     "offset_s": 69.8,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-1",
+     "fingerprint": "c733fafe72878385",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 342977 on notifications-1"
+    },
+    {
+     "offset_s": 110.3,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-0",
+     "fingerprint": "a4214d5991e2d79a",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 220809 on notifications-0"
+    },
+    {
+     "offset_s": 156.7,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-0",
+     "fingerprint": "a4214d5991e2d79a",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 262467 on notifications-0"
+    },
+    {
+     "offset_s": 168.3,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-3",
+     "fingerprint": "47ba0699bcb58ee9",
+     "severity": "critical",
+     "summary": "checkout errors 16% on orders-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 257.5,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-5",
+     "fingerprint": "6dc91d3f09a85df0",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 380419 on notifications-5"
+    },
+    {
+     "offset_s": 294.8,
+     "service": "notifications",
+     "alertname": "NotificationsConsumerLagHigh",
+     "instance": "notifications-5",
+     "fingerprint": "6dc91d3f09a85df0",
+     "severity": "warning",
+     "summary": "notifications_consumer_lag_msgs at 128944 on notifications-5"
+    },
+    {
+     "offset_s": 323.0,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-3",
+     "fingerprint": "47ba0699bcb58ee9",
+     "severity": "critical",
+     "summary": "checkout errors 36% on orders-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 326.2,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-3",
+     "fingerprint": "47ba0699bcb58ee9",
+     "severity": "critical",
+     "summary": "checkout errors 6% on orders-3",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "queue-backlog",
+    "component": "notifications"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/notifications-queue-backlog.md",
+     "ordinal": 0,
+     "heading_path": "Notifications: queue backlog"
+    }
+   ],
+   "opened_at": "2026-10-28T06:20:01.589638+00:00",
+   "severity": "sev3",
+   "summary": "notifications_consumer_lag_msgs at 327611 on notifications-0",
+   "split": "test"
+  },
+  {
+   "id": "ans-03",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerLatencyHigh on kafka-broker",
+   "category": "high-latency",
+   "alerts": [
+    {
+     "offset_s": 1.7,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "15aa348e8259a059",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 2725 on kafka-broker-4"
+    },
+    {
+     "offset_s": 7.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "aa2b3bb00a350c9c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 3967 on kafka-broker-0"
+    },
+    {
+     "offset_s": 24.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8eb0934a3499ea5c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 2054 on kafka-broker-5"
+    },
+    {
+     "offset_s": 49.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "15aa348e8259a059",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 3850 on kafka-broker-4"
+    },
+    {
+     "offset_s": 51.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "25afb91949cf7d8c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 3930 on kafka-broker-3"
+    },
+    {
+     "offset_s": 55.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "25afb91949cf7d8c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 3416 on kafka-broker-3"
+    },
+    {
+     "offset_s": 70.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "aa2b3bb00a350c9c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 3343 on kafka-broker-0"
+    },
+    {
+     "offset_s": 97.7,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerLatencyHigh",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8eb0934a3499ea5c",
+     "severity": "warning",
+     "summary": "kafka_broker_p99_latency_ms at 2863 on kafka-broker-5"
+    }
+   ],
+   "gold_cause": {
+    "category": "high-latency",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-high-latency.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: high p99 latency"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-high-latency.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: high p99 latency"
+    }
+   ],
+   "opened_at": "2026-10-28T06:11:58.550073+00:00",
+   "severity": "sev3",
+   "summary": "kafka_broker_p99_latency_ms at 2725 on kafka-broker-4",
+   "split": "dev"
+  },
+  {
+   "id": "ans-04",
+   "kind": "answerable",
+   "service": "redis-cache",
+   "title": "RedisCacheDiskFull on redis-cache",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 42.9,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-0",
+     "fingerprint": "f67bc151534a8792",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 93 on redis-cache-0"
+    },
+    {
+     "offset_s": 45.8,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-4",
+     "fingerprint": "317c0d42e5d9cfdc",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 98 on redis-cache-4"
+    },
+    {
+     "offset_s": 103.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-0",
+     "fingerprint": "f67bc151534a8792",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 93 on redis-cache-0"
+    },
+    {
+     "offset_s": 138.1,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-1",
+     "fingerprint": "51ffc3fe899753a0",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 99 on redis-cache-1"
+    },
+    {
+     "offset_s": 150.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-4",
+     "fingerprint": "317c0d42e5d9cfdc",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 93 on redis-cache-4"
+    },
+    {
+     "offset_s": 195.2,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-0",
+     "fingerprint": "f67bc151534a8792",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 95 on redis-cache-0"
+    },
+    {
+     "offset_s": 210.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-1",
+     "fingerprint": "51ffc3fe899753a0",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 98 on redis-cache-1"
+    },
+    {
+     "offset_s": 226.8,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-4",
+     "fingerprint": "317c0d42e5d9cfdc",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 99 on redis-cache-4"
+    },
+    {
+     "offset_s": 232.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-4",
+     "fingerprint": "317c0d42e5d9cfdc",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 97 on redis-cache-4"
+    },
+    {
+     "offset_s": 242.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-1",
+     "fingerprint": "51ffc3fe899753a0",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 94 on redis-cache-1"
+    },
+    {
+     "offset_s": 298.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheDiskFull",
+     "instance": "redis-cache-1",
+     "fingerprint": "51ffc3fe899753a0",
+     "severity": "critical",
+     "summary": "redis_cache_disk_used_pct at 98 on redis-cache-1"
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "redis-cache"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/redis-cache-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Redis cache: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/redis-cache-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Redis cache: disk full"
+    }
+   ],
+   "opened_at": "2026-10-28T10:39:15.304277+00:00",
+   "severity": "sev1",
+   "summary": "redis_cache_disk_used_pct at 93 on redis-cache-0",
+   "split": "dev"
+  },
+  {
+   "id": "ans-05",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerConsumerLagHigh on kafka-broker",
+   "category": "queue-backlog",
+   "alerts": [
+    {
+     "offset_s": 29.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "5c746f0ea987879c",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 105618 on kafka-broker-4"
+    },
+    {
+     "offset_s": 32.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "5c746f0ea987879c",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 308232 on kafka-broker-4"
+    },
+    {
+     "offset_s": 81.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "1bf895b98726c0a9",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 350702 on kafka-broker-0"
+    },
+    {
+     "offset_s": 109.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "55a9bc3f60bc493e",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 101686 on kafka-broker-3"
+    },
+    {
+     "offset_s": 161.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "1bf895b98726c0a9",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 373771 on kafka-broker-0"
+    },
+    {
+     "offset_s": 175.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "55a9bc3f60bc493e",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 302209 on kafka-broker-3"
+    },
+    {
+     "offset_s": 205.7,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "1bf895b98726c0a9",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 132048 on kafka-broker-0"
+    },
+    {
+     "offset_s": 239.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "1bf895b98726c0a9",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 178922 on kafka-broker-0"
+    },
+    {
+     "offset_s": 257.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "55a9bc3f60bc493e",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 394586 on kafka-broker-3"
+    },
+    {
+     "offset_s": 266.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "5c746f0ea987879c",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 321699 on kafka-broker-4"
+    },
+    {
+     "offset_s": 275.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-4",
+     "fingerprint": "5c746f0ea987879c",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 224128 on kafka-broker-4"
+    },
+    {
+     "offset_s": 316.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerConsumerLagHigh",
+     "instance": "kafka-broker-3",
+     "fingerprint": "55a9bc3f60bc493e",
+     "severity": "warning",
+     "summary": "kafka_broker_consumer_lag_msgs at 165088 on kafka-broker-3"
+    }
+   ],
+   "gold_cause": {
+    "category": "queue-backlog",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-queue-backlog.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: queue backlog"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-queue-backlog.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: queue backlog"
+    }
+   ],
+   "opened_at": "2026-10-28T06:49:10.665695+00:00",
+   "severity": "sev3",
+   "summary": "kafka_broker_consumer_lag_msgs at 105618 on kafka-broker-4",
+   "split": "test"
+  },
+  {
+   "id": "ans-06",
+   "kind": "answerable",
+   "service": "notifications",
+   "title": "NotificationsPoolExhausted on notifications",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 3.6,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-3",
+     "fingerprint": "b041d6c20c9eb3d4",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 1231 on notifications-3"
+    },
+    {
+     "offset_s": 21.2,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-0",
+     "fingerprint": "8065d14c75117858",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 738 on notifications-0"
+    },
+    {
+     "offset_s": 25.3,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-3",
+     "fingerprint": "b041d6c20c9eb3d4",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 383 on notifications-3"
+    },
+    {
+     "offset_s": 35.7,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-5",
+     "fingerprint": "1854bf995850868a",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 845 on notifications-5"
+    },
+    {
+     "offset_s": 41.3,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-1",
+     "fingerprint": "5e595d64a449f3ea",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 578 on notifications-1"
+    },
+    {
+     "offset_s": 44.6,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-0",
+     "fingerprint": "8065d14c75117858",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 396 on notifications-0"
+    },
+    {
+     "offset_s": 60.2,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-5",
+     "fingerprint": "1854bf995850868a",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 869 on notifications-5"
+    },
+    {
+     "offset_s": 92.8,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-3",
+     "fingerprint": "b041d6c20c9eb3d4",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 1226 on notifications-3"
+    },
+    {
+     "offset_s": 107.3,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-1",
+     "fingerprint": "5e595d64a449f3ea",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 1455 on notifications-1"
+    },
+    {
+     "offset_s": 114.3,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 36% on orders-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 118.4,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-3",
+     "fingerprint": "b041d6c20c9eb3d4",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 1055 on notifications-3"
+    },
+    {
+     "offset_s": 133.7,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-5",
+     "fingerprint": "1854bf995850868a",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 646 on notifications-5"
+    },
+    {
+     "offset_s": 138.8,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 42% on orders-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 156.2,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-1",
+     "fingerprint": "5e595d64a449f3ea",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 1364 on notifications-1"
+    },
+    {
+     "offset_s": 164.1,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-0",
+     "fingerprint": "8065d14c75117858",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 875 on notifications-0"
+    },
+    {
+     "offset_s": 185.0,
+     "service": "notifications",
+     "alertname": "NotificationsPoolExhausted",
+     "instance": "notifications-1",
+     "fingerprint": "5e595d64a449f3ea",
+     "severity": "critical",
+     "summary": "notifications_pool_wait_ms at 523 on notifications-1"
+    },
+    {
+     "offset_s": 247.9,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 42% on orders-2",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "notifications"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/notifications-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Notifications: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/notifications-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Notifications: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T07:10:37.079667+00:00",
+   "severity": "sev1",
+   "summary": "notifications_pool_wait_ms at 1231 on notifications-3",
+   "split": "dev"
+  },
+  {
+   "id": "ans-07",
+   "kind": "answerable",
+   "service": "search",
+   "title": "SearchMemoryPressure on search",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 14.0,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-3",
+     "fingerprint": "466d27250e6e0223",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 96 on search-3"
+    },
+    {
+     "offset_s": 28.8,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-1",
+     "fingerprint": "73cb7525d75183b6",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 98 on search-1"
+    },
+    {
+     "offset_s": 43.8,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-1",
+     "fingerprint": "73cb7525d75183b6",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 99 on search-1"
+    },
+    {
+     "offset_s": 80.6,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-3",
+     "fingerprint": "466d27250e6e0223",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 98 on search-3"
+    },
+    {
+     "offset_s": 86.1,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-3",
+     "fingerprint": "466d27250e6e0223",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 96 on search-3"
+    },
+    {
+     "offset_s": 136.7,
+     "service": "search",
+     "alertname": "SearchMemoryPressure",
+     "instance": "search-1",
+     "fingerprint": "73cb7525d75183b6",
+     "severity": "critical",
+     "summary": "search_rss_pct_of_limit at 96 on search-1"
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "search"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Search: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/search-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Search: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T06:10:28.245261+00:00",
+   "severity": "sev1",
+   "summary": "search_rss_pct_of_limit at 96 on search-3",
+   "split": "test"
+  },
+  {
+   "id": "ans-08",
+   "kind": "answerable",
+   "service": "payments",
+   "title": "PaymentsUpstreamTimeouts on payments",
+   "category": "dependency-timeout",
+   "alerts": [
+    {
+     "offset_s": 10.8,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-0",
+     "fingerprint": "097d43e9706fc817",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 21 on payments-0"
+    },
+    {
+     "offset_s": 50.5,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-0",
+     "fingerprint": "097d43e9706fc817",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 12 on payments-0"
+    },
+    {
+     "offset_s": 135.4,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-0",
+     "fingerprint": "097d43e9706fc817",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 11 on payments-0"
+    },
+    {
+     "offset_s": 137.4,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-3",
+     "fingerprint": "b6ab1509244c2666",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 24 on payments-3"
+    },
+    {
+     "offset_s": 166.1,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-1",
+     "fingerprint": "eaafaddbed6e50ee",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 18 on payments-1"
+    },
+    {
+     "offset_s": 169.1,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-0",
+     "fingerprint": "097d43e9706fc817",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 15 on payments-0"
+    },
+    {
+     "offset_s": 210.8,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-3",
+     "fingerprint": "b6ab1509244c2666",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 28 on payments-3"
+    },
+    {
+     "offset_s": 224.3,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-3",
+     "fingerprint": "b6ab1509244c2666",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 14 on payments-3"
+    },
+    {
+     "offset_s": 236.3,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-1",
+     "fingerprint": "eaafaddbed6e50ee",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 9 on payments-1"
+    },
+    {
+     "offset_s": 245.3,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-1",
+     "fingerprint": "eaafaddbed6e50ee",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 23 on payments-1"
+    },
+    {
+     "offset_s": 249.9,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-1",
+     "fingerprint": "eaafaddbed6e50ee",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 10 on payments-1"
+    },
+    {
+     "offset_s": 262.8,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-0",
+     "fingerprint": "097d43e9706fc817",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 25 on payments-0"
+    },
+    {
+     "offset_s": 269.9,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-1",
+     "fingerprint": "eaafaddbed6e50ee",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 15 on payments-1"
+    },
+    {
+     "offset_s": 285.2,
+     "service": "payments",
+     "alertname": "PaymentsUpstreamTimeouts",
+     "instance": "payments-3",
+     "fingerprint": "b6ab1509244c2666",
+     "severity": "warning",
+     "summary": "payments_upstream_timeout_pct at 30 on payments-3"
+    }
+   ],
+   "gold_cause": {
+    "category": "dependency-timeout",
+    "component": "card-auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-dependency-timeout.md",
+     "ordinal": 0,
+     "heading_path": "Payments: dependency timeouts"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-dependency-timeout.md",
+     "ordinal": 1,
+     "heading_path": "Payments: dependency timeouts > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T06:57:13.737409+00:00",
+   "severity": "sev3",
+   "summary": "payments_upstream_timeout_pct at 21 on payments-0",
+   "split": "dev"
+  },
+  {
+   "id": "ans-09",
+   "kind": "answerable",
+   "service": "payments",
+   "title": "PaymentsDiskFull on payments",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 68.5,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-1",
+     "fingerprint": "6b52da464c2cdc58",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 97 on payments-1"
+    },
+    {
+     "offset_s": 81.0,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-2",
+     "fingerprint": "b26cb1a5e6e6e05a",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 95 on payments-2"
+    },
+    {
+     "offset_s": 131.1,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-5",
+     "fingerprint": "88dcac04f0095663",
+     "severity": "critical",
+     "summary": "checkout errors 11% on orders-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 135.2,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-2",
+     "fingerprint": "b26cb1a5e6e6e05a",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 93 on payments-2"
+    },
+    {
+     "offset_s": 136.1,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-4",
+     "fingerprint": "3a77d57d37b1e461",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 95 on payments-4"
+    },
+    {
+     "offset_s": 142.7,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-1",
+     "fingerprint": "6b52da464c2cdc58",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 96 on payments-1"
+    },
+    {
+     "offset_s": 169.2,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-4",
+     "fingerprint": "3a77d57d37b1e461",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 95 on payments-4"
+    },
+    {
+     "offset_s": 169.8,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-4",
+     "fingerprint": "3a77d57d37b1e461",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 99 on payments-4"
+    },
+    {
+     "offset_s": 172.5,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-4",
+     "fingerprint": "3a77d57d37b1e461",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 94 on payments-4"
+    },
+    {
+     "offset_s": 172.7,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-4",
+     "fingerprint": "3a77d57d37b1e461",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 96 on payments-4"
+    },
+    {
+     "offset_s": 173.0,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-5",
+     "fingerprint": "88dcac04f0095663",
+     "severity": "critical",
+     "summary": "checkout errors 40% on orders-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 199.1,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-1",
+     "fingerprint": "6b52da464c2cdc58",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 93 on payments-1"
+    },
+    {
+     "offset_s": 203.3,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-2",
+     "fingerprint": "b26cb1a5e6e6e05a",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 98 on payments-2"
+    },
+    {
+     "offset_s": 220.9,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-2",
+     "fingerprint": "b26cb1a5e6e6e05a",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 97 on payments-2"
+    },
+    {
+     "offset_s": 227.3,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-1",
+     "fingerprint": "6b52da464c2cdc58",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 96 on payments-1"
+    },
+    {
+     "offset_s": 287.0,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-5",
+     "fingerprint": "88dcac04f0095663",
+     "severity": "critical",
+     "summary": "checkout errors 47% on orders-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 294.6,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-5",
+     "fingerprint": "88dcac04f0095663",
+     "severity": "critical",
+     "summary": "checkout errors 56% on orders-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 325.5,
+     "service": "payments",
+     "alertname": "PaymentsDiskFull",
+     "instance": "payments-2",
+     "fingerprint": "b26cb1a5e6e6e05a",
+     "severity": "critical",
+     "summary": "payments_disk_used_pct at 93 on payments-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "payments"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Payments: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Payments: disk full > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T08:45:45.593063+00:00",
+   "severity": "sev1",
+   "summary": "payments_disk_used_pct at 97 on payments-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-10",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerMemoryPressure on kafka-broker",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 0.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerMemoryPressure",
+     "instance": "kafka-broker-1",
+     "fingerprint": "fc2c4e4fc8d71457",
+     "severity": "critical",
+     "summary": "kafka_broker_rss_pct_of_limit at 97 on kafka-broker-1"
+    },
+    {
+     "offset_s": 19.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerMemoryPressure",
+     "instance": "kafka-broker-5",
+     "fingerprint": "dd70c79c5e5758f8",
+     "severity": "critical",
+     "summary": "kafka_broker_rss_pct_of_limit at 98 on kafka-broker-5"
+    },
+    {
+     "offset_s": 48.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerMemoryPressure",
+     "instance": "kafka-broker-5",
+     "fingerprint": "dd70c79c5e5758f8",
+     "severity": "critical",
+     "summary": "kafka_broker_rss_pct_of_limit at 99 on kafka-broker-5"
+    },
+    {
+     "offset_s": 57.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerMemoryPressure",
+     "instance": "kafka-broker-1",
+     "fingerprint": "fc2c4e4fc8d71457",
+     "severity": "critical",
+     "summary": "kafka_broker_rss_pct_of_limit at 99 on kafka-broker-1"
+    },
+    {
+     "offset_s": 68.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerMemoryPressure",
+     "instance": "kafka-broker-1",
+     "fingerprint": "fc2c4e4fc8d71457",
+     "severity": "critical",
+     "summary": "kafka_broker_rss_pct_of_limit at 98 on kafka-broker-1"
+    },
+    {
+     "offset_s": 72.9,
+     "service": "notifications",
+     "alertname": "NotificationQueueBacklog",
+     "instance": "notifications-1",
+     "fingerprint": "8526a3e1200bd543",
+     "severity": "warning",
+     "summary": "backlog 9 messages on notifications-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 73.3,
+     "service": "notifications",
+     "alertname": "NotificationQueueBacklog",
+     "instance": "notifications-0",
+     "fingerprint": "0f3567e42adb8669",
+     "severity": "warning",
+     "summary": "backlog 3 messages on notifications-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 93.2,
+     "service": "notifications",
+     "alertname": "NotificationQueueBacklog",
+     "instance": "notifications-1",
+     "fingerprint": "8526a3e1200bd543",
+     "severity": "warning",
+     "summary": "backlog 19 messages on notifications-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 94.6,
+     "service": "notifications",
+     "alertname": "NotificationQueueBacklog",
+     "instance": "notifications-0",
+     "fingerprint": "0f3567e42adb8669",
+     "severity": "warning",
+     "summary": "backlog 8 messages on notifications-0",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T11:35:19.155248+00:00",
+   "severity": "sev1",
+   "summary": "kafka_broker_rss_pct_of_limit at 97 on kafka-broker-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-11",
+   "kind": "answerable",
+   "service": "redis-cache",
+   "title": "RedisCacheUpstreamTimeouts on redis-cache",
+   "category": "dependency-timeout",
+   "alerts": [
+    {
+     "offset_s": 13.7,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-5",
+     "fingerprint": "4e3d9cb8f9d2cf37",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 25 on redis-cache-5"
+    },
+    {
+     "offset_s": 16.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-5",
+     "fingerprint": "4e3d9cb8f9d2cf37",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 18 on redis-cache-5"
+    },
+    {
+     "offset_s": 18.7,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-1",
+     "fingerprint": "ac5e252b4d8b666e",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 20 on redis-cache-1"
+    },
+    {
+     "offset_s": 28.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-1",
+     "fingerprint": "ac5e252b4d8b666e",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 19 on redis-cache-1"
+    },
+    {
+     "offset_s": 32.8,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-1",
+     "fingerprint": "ac5e252b4d8b666e",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 19 on redis-cache-1"
+    },
+    {
+     "offset_s": 88.5,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-4",
+     "fingerprint": "7a5abacc077b72c0",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 11 on redis-cache-4"
+    },
+    {
+     "offset_s": 111.4,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-2",
+     "fingerprint": "68c9370bb11ae1ac",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 20 on redis-cache-2"
+    },
+    {
+     "offset_s": 120.0,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-4",
+     "fingerprint": "7a5abacc077b72c0",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 12 on redis-cache-4"
+    },
+    {
+     "offset_s": 125.1,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-4",
+     "fingerprint": "7a5abacc077b72c0",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 15 on redis-cache-4"
+    },
+    {
+     "offset_s": 125.6,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-2",
+     "fingerprint": "68c9370bb11ae1ac",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 14 on redis-cache-2"
+    },
+    {
+     "offset_s": 127.3,
+     "service": "redis-cache",
+     "alertname": "RedisCacheUpstreamTimeouts",
+     "instance": "redis-cache-5",
+     "fingerprint": "4e3d9cb8f9d2cf37",
+     "severity": "warning",
+     "summary": "redis_cache_upstream_timeout_pct at 18 on redis-cache-5"
+    }
+   ],
+   "gold_cause": {
+    "category": "dependency-timeout",
+    "component": "redis-cache"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/redis-cache-dependency-timeout.md",
+     "ordinal": 0,
+     "heading_path": "Redis cache: dependency timeouts"
+    },
+    {
+     "doc": "data/corpus/runbooks/redis-cache-dependency-timeout.md",
+     "ordinal": 1,
+     "heading_path": "Redis cache: dependency timeouts"
+    }
+   ],
+   "opened_at": "2026-10-28T07:52:27.404016+00:00",
+   "severity": "sev3",
+   "summary": "redis_cache_upstream_timeout_pct at 25 on redis-cache-5",
+   "split": "dev"
+  },
+  {
+   "id": "ans-12",
+   "kind": "answerable",
+   "service": "search",
+   "title": "SearchConsumerLagHigh on search",
+   "category": "queue-backlog",
+   "alerts": [
+    {
+     "offset_s": 21.0,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-0",
+     "fingerprint": "735f085f976cd608",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 130687 on search-0"
+    },
+    {
+     "offset_s": 31.8,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-5",
+     "fingerprint": "86deb44f51ec3255",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 238423 on search-5"
+    },
+    {
+     "offset_s": 66.5,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-5",
+     "fingerprint": "86deb44f51ec3255",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 200145 on search-5"
+    },
+    {
+     "offset_s": 75.1,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-3",
+     "fingerprint": "5634dd04dfde080a",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 150265 on search-3"
+    },
+    {
+     "offset_s": 93.7,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-4",
+     "fingerprint": "9c0bb5a4decc3cb5",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 111431 on search-4"
+    },
+    {
+     "offset_s": 118.9,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-0",
+     "fingerprint": "735f085f976cd608",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 388184 on search-0"
+    },
+    {
+     "offset_s": 119.3,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-3",
+     "fingerprint": "5634dd04dfde080a",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 334821 on search-3"
+    },
+    {
+     "offset_s": 144.6,
+     "service": "search",
+     "alertname": "SearchConsumerLagHigh",
+     "instance": "search-4",
+     "fingerprint": "9c0bb5a4decc3cb5",
+     "severity": "warning",
+     "summary": "search_consumer_lag_msgs at 122477 on search-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "queue-backlog",
+    "component": "search"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-queue-backlog.md",
+     "ordinal": 0,
+     "heading_path": "Search: queue backlog"
+    }
+   ],
+   "opened_at": "2026-10-28T07:30:45.907391+00:00",
+   "severity": "sev3",
+   "summary": "search_consumer_lag_msgs at 130687 on search-0",
+   "split": "dev"
+  },
+  {
+   "id": "ans-13",
+   "kind": "answerable",
+   "service": "search",
+   "title": "SearchUpstreamTimeouts on search",
+   "category": "dependency-timeout",
+   "alerts": [
+    {
+     "offset_s": 25.1,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-5",
+     "fingerprint": "12757e73f72a01a8",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 8 on search-5"
+    },
+    {
+     "offset_s": 49.2,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-3",
+     "fingerprint": "34b30eef7249a4b3",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 30 on search-3"
+    },
+    {
+     "offset_s": 91.1,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-3",
+     "fingerprint": "34b30eef7249a4b3",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 18 on search-3"
+    },
+    {
+     "offset_s": 112.4,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-3",
+     "fingerprint": "34b30eef7249a4b3",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 27 on search-3"
+    },
+    {
+     "offset_s": 115.7,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 20% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 122.3,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-5",
+     "fingerprint": "12757e73f72a01a8",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 11 on search-5"
+    },
+    {
+     "offset_s": 133.1,
+     "service": "search",
+     "alertname": "SearchUpstreamTimeouts",
+     "instance": "search-5",
+     "fingerprint": "12757e73f72a01a8",
+     "severity": "warning",
+     "summary": "search_upstream_timeout_pct at 26 on search-5"
+    },
+    {
+     "offset_s": 168.8,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 50% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 190.4,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 16% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 192.2,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 47% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 192.3,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 47% on api-gateway-5",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "dependency-timeout",
+    "component": "inventory"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-dependency-timeout.md",
+     "ordinal": 0,
+     "heading_path": "Search: dependency timeouts"
+    },
+    {
+     "doc": "data/corpus/runbooks/search-dependency-timeout.md",
+     "ordinal": 1,
+     "heading_path": "Search: dependency timeouts > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T10:49:46.717316+00:00",
+   "severity": "sev3",
+   "summary": "search_upstream_timeout_pct at 8 on search-5",
+   "split": "test"
+  },
+  {
+   "id": "ans-14",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerUpstreamTimeouts on kafka-broker",
+   "category": "dependency-timeout",
+   "alerts": [
+    {
+     "offset_s": 1.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8665034583820ad1",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 27 on kafka-broker-5"
+    },
+    {
+     "offset_s": 7.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-3",
+     "fingerprint": "d5b4668e65735a02",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 17 on kafka-broker-3"
+    },
+    {
+     "offset_s": 13.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-3",
+     "fingerprint": "d5b4668e65735a02",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 18 on kafka-broker-3"
+    },
+    {
+     "offset_s": 16.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-1",
+     "fingerprint": "3227277ade150032",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 15 on kafka-broker-1"
+    },
+    {
+     "offset_s": 16.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-3",
+     "fingerprint": "d5b4668e65735a02",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 8 on kafka-broker-3"
+    },
+    {
+     "offset_s": 25.7,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-2",
+     "fingerprint": "f80da5db1bb8e125",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 24 on kafka-broker-2"
+    },
+    {
+     "offset_s": 36.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-2",
+     "fingerprint": "f80da5db1bb8e125",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 9 on kafka-broker-2"
+    },
+    {
+     "offset_s": 47.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-1",
+     "fingerprint": "3227277ade150032",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 26 on kafka-broker-1"
+    },
+    {
+     "offset_s": 52.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-3",
+     "fingerprint": "d5b4668e65735a02",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 13 on kafka-broker-3"
+    },
+    {
+     "offset_s": 54.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-1",
+     "fingerprint": "3227277ade150032",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 23 on kafka-broker-1"
+    },
+    {
+     "offset_s": 57.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-1",
+     "fingerprint": "3227277ade150032",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 10 on kafka-broker-1"
+    },
+    {
+     "offset_s": 76.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-2",
+     "fingerprint": "f80da5db1bb8e125",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 21 on kafka-broker-2"
+    },
+    {
+     "offset_s": 77.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-1",
+     "fingerprint": "3227277ade150032",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 24 on kafka-broker-1"
+    },
+    {
+     "offset_s": 80.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-2",
+     "fingerprint": "f80da5db1bb8e125",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 22 on kafka-broker-2"
+    },
+    {
+     "offset_s": 94.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-3",
+     "fingerprint": "d5b4668e65735a02",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 13 on kafka-broker-3"
+    },
+    {
+     "offset_s": 107.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8665034583820ad1",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 8 on kafka-broker-5"
+    },
+    {
+     "offset_s": 112.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-2",
+     "fingerprint": "f80da5db1bb8e125",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 11 on kafka-broker-2"
+    },
+    {
+     "offset_s": 114.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8665034583820ad1",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 27 on kafka-broker-5"
+    },
+    {
+     "offset_s": 116.5,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-0",
+     "fingerprint": "a6800b3309bb8ebe",
+     "severity": "critical",
+     "summary": "payments p99 1970 ms on payments-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 141.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerUpstreamTimeouts",
+     "instance": "kafka-broker-5",
+     "fingerprint": "8665034583820ad1",
+     "severity": "warning",
+     "summary": "kafka_broker_upstream_timeout_pct at 30 on kafka-broker-5"
+    },
+    {
+     "offset_s": 179.4,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-0",
+     "fingerprint": "a6800b3309bb8ebe",
+     "severity": "critical",
+     "summary": "payments p99 2686 ms on payments-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 213.5,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-0",
+     "fingerprint": "a6800b3309bb8ebe",
+     "severity": "critical",
+     "summary": "payments p99 2172 ms on payments-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 220.1,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-0",
+     "fingerprint": "a6800b3309bb8ebe",
+     "severity": "critical",
+     "summary": "payments p99 1413 ms on payments-0",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "dependency-timeout",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: dependency timeouts"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: dependency timeouts"
+    }
+   ],
+   "opened_at": "2026-10-28T07:04:33.112729+00:00",
+   "severity": "sev3",
+   "summary": "kafka_broker_upstream_timeout_pct at 27 on kafka-broker-5",
+   "split": "dev"
+  },
+  {
+   "id": "ans-15",
+   "kind": "answerable",
+   "service": "auth",
+   "title": "AuthMemoryPressure on auth",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 7.4,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-3",
+     "fingerprint": "ac765f12c9da3c23",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 99 on auth-3"
+    },
+    {
+     "offset_s": 11.8,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-2",
+     "fingerprint": "b73172a0bc020dcb",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-2"
+    },
+    {
+     "offset_s": 13.8,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-3",
+     "fingerprint": "ac765f12c9da3c23",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 95 on auth-3"
+    },
+    {
+     "offset_s": 14.5,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-4",
+     "fingerprint": "9307120d18158532",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-4"
+    },
+    {
+     "offset_s": 39.7,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-2",
+     "fingerprint": "b73172a0bc020dcb",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 99 on auth-2"
+    },
+    {
+     "offset_s": 69.0,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-4",
+     "fingerprint": "9307120d18158532",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 95 on auth-4"
+    },
+    {
+     "offset_s": 85.9,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-2",
+     "fingerprint": "b73172a0bc020dcb",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-2"
+    },
+    {
+     "offset_s": 98.1,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-2",
+     "fingerprint": "b73172a0bc020dcb",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 97 on auth-2"
+    },
+    {
+     "offset_s": 121.8,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-4",
+     "fingerprint": "9307120d18158532",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-4"
+    },
+    {
+     "offset_s": 125.3,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-3",
+     "fingerprint": "ac765f12c9da3c23",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 95 on auth-3"
+    },
+    {
+     "offset_s": 143.9,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-3",
+     "fingerprint": "ac765f12c9da3c23",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-3"
+    },
+    {
+     "offset_s": 165.3,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-3",
+     "fingerprint": "ac765f12c9da3c23",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-3"
+    },
+    {
+     "offset_s": 180.2,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-4",
+     "fingerprint": "9307120d18158532",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 97 on auth-4"
+    },
+    {
+     "offset_s": 194.3,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-4",
+     "fingerprint": "9307120d18158532",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-4"
+    },
+    {
+     "offset_s": 219.3,
+     "service": "auth",
+     "alertname": "AuthMemoryPressure",
+     "instance": "auth-2",
+     "fingerprint": "b73172a0bc020dcb",
+     "severity": "critical",
+     "summary": "auth_rss_pct_of_limit at 98 on auth-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/auth-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Auth: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/auth-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Auth: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T09:42:17.580818+00:00",
+   "severity": "sev1",
+   "summary": "auth_rss_pct_of_limit at 99 on auth-3",
+   "split": "dev"
+  },
+  {
+   "id": "ans-16",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerCPUSaturated on kafka-broker",
+   "category": "cpu-saturation",
+   "alerts": [
+    {
+     "offset_s": 13.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-1",
+     "fingerprint": "97301770c231395a",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 95 on kafka-broker-1"
+    },
+    {
+     "offset_s": 33.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-5",
+     "fingerprint": "0faca3f13175ce8b",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 93 on kafka-broker-5"
+    },
+    {
+     "offset_s": 85.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-2",
+     "fingerprint": "d0865a42f251e667",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 93 on kafka-broker-2"
+    },
+    {
+     "offset_s": 90.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-5",
+     "fingerprint": "0faca3f13175ce8b",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 98 on kafka-broker-5"
+    },
+    {
+     "offset_s": 92.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-2",
+     "fingerprint": "d0865a42f251e667",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 94 on kafka-broker-2"
+    },
+    {
+     "offset_s": 159.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-1",
+     "fingerprint": "97301770c231395a",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 95 on kafka-broker-1"
+    },
+    {
+     "offset_s": 166.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-5",
+     "fingerprint": "0faca3f13175ce8b",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 98 on kafka-broker-5"
+    },
+    {
+     "offset_s": 187.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-1",
+     "fingerprint": "97301770c231395a",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 98 on kafka-broker-1"
+    },
+    {
+     "offset_s": 259.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerCPUSaturated",
+     "instance": "kafka-broker-2",
+     "fingerprint": "d0865a42f251e667",
+     "severity": "warning",
+     "summary": "kafka_broker_cpu_util_pct at 95 on kafka-broker-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "cpu-saturation",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-cpu-saturation.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: CPU saturation"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-cpu-saturation.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: CPU saturation"
+    }
+   ],
+   "opened_at": "2026-10-28T09:35:18.651716+00:00",
+   "severity": "sev3",
+   "summary": "kafka_broker_cpu_util_pct at 95 on kafka-broker-1",
+   "split": "test"
+  },
+  {
+   "id": "ans-17",
+   "kind": "answerable",
+   "service": "ledger",
+   "title": "LedgerPoolExhausted on ledger",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 29.9,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-1",
+     "fingerprint": "414dc83b4ef8ecd3",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 573 on ledger-1"
+    },
+    {
+     "offset_s": 41.3,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-4",
+     "fingerprint": "d2e9ca2e1c410815",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 676 on ledger-4"
+    },
+    {
+     "offset_s": 60.7,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-1",
+     "fingerprint": "414dc83b4ef8ecd3",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 498 on ledger-1"
+    },
+    {
+     "offset_s": 63.1,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-4",
+     "fingerprint": "d2e9ca2e1c410815",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 1098 on ledger-4"
+    },
+    {
+     "offset_s": 63.5,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-1",
+     "fingerprint": "414dc83b4ef8ecd3",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 736 on ledger-1"
+    },
+    {
+     "offset_s": 65.6,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-4",
+     "fingerprint": "d2e9ca2e1c410815",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 1413 on ledger-4"
+    },
+    {
+     "offset_s": 115.0,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-1",
+     "fingerprint": "414dc83b4ef8ecd3",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 966 on ledger-1"
+    },
+    {
+     "offset_s": 119.1,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-4",
+     "fingerprint": "d2e9ca2e1c410815",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 545 on ledger-4"
+    },
+    {
+     "offset_s": 139.4,
+     "service": "ledger",
+     "alertname": "LedgerPoolExhausted",
+     "instance": "ledger-4",
+     "fingerprint": "d2e9ca2e1c410815",
+     "severity": "critical",
+     "summary": "ledger_pool_wait_ms at 1025 on ledger-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "ledger"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/ledger-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Ledger: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/ledger-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Ledger: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T11:27:21.825664+00:00",
+   "severity": "sev1",
+   "summary": "ledger_pool_wait_ms at 573 on ledger-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-18",
+   "kind": "answerable",
+   "service": "payments",
+   "title": "PaymentsLatencyHigh on payments",
+   "category": "high-latency",
+   "alerts": [
+    {
+     "offset_s": 21.4,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-5",
+     "fingerprint": "f315342c470c3cf6",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 3372 on payments-5"
+    },
+    {
+     "offset_s": 23.0,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "f8d8ac33205f7e67",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 3869 on payments-4"
+    },
+    {
+     "offset_s": 61.5,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "f8d8ac33205f7e67",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 2239 on payments-4"
+    },
+    {
+     "offset_s": 103.0,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-5",
+     "fingerprint": "f315342c470c3cf6",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 3805 on payments-5"
+    },
+    {
+     "offset_s": 123.9,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "f8d8ac33205f7e67",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 3714 on payments-4"
+    },
+    {
+     "offset_s": 214.7,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-5",
+     "fingerprint": "f315342c470c3cf6",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 1485 on payments-5"
+    },
+    {
+     "offset_s": 229.1,
+     "service": "payments",
+     "alertname": "PaymentsLatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "f8d8ac33205f7e67",
+     "severity": "warning",
+     "summary": "payments_p99_latency_ms at 938 on payments-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "high-latency",
+    "component": "payments"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-high-latency.md",
+     "ordinal": 0,
+     "heading_path": "Payments: high p99 latency"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-high-latency.md",
+     "ordinal": 1,
+     "heading_path": "Payments: high p99 latency"
+    }
+   ],
+   "opened_at": "2026-10-28T06:15:18.167220+00:00",
+   "severity": "sev3",
+   "summary": "payments_p99_latency_ms at 3372 on payments-5",
+   "split": "dev"
+  },
+  {
+   "id": "ans-19",
+   "kind": "answerable",
+   "service": "auth",
+   "title": "AuthPoolExhausted on auth",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 6.8,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-3",
+     "fingerprint": "46bf92083f65bf6c",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 1497 on auth-3"
+    },
+    {
+     "offset_s": 25.5,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-4",
+     "fingerprint": "822a63178c0b6680",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 876 on auth-4"
+    },
+    {
+     "offset_s": 62.8,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-4",
+     "fingerprint": "822a63178c0b6680",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 1357 on auth-4"
+    },
+    {
+     "offset_s": 70.5,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-2",
+     "fingerprint": "f891b947e5ddae47",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 1048 on auth-2"
+    },
+    {
+     "offset_s": 104.6,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-2",
+     "fingerprint": "f891b947e5ddae47",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 617 on auth-2"
+    },
+    {
+     "offset_s": 110.1,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-4",
+     "fingerprint": "822a63178c0b6680",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 1454 on auth-4"
+    },
+    {
+     "offset_s": 154.5,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-3",
+     "fingerprint": "46bf92083f65bf6c",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 345 on auth-3"
+    },
+    {
+     "offset_s": 165.3,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-2",
+     "fingerprint": "f891b947e5ddae47",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 1417 on auth-2"
+    },
+    {
+     "offset_s": 175.9,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 49% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 184.9,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-4",
+     "fingerprint": "822a63178c0b6680",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 431 on auth-4"
+    },
+    {
+     "offset_s": 186.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 19% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 230.6,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-2",
+     "fingerprint": "f891b947e5ddae47",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 418 on auth-2"
+    },
+    {
+     "offset_s": 237.5,
+     "service": "auth",
+     "alertname": "AuthPoolExhausted",
+     "instance": "auth-3",
+     "fingerprint": "46bf92083f65bf6c",
+     "severity": "critical",
+     "summary": "auth_pool_wait_ms at 661 on auth-3"
+    },
+    {
+     "offset_s": 250.6,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 38% on api-gateway-0",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/auth-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Auth: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/auth-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Auth: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T09:17:06.698366+00:00",
+   "severity": "sev1",
+   "summary": "auth_pool_wait_ms at 1497 on auth-3",
+   "split": "test"
+  },
+  {
+   "id": "ans-20",
+   "kind": "answerable",
+   "service": "notifications",
+   "title": "NotificationsDiskFull on notifications",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 16.7,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-2",
+     "fingerprint": "1b51394b4b0bf710",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 96 on notifications-2"
+    },
+    {
+     "offset_s": 24.3,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-0",
+     "fingerprint": "a3f1d36d018bf443",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 93 on notifications-0"
+    },
+    {
+     "offset_s": 50.9,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-2",
+     "fingerprint": "1b51394b4b0bf710",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 95 on notifications-2"
+    },
+    {
+     "offset_s": 52.6,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 11% on orders-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 105.8,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 18% on orders-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 114.0,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-0",
+     "fingerprint": "a3f1d36d018bf443",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 98 on notifications-0"
+    },
+    {
+     "offset_s": 134.4,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 52% on orders-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 146.5,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-2",
+     "fingerprint": "1b51394b4b0bf710",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 98 on notifications-2"
+    },
+    {
+     "offset_s": 174.9,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-0",
+     "fingerprint": "a3f1d36d018bf443",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 99 on notifications-0"
+    },
+    {
+     "offset_s": 176.6,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-0",
+     "fingerprint": "a3f1d36d018bf443",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 95 on notifications-0"
+    },
+    {
+     "offset_s": 186.5,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-2",
+     "fingerprint": "1b51394b4b0bf710",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 94 on notifications-2"
+    },
+    {
+     "offset_s": 188.6,
+     "service": "notifications",
+     "alertname": "NotificationsDiskFull",
+     "instance": "notifications-0",
+     "fingerprint": "a3f1d36d018bf443",
+     "severity": "critical",
+     "summary": "notifications_disk_used_pct at 98 on notifications-0"
+    },
+    {
+     "offset_s": 231.4,
+     "service": "orders",
+     "alertname": "OrdersCheckoutErrors",
+     "instance": "orders-2",
+     "fingerprint": "0130c1e89fe62249",
+     "severity": "critical",
+     "summary": "checkout errors 54% on orders-2",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "notifications"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/notifications-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Notifications: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/notifications-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Notifications: disk full > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T08:13:59.841976+00:00",
+   "severity": "sev1",
+   "summary": "notifications_disk_used_pct at 96 on notifications-2",
+   "split": "test"
+  },
+  {
+   "id": "ans-21",
+   "kind": "answerable",
+   "service": "inventory",
+   "title": "InventoryLatencyHigh on inventory",
+   "category": "high-latency",
+   "alerts": [
+    {
+     "offset_s": 2.6,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-3",
+     "fingerprint": "37067bd3c71d0ef2",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 2622 on inventory-3"
+    },
+    {
+     "offset_s": 73.9,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-3",
+     "fingerprint": "37067bd3c71d0ef2",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 2163 on inventory-3"
+    },
+    {
+     "offset_s": 81.2,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-0",
+     "fingerprint": "43015762f93d97c8",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 3067 on inventory-0"
+    },
+    {
+     "offset_s": 137.1,
+     "service": "search",
+     "alertname": "SearchLatencyHigh",
+     "instance": "search-2",
+     "fingerprint": "21ff184c885baff5",
+     "severity": "warning",
+     "summary": "query p95 2841 ms on search-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 145.8,
+     "service": "search",
+     "alertname": "SearchLatencyHigh",
+     "instance": "search-2",
+     "fingerprint": "21ff184c885baff5",
+     "severity": "warning",
+     "summary": "query p95 2948 ms on search-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 162.0,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-0",
+     "fingerprint": "43015762f93d97c8",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 3808 on inventory-0"
+    },
+    {
+     "offset_s": 184.9,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-0",
+     "fingerprint": "43015762f93d97c8",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 1536 on inventory-0"
+    },
+    {
+     "offset_s": 189.6,
+     "service": "search",
+     "alertname": "SearchLatencyHigh",
+     "instance": "search-2",
+     "fingerprint": "21ff184c885baff5",
+     "severity": "warning",
+     "summary": "query p95 2597 ms on search-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 196.3,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-3",
+     "fingerprint": "37067bd3c71d0ef2",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 3984 on inventory-3"
+    },
+    {
+     "offset_s": 231.6,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-0",
+     "fingerprint": "43015762f93d97c8",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 1564 on inventory-0"
+    },
+    {
+     "offset_s": 250.7,
+     "service": "inventory",
+     "alertname": "InventoryLatencyHigh",
+     "instance": "inventory-3",
+     "fingerprint": "37067bd3c71d0ef2",
+     "severity": "warning",
+     "summary": "inventory_p99_latency_ms at 1586 on inventory-3"
+    },
+    {
+     "offset_s": 318.9,
+     "service": "search",
+     "alertname": "SearchLatencyHigh",
+     "instance": "search-2",
+     "fingerprint": "21ff184c885baff5",
+     "severity": "warning",
+     "summary": "query p95 2658 ms on search-2",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "high-latency",
+    "component": "inventory"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/inventory-high-latency.md",
+     "ordinal": 0,
+     "heading_path": "Inventory: high p99 latency"
+    },
+    {
+     "doc": "data/corpus/runbooks/inventory-high-latency.md",
+     "ordinal": 1,
+     "heading_path": "Inventory: high p99 latency"
+    }
+   ],
+   "opened_at": "2026-10-28T10:48:16.615577+00:00",
+   "severity": "sev3",
+   "summary": "inventory_p99_latency_ms at 2622 on inventory-3",
+   "split": "dev"
+  },
+  {
+   "id": "ans-22",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayDiskFull on api-gateway",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 7.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-4",
+     "fingerprint": "8c53007bd1d1b704",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 94 on api-gateway-4"
+    },
+    {
+     "offset_s": 15.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-0",
+     "fingerprint": "1aa4afaa4fb3155e",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 94 on api-gateway-0"
+    },
+    {
+     "offset_s": 35.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-3",
+     "fingerprint": "e0df24063b24c874",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 93 on api-gateway-3"
+    },
+    {
+     "offset_s": 37.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-0",
+     "fingerprint": "1aa4afaa4fb3155e",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 96 on api-gateway-0"
+    },
+    {
+     "offset_s": 40.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-3",
+     "fingerprint": "e0df24063b24c874",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 96 on api-gateway-3"
+    },
+    {
+     "offset_s": 40.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-0",
+     "fingerprint": "1aa4afaa4fb3155e",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 94 on api-gateway-0"
+    },
+    {
+     "offset_s": 52.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-3",
+     "fingerprint": "e0df24063b24c874",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 99 on api-gateway-3"
+    },
+    {
+     "offset_s": 54.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-4",
+     "fingerprint": "8c53007bd1d1b704",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 99 on api-gateway-4"
+    },
+    {
+     "offset_s": 60.3,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-4",
+     "fingerprint": "8c53007bd1d1b704",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 97 on api-gateway-4"
+    },
+    {
+     "offset_s": 60.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-4",
+     "fingerprint": "8c53007bd1d1b704",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 99 on api-gateway-4"
+    },
+    {
+     "offset_s": 63.7,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayDiskFull",
+     "instance": "api-gateway-3",
+     "fingerprint": "e0df24063b24c874",
+     "severity": "critical",
+     "summary": "api_gateway_disk_used_pct at 99 on api-gateway-3"
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: disk full > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T07:28:18.136437+00:00",
+   "severity": "sev1",
+   "summary": "api_gateway_disk_used_pct at 94 on api-gateway-4",
+   "split": "dev"
+  },
+  {
+   "id": "ans-23",
+   "kind": "answerable",
+   "service": "search",
+   "title": "SearchCPUSaturated on search",
+   "category": "cpu-saturation",
+   "alerts": [
+    {
+     "offset_s": 14.9,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-1",
+     "fingerprint": "14b909c26927a355",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 98 on search-1"
+    },
+    {
+     "offset_s": 15.0,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-3",
+     "fingerprint": "97cd1f4bbe1cfcc8",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 97 on search-3"
+    },
+    {
+     "offset_s": 22.1,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-1",
+     "fingerprint": "14b909c26927a355",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 99 on search-1"
+    },
+    {
+     "offset_s": 23.7,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-1",
+     "fingerprint": "14b909c26927a355",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 95 on search-1"
+    },
+    {
+     "offset_s": 26.2,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-2",
+     "fingerprint": "b7e7f2cd9cf9d70a",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 97 on search-2"
+    },
+    {
+     "offset_s": 28.5,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-3",
+     "fingerprint": "97cd1f4bbe1cfcc8",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 95 on search-3"
+    },
+    {
+     "offset_s": 34.0,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-1",
+     "fingerprint": "14b909c26927a355",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 93 on search-1"
+    },
+    {
+     "offset_s": 44.6,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-0",
+     "fingerprint": "514885b5034a27b0",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 99 on search-0"
+    },
+    {
+     "offset_s": 73.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-1",
+     "fingerprint": "14b909c26927a355",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 96 on search-1"
+    },
+    {
+     "offset_s": 93.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-0",
+     "fingerprint": "514885b5034a27b0",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 97 on search-0"
+    },
+    {
+     "offset_s": 95.6,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-0",
+     "fingerprint": "514885b5034a27b0",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 96 on search-0"
+    },
+    {
+     "offset_s": 98.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-3",
+     "fingerprint": "97cd1f4bbe1cfcc8",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 94 on search-3"
+    },
+    {
+     "offset_s": 120.8,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-0",
+     "fingerprint": "514885b5034a27b0",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 93 on search-0"
+    },
+    {
+     "offset_s": 122.3,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-2",
+     "fingerprint": "b7e7f2cd9cf9d70a",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 99 on search-2"
+    },
+    {
+     "offset_s": 124.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-3",
+     "fingerprint": "97cd1f4bbe1cfcc8",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 96 on search-3"
+    },
+    {
+     "offset_s": 128.1,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 56% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 139.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-3",
+     "fingerprint": "97cd1f4bbe1cfcc8",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 99 on search-3"
+    },
+    {
+     "offset_s": 141.4,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-0",
+     "fingerprint": "514885b5034a27b0",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 93 on search-0"
+    },
+    {
+     "offset_s": 144.6,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 34% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 155.2,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-2",
+     "fingerprint": "b7e7f2cd9cf9d70a",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 99 on search-2"
+    },
+    {
+     "offset_s": 159.6,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 42% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 165.8,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-2",
+     "fingerprint": "b7e7f2cd9cf9d70a",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 94 on search-2"
+    },
+    {
+     "offset_s": 171.3,
+     "service": "search",
+     "alertname": "SearchCPUSaturated",
+     "instance": "search-2",
+     "fingerprint": "b7e7f2cd9cf9d70a",
+     "severity": "warning",
+     "summary": "search_cpu_util_pct at 95 on search-2"
+    },
+    {
+     "offset_s": 205.8,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 35% on api-gateway-1",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "cpu-saturation",
+    "component": "search"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-cpu-saturation.md",
+     "ordinal": 0,
+     "heading_path": "Search: CPU saturation"
+    }
+   ],
+   "opened_at": "2026-10-28T10:10:14.581171+00:00",
+   "severity": "sev3",
+   "summary": "search_cpu_util_pct at 98 on search-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-24",
+   "kind": "answerable",
+   "service": "postgres-primary",
+   "title": "PostgresPrimaryDiskFull on postgres-primary",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 28.0,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-0",
+     "fingerprint": "9678262e9dabeb3a",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 93 on postgres-primary-0"
+    },
+    {
+     "offset_s": 39.8,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-1",
+     "fingerprint": "b6b03cbfd19834dc",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 94 on postgres-primary-1"
+    },
+    {
+     "offset_s": 54.5,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-2",
+     "fingerprint": "e634d094b9871596",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 99 on postgres-primary-2"
+    },
+    {
+     "offset_s": 68.7,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-1",
+     "fingerprint": "b6b03cbfd19834dc",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 96 on postgres-primary-1"
+    },
+    {
+     "offset_s": 114.1,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-0",
+     "fingerprint": "9678262e9dabeb3a",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 95 on postgres-primary-0"
+    },
+    {
+     "offset_s": 140.3,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-0",
+     "fingerprint": "9678262e9dabeb3a",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 93 on postgres-primary-0"
+    },
+    {
+     "offset_s": 190.2,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-0",
+     "fingerprint": "9678262e9dabeb3a",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 95 on postgres-primary-0"
+    },
+    {
+     "offset_s": 194.0,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-2",
+     "fingerprint": "e634d094b9871596",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 96 on postgres-primary-2"
+    },
+    {
+     "offset_s": 202.0,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-2",
+     "fingerprint": "e634d094b9871596",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 94 on postgres-primary-2"
+    },
+    {
+     "offset_s": 217.9,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-2",
+     "fingerprint": "e634d094b9871596",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 95 on postgres-primary-2"
+    },
+    {
+     "offset_s": 233.9,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-1",
+     "fingerprint": "b6b03cbfd19834dc",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 99 on postgres-primary-1"
+    },
+    {
+     "offset_s": 286.3,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-1",
+     "fingerprint": "b6b03cbfd19834dc",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 98 on postgres-primary-1"
+    },
+    {
+     "offset_s": 289.1,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryDiskFull",
+     "instance": "postgres-primary-1",
+     "fingerprint": "b6b03cbfd19834dc",
+     "severity": "critical",
+     "summary": "postgres_primary_disk_used_pct at 97 on postgres-primary-1"
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "postgres-primary"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/postgres-primary-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Postgres primary: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/postgres-primary-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Postgres primary: disk full"
+    }
+   ],
+   "opened_at": "2026-10-28T07:04:50.607094+00:00",
+   "severity": "sev1",
+   "summary": "postgres_primary_disk_used_pct at 93 on postgres-primary-0",
+   "split": "test"
+  },
+  {
+   "id": "ans-25",
+   "kind": "answerable",
+   "service": "orders",
+   "title": "OrdersPoolExhausted on orders",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 1.8,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-3",
+     "fingerprint": "83339d4db9a69978",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 1000 on orders-3"
+    },
+    {
+     "offset_s": 24.6,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-1",
+     "fingerprint": "4819358db81f5be5",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 911 on orders-1"
+    },
+    {
+     "offset_s": 29.8,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-1",
+     "fingerprint": "4819358db81f5be5",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 1441 on orders-1"
+    },
+    {
+     "offset_s": 36.6,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-2",
+     "fingerprint": "89cafde05f77c85c",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 901 on orders-2"
+    },
+    {
+     "offset_s": 46.8,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-3",
+     "fingerprint": "83339d4db9a69978",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 331 on orders-3"
+    },
+    {
+     "offset_s": 70.5,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-1",
+     "fingerprint": "4819358db81f5be5",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 950 on orders-1"
+    },
+    {
+     "offset_s": 74.4,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-2",
+     "fingerprint": "89cafde05f77c85c",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 1090 on orders-2"
+    },
+    {
+     "offset_s": 80.0,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-3",
+     "fingerprint": "83339d4db9a69978",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 624 on orders-3"
+    },
+    {
+     "offset_s": 95.2,
+     "service": "orders",
+     "alertname": "OrdersPoolExhausted",
+     "instance": "orders-2",
+     "fingerprint": "89cafde05f77c85c",
+     "severity": "critical",
+     "summary": "orders_pool_wait_ms at 1385 on orders-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "orders"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/orders-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Orders: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/orders-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Orders: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T08:53:17.157190+00:00",
+   "severity": "sev1",
+   "summary": "orders_pool_wait_ms at 1000 on orders-3",
+   "split": "test"
+  },
+  {
+   "id": "ans-26",
+   "kind": "answerable",
+   "service": "orders",
+   "title": "OrdersDiskFull on orders",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 5.7,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-1",
+     "fingerprint": "7da021f361e7b7bb",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 98 on orders-1"
+    },
+    {
+     "offset_s": 11.4,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-2",
+     "fingerprint": "b6510f5b77c3a45b",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 98 on orders-2"
+    },
+    {
+     "offset_s": 24.4,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-5",
+     "fingerprint": "0c0fa9f147f685cc",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 96 on orders-5"
+    },
+    {
+     "offset_s": 24.7,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-5",
+     "fingerprint": "0c0fa9f147f685cc",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 99 on orders-5"
+    },
+    {
+     "offset_s": 26.1,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-1",
+     "fingerprint": "7da021f361e7b7bb",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 95 on orders-1"
+    },
+    {
+     "offset_s": 29.7,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 50% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 35.5,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-2",
+     "fingerprint": "b6510f5b77c3a45b",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 98 on orders-2"
+    },
+    {
+     "offset_s": 35.7,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-1",
+     "fingerprint": "7da021f361e7b7bb",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 94 on orders-1"
+    },
+    {
+     "offset_s": 46.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 9% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 64.7,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-4",
+     "fingerprint": "0735e5ae1ba179fe",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 93 on orders-4"
+    },
+    {
+     "offset_s": 81.0,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-1",
+     "fingerprint": "7da021f361e7b7bb",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 94 on orders-1"
+    },
+    {
+     "offset_s": 102.7,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-2",
+     "fingerprint": "b6510f5b77c3a45b",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 94 on orders-2"
+    },
+    {
+     "offset_s": 107.0,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-4",
+     "fingerprint": "0735e5ae1ba179fe",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 96 on orders-4"
+    },
+    {
+     "offset_s": 112.3,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-1",
+     "fingerprint": "7da021f361e7b7bb",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 93 on orders-1"
+    },
+    {
+     "offset_s": 114.6,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-4",
+     "fingerprint": "0735e5ae1ba179fe",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 94 on orders-4"
+    },
+    {
+     "offset_s": 121.9,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-4",
+     "fingerprint": "697f7ade3deef92b",
+     "severity": "critical",
+     "summary": "5xx rate 41% on api-gateway-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 122.6,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-5",
+     "fingerprint": "0c0fa9f147f685cc",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 99 on orders-5"
+    },
+    {
+     "offset_s": 124.8,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-2",
+     "fingerprint": "b6510f5b77c3a45b",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 99 on orders-2"
+    },
+    {
+     "offset_s": 132.0,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-2",
+     "fingerprint": "b6510f5b77c3a45b",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 97 on orders-2"
+    },
+    {
+     "offset_s": 149.6,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-4",
+     "fingerprint": "0735e5ae1ba179fe",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 93 on orders-4"
+    },
+    {
+     "offset_s": 161.8,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-5",
+     "fingerprint": "0c0fa9f147f685cc",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 97 on orders-5"
+    },
+    {
+     "offset_s": 177.6,
+     "service": "orders",
+     "alertname": "OrdersDiskFull",
+     "instance": "orders-4",
+     "fingerprint": "0735e5ae1ba179fe",
+     "severity": "critical",
+     "summary": "orders_disk_used_pct at 97 on orders-4"
+    },
+    {
+     "offset_s": 199.8,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-4",
+     "fingerprint": "697f7ade3deef92b",
+     "severity": "critical",
+     "summary": "5xx rate 44% on api-gateway-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 204.6,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-4",
+     "fingerprint": "697f7ade3deef92b",
+     "severity": "critical",
+     "summary": "5xx rate 20% on api-gateway-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 240.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-1",
+     "fingerprint": "af690e8caa8a3060",
+     "severity": "critical",
+     "summary": "5xx rate 59% on api-gateway-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 255.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-4",
+     "fingerprint": "697f7ade3deef92b",
+     "severity": "critical",
+     "summary": "5xx rate 60% on api-gateway-4",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "orders"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/orders-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Orders: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/orders-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Orders: disk full > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T11:38:55.123463+00:00",
+   "severity": "sev1",
+   "summary": "orders_disk_used_pct at 98 on orders-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-27",
+   "kind": "answerable",
+   "service": "payments",
+   "title": "PaymentsPoolExhausted on payments",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 82.4,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-3",
+     "fingerprint": "24c88023e477aa45",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1187 on payments-3"
+    },
+    {
+     "offset_s": 88.8,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-0",
+     "fingerprint": "f9c0158365f69fa2",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1456 on payments-0"
+    },
+    {
+     "offset_s": 114.2,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 32% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 133.6,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-0",
+     "fingerprint": "f9c0158365f69fa2",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1463 on payments-0"
+    },
+    {
+     "offset_s": 133.8,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-4",
+     "fingerprint": "67cc87c589ca54f4",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 349 on payments-4"
+    },
+    {
+     "offset_s": 168.8,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 28% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 185.5,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-3",
+     "fingerprint": "24c88023e477aa45",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1125 on payments-3"
+    },
+    {
+     "offset_s": 188.1,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-5",
+     "fingerprint": "badf39cf22b1c677",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 924 on payments-5"
+    },
+    {
+     "offset_s": 194.8,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-4",
+     "fingerprint": "67cc87c589ca54f4",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1294 on payments-4"
+    },
+    {
+     "offset_s": 212.1,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-5",
+     "fingerprint": "badf39cf22b1c677",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 534 on payments-5"
+    },
+    {
+     "offset_s": 219.1,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 10% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 221.0,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 31% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 226.8,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-0",
+     "fingerprint": "f9c0158365f69fa2",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 554 on payments-0"
+    },
+    {
+     "offset_s": 228.5,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-3",
+     "fingerprint": "24c88023e477aa45",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1137 on payments-3"
+    },
+    {
+     "offset_s": 232.6,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-0",
+     "fingerprint": "f9c0158365f69fa2",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1375 on payments-0"
+    },
+    {
+     "offset_s": 239.4,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-4",
+     "fingerprint": "67cc87c589ca54f4",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 377 on payments-4"
+    },
+    {
+     "offset_s": 246.5,
+     "service": "payments",
+     "alertname": "PaymentsPoolExhausted",
+     "instance": "payments-5",
+     "fingerprint": "badf39cf22b1c677",
+     "severity": "critical",
+     "summary": "payments_pool_wait_ms at 1262 on payments-5"
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "payments"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Payments: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Payments: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T07:23:58.523603+00:00",
+   "severity": "sev1",
+   "summary": "payments_pool_wait_ms at 1187 on payments-3",
+   "split": "dev"
+  },
+  {
+   "id": "ans-28",
+   "kind": "answerable",
+   "service": "search",
+   "title": "SearchCertExpiring on search",
+   "category": "cert-expiry",
+   "alerts": [
+    {
+     "offset_s": 5.7,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-4",
+     "fingerprint": "89ff34a80dbf49f7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 2 on search-4"
+    },
+    {
+     "offset_s": 18.1,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-4",
+     "fingerprint": "89ff34a80dbf49f7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 1 on search-4"
+    },
+    {
+     "offset_s": 54.5,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-0",
+     "fingerprint": "cb4397f51d8d4ef7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 1 on search-0"
+    },
+    {
+     "offset_s": 56.4,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-3",
+     "fingerprint": "73f649dcd8734e1b",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 1 on search-3"
+    },
+    {
+     "offset_s": 59.8,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-4",
+     "fingerprint": "89ff34a80dbf49f7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 2 on search-4"
+    },
+    {
+     "offset_s": 67.9,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-4",
+     "fingerprint": "89ff34a80dbf49f7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 3 on search-4"
+    },
+    {
+     "offset_s": 77.6,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-0",
+     "fingerprint": "cb4397f51d8d4ef7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 1 on search-0"
+    },
+    {
+     "offset_s": 127.4,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-0",
+     "fingerprint": "cb4397f51d8d4ef7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 2 on search-0"
+    },
+    {
+     "offset_s": 127.9,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-4",
+     "fingerprint": "89ff34a80dbf49f7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 3 on search-4"
+    },
+    {
+     "offset_s": 148.2,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-3",
+     "fingerprint": "73f649dcd8734e1b",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 3 on search-3"
+    },
+    {
+     "offset_s": 150.0,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-3",
+     "fingerprint": "73f649dcd8734e1b",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 2 on search-3"
+    },
+    {
+     "offset_s": 162.3,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-3",
+     "fingerprint": "73f649dcd8734e1b",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 1 on search-3"
+    },
+    {
+     "offset_s": 183.9,
+     "service": "search",
+     "alertname": "SearchCertExpiring",
+     "instance": "search-0",
+     "fingerprint": "cb4397f51d8d4ef7",
+     "severity": "warning",
+     "summary": "search_cert_days_left at 3 on search-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "cert-expiry",
+    "component": "search"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-cert-expiry.md",
+     "ordinal": 0,
+     "heading_path": "Search: TLS certificate expiry"
+    },
+    {
+     "doc": "data/corpus/runbooks/search-cert-expiry.md",
+     "ordinal": 1,
+     "heading_path": "Search: TLS certificate expiry > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T07:37:36.749629+00:00",
+   "severity": "sev3",
+   "summary": "search_cert_days_left at 2 on search-4",
+   "split": "dev"
+  },
+  {
+   "id": "ans-29",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayErrorRateHigh on api-gateway",
+   "category": "error-rate",
+   "alerts": [
+    {
+     "offset_s": 16.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "194a2d1caaf4ef82",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 23 on api-gateway-4"
+    },
+    {
+     "offset_s": 24.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-3",
+     "fingerprint": "7257d4c99f4965f6",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 24 on api-gateway-3"
+    },
+    {
+     "offset_s": 26.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-1",
+     "fingerprint": "381c081bbf65dea8",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 28 on api-gateway-1"
+    },
+    {
+     "offset_s": 55.2,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-1",
+     "fingerprint": "381c081bbf65dea8",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 25 on api-gateway-1"
+    },
+    {
+     "offset_s": 70.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-3",
+     "fingerprint": "7257d4c99f4965f6",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 9 on api-gateway-3"
+    },
+    {
+     "offset_s": 86.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-1",
+     "fingerprint": "381c081bbf65dea8",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 26 on api-gateway-1"
+    },
+    {
+     "offset_s": 94.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-3",
+     "fingerprint": "7257d4c99f4965f6",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 34 on api-gateway-3"
+    },
+    {
+     "offset_s": 114.2,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-3",
+     "fingerprint": "7257d4c99f4965f6",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 9 on api-gateway-3"
+    },
+    {
+     "offset_s": 119.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "194a2d1caaf4ef82",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 18 on api-gateway-4"
+    },
+    {
+     "offset_s": 127.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayErrorRateHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "194a2d1caaf4ef82",
+     "severity": "critical",
+     "summary": "api_gateway_error_ratio_pct at 32 on api-gateway-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "error-rate",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-error-rate.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: elevated error rate"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-error-rate.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: elevated error rate"
+    }
+   ],
+   "opened_at": "2026-10-28T11:21:07.742479+00:00",
+   "severity": "sev1",
+   "summary": "api_gateway_error_ratio_pct at 23 on api-gateway-4",
+   "split": "dev"
+  },
+  {
+   "id": "ans-30",
+   "kind": "answerable",
+   "service": "notifications",
+   "title": "NotificationsCPUSaturated on notifications",
+   "category": "cpu-saturation",
+   "alerts": [
+    {
+     "offset_s": 0.7,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-4",
+     "fingerprint": "c56ebed0b4c68177",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 94 on notifications-4"
+    },
+    {
+     "offset_s": 1.7,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-4",
+     "fingerprint": "c56ebed0b4c68177",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 97 on notifications-4"
+    },
+    {
+     "offset_s": 16.0,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-0",
+     "fingerprint": "f75a0fd9be1a8d66",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 95 on notifications-0"
+    },
+    {
+     "offset_s": 41.1,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-5",
+     "fingerprint": "272b398684fa2651",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 94 on notifications-5"
+    },
+    {
+     "offset_s": 44.8,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-4",
+     "fingerprint": "c56ebed0b4c68177",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 93 on notifications-4"
+    },
+    {
+     "offset_s": 46.6,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-0",
+     "fingerprint": "f75a0fd9be1a8d66",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 93 on notifications-0"
+    },
+    {
+     "offset_s": 62.7,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-0",
+     "fingerprint": "f75a0fd9be1a8d66",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 93 on notifications-0"
+    },
+    {
+     "offset_s": 80.2,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-5",
+     "fingerprint": "272b398684fa2651",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 93 on notifications-5"
+    },
+    {
+     "offset_s": 129.0,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-5",
+     "fingerprint": "272b398684fa2651",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 94 on notifications-5"
+    },
+    {
+     "offset_s": 129.2,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-4",
+     "fingerprint": "c56ebed0b4c68177",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 99 on notifications-4"
+    },
+    {
+     "offset_s": 155.5,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-5",
+     "fingerprint": "272b398684fa2651",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 96 on notifications-5"
+    },
+    {
+     "offset_s": 158.7,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-0",
+     "fingerprint": "f75a0fd9be1a8d66",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 97 on notifications-0"
+    },
+    {
+     "offset_s": 166.8,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-4",
+     "fingerprint": "c56ebed0b4c68177",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 98 on notifications-4"
+    },
+    {
+     "offset_s": 167.0,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-0",
+     "fingerprint": "f75a0fd9be1a8d66",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 96 on notifications-0"
+    },
+    {
+     "offset_s": 229.3,
+     "service": "notifications",
+     "alertname": "NotificationsCPUSaturated",
+     "instance": "notifications-5",
+     "fingerprint": "272b398684fa2651",
+     "severity": "warning",
+     "summary": "notifications_cpu_util_pct at 93 on notifications-5"
+    }
+   ],
+   "gold_cause": {
+    "category": "cpu-saturation",
+    "component": "notifications"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/notifications-cpu-saturation.md",
+     "ordinal": 0,
+     "heading_path": "Notifications: CPU saturation"
+    },
+    {
+     "doc": "data/corpus/runbooks/notifications-cpu-saturation.md",
+     "ordinal": 1,
+     "heading_path": "Notifications: CPU saturation > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T09:56:03.750006+00:00",
+   "severity": "sev3",
+   "summary": "notifications_cpu_util_pct at 94 on notifications-4",
+   "split": "test"
+  },
+  {
+   "id": "ans-31",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayConsumerLagHigh on api-gateway",
+   "category": "queue-backlog",
+   "alerts": [
+    {
+     "offset_s": 33.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-0",
+     "fingerprint": "b054501fc29828dc",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 224304 on api-gateway-0"
+    },
+    {
+     "offset_s": 37.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-0",
+     "fingerprint": "b054501fc29828dc",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 394134 on api-gateway-0"
+    },
+    {
+     "offset_s": 64.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "050fb4e341336b04",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 169592 on api-gateway-4"
+    },
+    {
+     "offset_s": 85.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-0",
+     "fingerprint": "b054501fc29828dc",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 390228 on api-gateway-0"
+    },
+    {
+     "offset_s": 86.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "050fb4e341336b04",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 196172 on api-gateway-4"
+    },
+    {
+     "offset_s": 87.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-0",
+     "fingerprint": "b054501fc29828dc",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 317874 on api-gateway-0"
+    },
+    {
+     "offset_s": 113.3,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayConsumerLagHigh",
+     "instance": "api-gateway-4",
+     "fingerprint": "050fb4e341336b04",
+     "severity": "warning",
+     "summary": "api_gateway_consumer_lag_msgs at 213699 on api-gateway-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "queue-backlog",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-queue-backlog.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: queue backlog"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-queue-backlog.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: queue backlog > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T06:23:03.886228+00:00",
+   "severity": "sev3",
+   "summary": "api_gateway_consumer_lag_msgs at 224304 on api-gateway-0",
+   "split": "dev"
+  },
+  {
+   "id": "ans-32",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayCertExpiring on api-gateway",
+   "category": "cert-expiry",
+   "alerts": [
+    {
+     "offset_s": 41.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-0",
+     "fingerprint": "f9983506cc19d37e",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 1 on api-gateway-0"
+    },
+    {
+     "offset_s": 49.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-0",
+     "fingerprint": "f9983506cc19d37e",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 1 on api-gateway-0"
+    },
+    {
+     "offset_s": 76.0,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 1782 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 76.6,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "e468209de873f386",
+     "severity": "critical",
+     "summary": "payments p99 2647 ms on payments-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 92.7,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "e468209de873f386",
+     "severity": "critical",
+     "summary": "payments p99 1248 ms on payments-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 136.6,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 1804 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 142.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-3",
+     "fingerprint": "0a4d710af2662cdc",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-3"
+    },
+    {
+     "offset_s": 142.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-2",
+     "fingerprint": "dd0f83eb2a16eea8",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-2"
+    },
+    {
+     "offset_s": 150.3,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-5",
+     "fingerprint": "3f5f4621c6487bc5",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-5"
+    },
+    {
+     "offset_s": 165.7,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-2",
+     "fingerprint": "dd0f83eb2a16eea8",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-2"
+    },
+    {
+     "offset_s": 198.9,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 2502 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 199.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-3",
+     "fingerprint": "0a4d710af2662cdc",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-3"
+    },
+    {
+     "offset_s": 225.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-5",
+     "fingerprint": "3f5f4621c6487bc5",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 2 on api-gateway-5"
+    },
+    {
+     "offset_s": 227.9,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 2682 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 253.3,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "e468209de873f386",
+     "severity": "critical",
+     "summary": "payments p99 2676 ms on payments-4",
+     "cascade": true
+    },
+    {
+     "offset_s": 259.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCertExpiring",
+     "instance": "api-gateway-5",
+     "fingerprint": "3f5f4621c6487bc5",
+     "severity": "warning",
+     "summary": "api_gateway_cert_days_left at 3 on api-gateway-5"
+    },
+    {
+     "offset_s": 306.0,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-4",
+     "fingerprint": "e468209de873f386",
+     "severity": "critical",
+     "summary": "payments p99 2291 ms on payments-4",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "cert-expiry",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-cert-expiry.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: TLS certificate expiry"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-cert-expiry.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: TLS certificate expiry"
+    }
+   ],
+   "opened_at": "2026-10-28T07:05:15.929136+00:00",
+   "severity": "sev3",
+   "summary": "api_gateway_cert_days_left at 1 on api-gateway-0",
+   "split": "dev"
+  },
+  {
+   "id": "ans-33",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayCPUSaturated on api-gateway",
+   "category": "cpu-saturation",
+   "alerts": [
+    {
+     "offset_s": 35.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-1",
+     "fingerprint": "eba65d946b95a085",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 98 on api-gateway-1"
+    },
+    {
+     "offset_s": 62.3,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-1",
+     "fingerprint": "eba65d946b95a085",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 94 on api-gateway-1"
+    },
+    {
+     "offset_s": 120.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-5",
+     "fingerprint": "c4fc124f3ca4fbfc",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 94 on api-gateway-5"
+    },
+    {
+     "offset_s": 136.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-1",
+     "fingerprint": "eba65d946b95a085",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 93 on api-gateway-1"
+    },
+    {
+     "offset_s": 219.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-5",
+     "fingerprint": "c4fc124f3ca4fbfc",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 96 on api-gateway-5"
+    },
+    {
+     "offset_s": 239.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-0",
+     "fingerprint": "00b34c2e041ba43e",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 99 on api-gateway-0"
+    },
+    {
+     "offset_s": 240.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-5",
+     "fingerprint": "c4fc124f3ca4fbfc",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 95 on api-gateway-5"
+    },
+    {
+     "offset_s": 242.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayCPUSaturated",
+     "instance": "api-gateway-0",
+     "fingerprint": "00b34c2e041ba43e",
+     "severity": "warning",
+     "summary": "api_gateway_cpu_util_pct at 96 on api-gateway-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "cpu-saturation",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-cpu-saturation.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: CPU saturation"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-cpu-saturation.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: CPU saturation > Escalation"
+    }
+   ],
+   "opened_at": "2026-10-28T07:23:00.809048+00:00",
+   "severity": "sev3",
+   "summary": "api_gateway_cpu_util_pct at 98 on api-gateway-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-34",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerErrorRateHigh on kafka-broker",
+   "category": "error-rate",
+   "alerts": [
+    {
+     "offset_s": 47.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a519d409379fb5ed",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 9 on kafka-broker-1"
+    },
+    {
+     "offset_s": 60.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "67e756f90550f5be",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 10 on kafka-broker-0"
+    },
+    {
+     "offset_s": 99.8,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "67e756f90550f5be",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 8 on kafka-broker-0"
+    },
+    {
+     "offset_s": 112.8,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a519d409379fb5ed",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 19 on kafka-broker-1"
+    },
+    {
+     "offset_s": 123.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-2",
+     "fingerprint": "e44455f57a4e5cf6",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 16 on kafka-broker-2"
+    },
+    {
+     "offset_s": 136.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "67e756f90550f5be",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 19 on kafka-broker-0"
+    },
+    {
+     "offset_s": 142.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-0",
+     "fingerprint": "67e756f90550f5be",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 35 on kafka-broker-0"
+    },
+    {
+     "offset_s": 207.5,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 1584 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 218.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-2",
+     "fingerprint": "e44455f57a4e5cf6",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 17 on kafka-broker-2"
+    },
+    {
+     "offset_s": 224.8,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a519d409379fb5ed",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 37 on kafka-broker-1"
+    },
+    {
+     "offset_s": 252.1,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 2620 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 288.1,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 1097 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 294.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerErrorRateHigh",
+     "instance": "kafka-broker-2",
+     "fingerprint": "e44455f57a4e5cf6",
+     "severity": "critical",
+     "summary": "kafka_broker_error_ratio_pct at 37 on kafka-broker-2"
+    },
+    {
+     "offset_s": 331.1,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 2925 ms on payments-2",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "error-rate",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-error-rate.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: elevated error rate"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-error-rate.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: elevated error rate"
+    }
+   ],
+   "opened_at": "2026-10-28T07:41:28.245561+00:00",
+   "severity": "sev1",
+   "summary": "kafka_broker_error_ratio_pct at 9 on kafka-broker-1",
+   "split": "dev"
+  },
+  {
+   "id": "ans-35",
+   "kind": "answerable",
+   "service": "card-auth",
+   "title": "CardAuthMemoryPressure on card-auth",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 3.7,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-2",
+     "fingerprint": "8d78aa20781c88a8",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 97 on card-auth-2"
+    },
+    {
+     "offset_s": 4.1,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-5",
+     "fingerprint": "25d08ad225993216",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 98 on card-auth-5"
+    },
+    {
+     "offset_s": 54.0,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-2",
+     "fingerprint": "8d78aa20781c88a8",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 96 on card-auth-2"
+    },
+    {
+     "offset_s": 65.4,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-5",
+     "fingerprint": "25d08ad225993216",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 99 on card-auth-5"
+    },
+    {
+     "offset_s": 90.4,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-2",
+     "fingerprint": "8d78aa20781c88a8",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 98 on card-auth-2"
+    },
+    {
+     "offset_s": 102.9,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-5",
+     "fingerprint": "25d08ad225993216",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 96 on card-auth-5"
+    },
+    {
+     "offset_s": 146.3,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-5",
+     "fingerprint": "25d08ad225993216",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 96 on card-auth-5"
+    },
+    {
+     "offset_s": 153.9,
+     "service": "card-auth",
+     "alertname": "CardAuthMemoryPressure",
+     "instance": "card-auth-2",
+     "fingerprint": "8d78aa20781c88a8",
+     "severity": "critical",
+     "summary": "card_auth_rss_pct_of_limit at 95 on card-auth-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "card-auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/card-auth-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Card auth: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/card-auth-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Card auth: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T10:55:36.580848+00:00",
+   "severity": "sev1",
+   "summary": "card_auth_rss_pct_of_limit at 97 on card-auth-2",
+   "split": "test"
+  },
+  {
+   "id": "ans-36",
+   "kind": "answerable",
+   "service": "api-gateway",
+   "title": "ApiGatewayMemoryPressure on api-gateway",
+   "category": "memory-pressure",
+   "alerts": [
+    {
+     "offset_s": 2.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-3",
+     "fingerprint": "8d0b79a912042214",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 98 on api-gateway-3"
+    },
+    {
+     "offset_s": 16.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-2",
+     "fingerprint": "4827c7532b0738fd",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 96 on api-gateway-2"
+    },
+    {
+     "offset_s": 19.9,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-4",
+     "fingerprint": "bfc89475c93ecdc6",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 97 on api-gateway-4"
+    },
+    {
+     "offset_s": 35.7,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-1",
+     "fingerprint": "e847f8752cd3b1ce",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 97 on api-gateway-1"
+    },
+    {
+     "offset_s": 41.1,
+     "service": "auth",
+     "alertname": "AuthTokenErrors",
+     "instance": "auth-0",
+     "fingerprint": "e947e6217ef10cd6",
+     "severity": "warning",
+     "summary": "token validation errors 42% on auth-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 42.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-1",
+     "fingerprint": "e847f8752cd3b1ce",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 99 on api-gateway-1"
+    },
+    {
+     "offset_s": 58.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-2",
+     "fingerprint": "4827c7532b0738fd",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 96 on api-gateway-2"
+    },
+    {
+     "offset_s": 62.2,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-4",
+     "fingerprint": "bfc89475c93ecdc6",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 98 on api-gateway-4"
+    },
+    {
+     "offset_s": 73.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayMemoryPressure",
+     "instance": "api-gateway-3",
+     "fingerprint": "8d0b79a912042214",
+     "severity": "critical",
+     "summary": "api_gateway_rss_pct_of_limit at 98 on api-gateway-3"
+    },
+    {
+     "offset_s": 81.2,
+     "service": "auth",
+     "alertname": "AuthTokenErrors",
+     "instance": "auth-0",
+     "fingerprint": "e947e6217ef10cd6",
+     "severity": "warning",
+     "summary": "token validation errors 30% on auth-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 121.0,
+     "service": "auth",
+     "alertname": "AuthTokenErrors",
+     "instance": "auth-0",
+     "fingerprint": "e947e6217ef10cd6",
+     "severity": "warning",
+     "summary": "token validation errors 15% on auth-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 145.8,
+     "service": "auth",
+     "alertname": "AuthTokenErrors",
+     "instance": "auth-0",
+     "fingerprint": "e947e6217ef10cd6",
+     "severity": "warning",
+     "summary": "token validation errors 29% on auth-0",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "memory-pressure",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-memory-pressure.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: memory pressure and OOM kills"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-memory-pressure.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: memory pressure and OOM kills"
+    }
+   ],
+   "opened_at": "2026-10-28T10:05:10.858714+00:00",
+   "severity": "sev1",
+   "summary": "api_gateway_rss_pct_of_limit at 98 on api-gateway-3",
+   "split": "dev"
+  },
+  {
+   "id": "ans-37",
+   "kind": "answerable",
+   "service": "kafka-broker",
+   "title": "KafkaBrokerDiskFull on kafka-broker",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 9.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-2",
+     "fingerprint": "5168874caeabef59",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 97 on kafka-broker-2"
+    },
+    {
+     "offset_s": 11.4,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-4",
+     "fingerprint": "1b32c349f97b06c0",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 97 on kafka-broker-4"
+    },
+    {
+     "offset_s": 12.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-0",
+     "fingerprint": "4324559d68537f2b",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 95 on kafka-broker-0"
+    },
+    {
+     "offset_s": 20.5,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-4",
+     "fingerprint": "1b32c349f97b06c0",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 95 on kafka-broker-4"
+    },
+    {
+     "offset_s": 44.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-0",
+     "fingerprint": "4324559d68537f2b",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 93 on kafka-broker-0"
+    },
+    {
+     "offset_s": 47.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a2202392a062d796",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 94 on kafka-broker-1"
+    },
+    {
+     "offset_s": 51.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a2202392a062d796",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 95 on kafka-broker-1"
+    },
+    {
+     "offset_s": 58.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-2",
+     "fingerprint": "5168874caeabef59",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 94 on kafka-broker-2"
+    },
+    {
+     "offset_s": 66.7,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-4",
+     "fingerprint": "1b32c349f97b06c0",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 96 on kafka-broker-4"
+    },
+    {
+     "offset_s": 80.8,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-0",
+     "fingerprint": "4324559d68537f2b",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 98 on kafka-broker-0"
+    },
+    {
+     "offset_s": 81.3,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a2202392a062d796",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 99 on kafka-broker-1"
+    },
+    {
+     "offset_s": 82.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a2202392a062d796",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 99 on kafka-broker-1"
+    },
+    {
+     "offset_s": 94.0,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-0",
+     "fingerprint": "4324559d68537f2b",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 96 on kafka-broker-0"
+    },
+    {
+     "offset_s": 110.2,
+     "service": "ledger",
+     "alertname": "LedgerWriteErrors",
+     "instance": "ledger-0",
+     "fingerprint": "5a9bb8264e0e2827",
+     "severity": "critical",
+     "summary": "write errors 36% on ledger-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 117.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-2",
+     "fingerprint": "5168874caeabef59",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 99 on kafka-broker-2"
+    },
+    {
+     "offset_s": 121.1,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-4",
+     "fingerprint": "1b32c349f97b06c0",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 98 on kafka-broker-4"
+    },
+    {
+     "offset_s": 145.5,
+     "service": "ledger",
+     "alertname": "LedgerWriteErrors",
+     "instance": "ledger-0",
+     "fingerprint": "5a9bb8264e0e2827",
+     "severity": "critical",
+     "summary": "write errors 6% on ledger-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 147.6,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-1",
+     "fingerprint": "a2202392a062d796",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 98 on kafka-broker-1"
+    },
+    {
+     "offset_s": 158.2,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-2",
+     "fingerprint": "5168874caeabef59",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 98 on kafka-broker-2"
+    },
+    {
+     "offset_s": 165.9,
+     "service": "kafka-broker",
+     "alertname": "KafkaBrokerDiskFull",
+     "instance": "kafka-broker-0",
+     "fingerprint": "4324559d68537f2b",
+     "severity": "critical",
+     "summary": "kafka_broker_disk_used_pct at 98 on kafka-broker-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "kafka-broker"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Kafka broker: disk full"
+    },
+    {
+     "doc": "data/corpus/runbooks/kafka-broker-disk-full.md",
+     "ordinal": 1,
+     "heading_path": "Kafka broker: disk full"
+    }
+   ],
+   "opened_at": "2026-10-28T11:42:54.633064+00:00",
+   "severity": "sev1",
+   "summary": "kafka_broker_disk_used_pct at 97 on kafka-broker-2",
+   "split": "test"
+  },
+  {
+   "id": "ans-38",
+   "kind": "answerable",
+   "service": "ledger",
+   "title": "LedgerDiskFull on ledger",
+   "category": "disk-full",
+   "alerts": [
+    {
+     "offset_s": 10.8,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-5",
+     "fingerprint": "a4df33d14d044dd2",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 99 on ledger-5"
+    },
+    {
+     "offset_s": 23.9,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-5",
+     "fingerprint": "a4df33d14d044dd2",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 96 on ledger-5"
+    },
+    {
+     "offset_s": 26.4,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-1",
+     "fingerprint": "99b60d27b09b1c0e",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 97 on ledger-1"
+    },
+    {
+     "offset_s": 47.4,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-2",
+     "fingerprint": "a30841d4123bd8db",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 95 on ledger-2"
+    },
+    {
+     "offset_s": 133.3,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-1",
+     "fingerprint": "99b60d27b09b1c0e",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 99 on ledger-1"
+    },
+    {
+     "offset_s": 134.2,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-2",
+     "fingerprint": "a30841d4123bd8db",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 95 on ledger-2"
+    },
+    {
+     "offset_s": 143.4,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-2",
+     "fingerprint": "a30841d4123bd8db",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 95 on ledger-2"
+    },
+    {
+     "offset_s": 143.5,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 1827 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 172.8,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-5",
+     "fingerprint": "a4df33d14d044dd2",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 94 on ledger-5"
+    },
+    {
+     "offset_s": 176.5,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 2919 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 190.9,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-1",
+     "fingerprint": "99b60d27b09b1c0e",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 99 on ledger-1"
+    },
+    {
+     "offset_s": 191.3,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-2",
+     "fingerprint": "a30841d4123bd8db",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 97 on ledger-2"
+    },
+    {
+     "offset_s": 211.3,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-1",
+     "fingerprint": "99b60d27b09b1c0e",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 95 on ledger-1"
+    },
+    {
+     "offset_s": 220.4,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 2326 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 237.1,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 2297 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 237.4,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-2",
+     "fingerprint": "a30841d4123bd8db",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 93 on ledger-2"
+    },
+    {
+     "offset_s": 239.0,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 2709 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 258.3,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 1812 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 305.4,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 1156 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 308.9,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-2",
+     "fingerprint": "87a2cf420a142e6b",
+     "severity": "critical",
+     "summary": "payments p99 1646 ms on payments-2",
+     "cascade": true
+    },
+    {
+     "offset_s": 323.3,
+     "service": "ledger",
+     "alertname": "LedgerDiskFull",
+     "instance": "ledger-5",
+     "fingerprint": "a4df33d14d044dd2",
+     "severity": "critical",
+     "summary": "ledger_disk_used_pct at 94 on ledger-5"
+    },
+    {
+     "offset_s": 343.4,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 2052 ms on payments-1",
+     "cascade": true
+    },
+    {
+     "offset_s": 353.0,
+     "service": "payments",
+     "alertname": "PaymentsP99LatencyHigh",
+     "instance": "payments-1",
+     "fingerprint": "9f1474fbd34b6954",
+     "severity": "critical",
+     "summary": "payments p99 1602 ms on payments-1",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "disk-full",
+    "component": "ledger"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/ledger-disk-full.md",
+     "ordinal": 0,
+     "heading_path": "Ledger: disk full"
+    }
+   ],
+   "opened_at": "2026-10-28T09:54:23.314823+00:00",
+   "severity": "sev1",
+   "summary": "ledger_disk_used_pct at 99 on ledger-5",
+   "split": "dev"
+  },
+  {
+   "id": "ans-39",
+   "kind": "answerable",
+   "service": "redis-cache",
+   "title": "RedisCachePoolExhausted on redis-cache",
+   "category": "connection-pool",
+   "alerts": [
+    {
+     "offset_s": 12.3,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-3",
+     "fingerprint": "847c35edc454ec17",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1339 on redis-cache-3"
+    },
+    {
+     "offset_s": 36.7,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-0",
+     "fingerprint": "c2b3de96db0ec9f7",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1304 on redis-cache-0"
+    },
+    {
+     "offset_s": 37.4,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-0",
+     "fingerprint": "c2b3de96db0ec9f7",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1287 on redis-cache-0"
+    },
+    {
+     "offset_s": 65.7,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-2",
+     "fingerprint": "b9456ff473411877",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1393 on redis-cache-2"
+    },
+    {
+     "offset_s": 74.7,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-0",
+     "fingerprint": "c2b3de96db0ec9f7",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 558 on redis-cache-0"
+    },
+    {
+     "offset_s": 114.6,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-5",
+     "fingerprint": "edba6fb84e2a6e2c",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1041 on redis-cache-5"
+    },
+    {
+     "offset_s": 117.8,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-5",
+     "fingerprint": "edba6fb84e2a6e2c",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 382 on redis-cache-5"
+    },
+    {
+     "offset_s": 157.9,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-5",
+     "fingerprint": "edba6fb84e2a6e2c",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 629 on redis-cache-5"
+    },
+    {
+     "offset_s": 170.1,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-2",
+     "fingerprint": "b9456ff473411877",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 818 on redis-cache-2"
+    },
+    {
+     "offset_s": 185.1,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-3",
+     "fingerprint": "847c35edc454ec17",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1149 on redis-cache-3"
+    },
+    {
+     "offset_s": 185.3,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-2",
+     "fingerprint": "b9456ff473411877",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1111 on redis-cache-2"
+    },
+    {
+     "offset_s": 201.8,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-3",
+     "fingerprint": "847c35edc454ec17",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 509 on redis-cache-3"
+    },
+    {
+     "offset_s": 203.7,
+     "service": "redis-cache",
+     "alertname": "RedisCachePoolExhausted",
+     "instance": "redis-cache-2",
+     "fingerprint": "b9456ff473411877",
+     "severity": "critical",
+     "summary": "redis_cache_pool_wait_ms at 1224 on redis-cache-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "connection-pool",
+    "component": "redis-cache"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/redis-cache-connection-pool.md",
+     "ordinal": 0,
+     "heading_path": "Redis cache: connection pool exhaustion"
+    },
+    {
+     "doc": "data/corpus/runbooks/redis-cache-connection-pool.md",
+     "ordinal": 1,
+     "heading_path": "Redis cache: connection pool exhaustion"
+    }
+   ],
+   "opened_at": "2026-10-28T09:39:45.023543+00:00",
+   "severity": "sev1",
+   "summary": "redis_cache_pool_wait_ms at 1339 on redis-cache-3",
+   "split": "test"
+  },
+  {
+   "id": "ans-40",
+   "kind": "answerable",
+   "service": "payments",
+   "title": "PaymentsCertExpiring on payments",
+   "category": "cert-expiry",
+   "alerts": [
+    {
+     "offset_s": 9.2,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-5",
+     "fingerprint": "bd36cea0a5ac4187",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 1 on payments-5"
+    },
+    {
+     "offset_s": 23.6,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-1",
+     "fingerprint": "782ab02ec5de9b63",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-1"
+    },
+    {
+     "offset_s": 32.2,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-5",
+     "fingerprint": "bd36cea0a5ac4187",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-5"
+    },
+    {
+     "offset_s": 34.7,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-5",
+     "fingerprint": "bd36cea0a5ac4187",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-5"
+    },
+    {
+     "offset_s": 36.4,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-1",
+     "fingerprint": "782ab02ec5de9b63",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-1"
+    },
+    {
+     "offset_s": 38.5,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-2",
+     "fingerprint": "e28e9a9c10a8db40",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 1 on payments-2"
+    },
+    {
+     "offset_s": 42.1,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-3",
+     "fingerprint": "5587495246987b2e",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-3"
+    },
+    {
+     "offset_s": 83.1,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-1",
+     "fingerprint": "782ab02ec5de9b63",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-1"
+    },
+    {
+     "offset_s": 106.7,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-5",
+     "fingerprint": "bd36cea0a5ac4187",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-5"
+    },
+    {
+     "offset_s": 116.8,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-2",
+     "fingerprint": "e28e9a9c10a8db40",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-2"
+    },
+    {
+     "offset_s": 125.2,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-2",
+     "fingerprint": "e28e9a9c10a8db40",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 1 on payments-2"
+    },
+    {
+     "offset_s": 129.3,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-3",
+     "fingerprint": "5587495246987b2e",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-3"
+    },
+    {
+     "offset_s": 130.4,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-1",
+     "fingerprint": "782ab02ec5de9b63",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-1"
+    },
+    {
+     "offset_s": 130.5,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-5",
+     "fingerprint": "bd36cea0a5ac4187",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 1 on payments-5"
+    },
+    {
+     "offset_s": 143.9,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-2",
+     "fingerprint": "e28e9a9c10a8db40",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 3 on payments-2"
+    },
+    {
+     "offset_s": 150.5,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-1",
+     "fingerprint": "782ab02ec5de9b63",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-1"
+    },
+    {
+     "offset_s": 150.6,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-3",
+     "fingerprint": "5587495246987b2e",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-3"
+    },
+    {
+     "offset_s": 170.1,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-2",
+     "fingerprint": "e28e9a9c10a8db40",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-2"
+    },
+    {
+     "offset_s": 175.5,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-3",
+     "fingerprint": "5587495246987b2e",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-3"
+    },
+    {
+     "offset_s": 186.8,
+     "service": "payments",
+     "alertname": "PaymentsCertExpiring",
+     "instance": "payments-3",
+     "fingerprint": "5587495246987b2e",
+     "severity": "warning",
+     "summary": "payments_cert_days_left at 2 on payments-3"
+    }
+   ],
+   "gold_cause": {
+    "category": "cert-expiry",
+    "component": "payments"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-cert-expiry.md",
+     "ordinal": 0,
+     "heading_path": "Payments: TLS certificate expiry"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-cert-expiry.md",
+     "ordinal": 1,
+     "heading_path": "Payments: TLS certificate expiry"
+    }
+   ],
+   "opened_at": "2026-10-28T08:14:05.461637+00:00",
+   "severity": "sev3",
+   "summary": "payments_cert_days_left at 1 on payments-5",
+   "split": "test"
+  }
+ ]
+}
