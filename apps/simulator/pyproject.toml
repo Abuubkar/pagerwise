@@ -3,7 +3,7 @@ name = "pagerwise-simulator"
 version = "0.1.0"
 description = "Produces realistic alerts for a 12-service system at a set rate, optionally with malformed events"
 requires-python = ">=3.13"
-dependencies = ["pagerwise-kafka"]
+dependencies = ["pagerwise-kafka", "pyyaml>=6.0.3"]
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
