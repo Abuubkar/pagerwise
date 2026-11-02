@@ -20,12 +20,19 @@ class Settings(BaseSettings):
     llm_timeout_s: float = 180.0
 
     embedding_model: str = "BAAI/bge-small-en-v1.5"
+    # Which chunk embedding vector search reads: v1 (bge-small, chunks.embedding), v2 (bge-base, embedding_v2) or
+    # dual (both, fused with full-text search). See migration 0009 and docs/adr/0009.
+    retrieval_embedding_version: str = "v2"  # v2 won on both eval splits (docs/adr/0009); v1 stays until 6b
+    # A chunk in the top results brings its document's other chunks in right after it (retrieval._with_siblings).
+    retrieval_sibling_chunks: bool = True
+    embedding_model_v2: str = "BAAI/bge-base-en-v1.5"
     # Chunks retrieved per question; each goes into the prompt as one [Cn] tag.
     retrieval_top_k: int = 8
-    # Cross-encoder that reorders hybrid search's 40 candidates. Chosen by measurement: docs/adr/0006.
+    # Cross-encoder that can reorder hybrid search's candidates (docs/adr/0006). Off by default since slice 6: with
+    # v2 embeddings and sibling chunks it changed no eval metric and cost ~490 ms per search (docs/adr/0009).
     reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     # Fused candidates the reranker reads. 0 turns reranking off (results in fused order).
-    rerank_candidates: int = 10
+    rerank_candidates: int = 0
 
     # Signs pagination cursors so clients can't forge or edit them. Override in every real deployment.
     cursor_secret: str = "dev-only-cursor-secret"

@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from pagerwise_api.chunking import ChunkDraft, chunk_markdown, embed_text, parse_document
 from pagerwise_api.db import Chunk, Document, ImportState
-from pagerwise_api.embedding import count_tokens, embed_passages
+from pagerwise_api.embedding import count_tokens, embed_passages, embed_passages_v2
 
 log = logging.getLogger("pagerwise.indexer")
 
@@ -139,6 +139,8 @@ async def store_page(session: AsyncSession, source_type: str, items: list[dict],
 
     texts = [embed_text(d.heading_path, d.text) for _, _, drafts, _ in changed for d in drafts]
     vectors = iter(await asyncio.to_thread(embed_passages, texts))  # CPU-bound; keep the event loop free
+    # Both embeddings while the v1 -> v2 switch is open (migration 0009), so new chunks never lack either.
+    vectors_v2 = iter(await asyncio.to_thread(embed_passages_v2, texts))
     for item, sha, drafts, old in changed:
         doc = parse_document(item["body"])
         if old is not None:
@@ -152,7 +154,7 @@ async def store_page(session: AsyncSession, source_type: str, items: list[dict],
         await session.flush()
         session.add_all(
             Chunk(document_id=row.id, ordinal=i, heading_path=d.heading_path, text=d.text, token_count=d.token_count,
-                  embedding=next(vectors))
+                  embedding=next(vectors), embedding_v2=next(vectors_v2))
             for i, d in enumerate(drafts)
         )
         report.chunks += len(drafts)

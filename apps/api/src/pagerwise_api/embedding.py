@@ -21,6 +21,20 @@ def embed_query(text: str) -> list[float]:
     return next(iter(_model().query_embed(text))).tolist()
 
 
+@cache
+def _model_v2() -> TextEmbedding:
+    return TextEmbedding(model_name=settings.embedding_model_v2)
+
+
+def embed_passages_v2(texts: list[str]) -> list[list[float]]:
+    """bge-base, for chunks.embedding_v2 (migration 0009). Same input text as embed_passages."""
+    return [v.tolist() for v in _model_v2().passage_embed(texts)]
+
+
+def embed_query_v2(text: str) -> list[float]:
+    return next(iter(_model_v2().query_embed(text))).tolist()
+
+
 def count_tokens(text: str) -> int:
     """Tokens as the embedding model counts them. Chunks are sized with this because bge-small ignores anything
     past 512 tokens; it's also a close stand-in for the chat model's count on English text (the prompt budget).
