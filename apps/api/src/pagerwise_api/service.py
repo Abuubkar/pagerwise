@@ -7,14 +7,16 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
+from aiokafka.errors import KafkaError
 from pydantic import BaseModel
 from sqlalchemy import Select, func, or_, select, tuple_, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import pagerwise_kafka as k
 from pagerwise_api import citations, cursor, llm, prompts, schemas
 from pagerwise_api.citations import Verdict, parse_answer
-from pagerwise_api.db import Answer, Chunk, Document, Incident, TriageRun
+from pagerwise_api.db import Answer, Chunk, DeadLetter, Document, Incident, TriageRun
 from pagerwise_api.embedding import count_tokens, embed_query
 from pagerwise_api.schemas import ApiProblem, ProblemCode
 from pagerwise_api.settings import settings
@@ -358,3 +360,42 @@ async def _replay(run: TriageRun) -> AsyncIterator[TriageEvent]:
             yield "citation", schemas.CitationEvent(**c.model_dump(), section=key)
         yield "section_complete", schemas.SectionCompleteEvent(section=key)  # type: ignore[arg-type]
     yield "done", brief
+
+
+async def replay_dead_letters(session: AsyncSession, body: schemas.DlqReplayRequest) -> list[int]:
+    """Republishes the selected dead letters' stored payloads to alerts.v1 as fresh messages (attempt 0), marked
+    with the DLQ offset they came from. Returns their DLQ offsets once Kafka has acknowledged all of them."""
+    query = select(DeadLetter).order_by(DeadLetter.dlq_offset).limit(schemas.REPLAY_MAX + 1)
+    if body.keys is not None:
+        query = query.where(DeadLetter.key.in_(body.keys))
+    else:
+        query = query.where(DeadLetter.dlq_offset.between(body.from_offset, body.to_offset))
+    rows = (await session.scalars(query)).all()
+    if len(rows) > schemas.REPLAY_MAX:
+        raise ApiProblem(400, ProblemCode.INVALID_REQUEST, "Too many dead letters",
+                         f"more than {schemas.REPLAY_MAX} match; replay them in offset ranges")
+    if not rows:
+        return []
+
+    producer = k.producer(settings.kafka_bootstrap, request_timeout_ms=10_000)
+    try:
+        await producer.start()
+        sent = [
+            await producer.send(k.ALERTS, row.payload, key=row.key.encode() if row.key else None,
+                                headers=[(k.H_REPLAYED_FROM, str(row.dlq_offset).encode())])
+            for row in rows
+        ]
+        await asyncio.gather(*sent)
+    except KafkaError as e:
+        raise ApiProblem(503, ProblemCode.BROKER_UNAVAILABLE, "Broker unavailable", f"Kafka: {e}") from e
+    finally:
+        await producer.stop()
+
+    await session.execute(
+        update(DeadLetter)
+        .where(DeadLetter.id.in_([row.id for row in rows]))
+        .values(replayed_at=datetime.now(UTC), replay_count=DeadLetter.replay_count + 1)
+    )
+    await session.commit()
+    return [row.dlq_offset for row in rows]
+

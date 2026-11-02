@@ -3,10 +3,12 @@ name = "pagerwise"
 version = "0.1.0"
 description = "Workspace root: dev tooling and scripts. App code lives in apps/."
 requires-python = ">=3.13"
-dependencies = ["pagerwise-api"]
+dependencies = ["pagerwise-api", "pagerwise-consumer", "pagerwise-simulator"]
 
 [dependency-groups]
 dev = [
+    "datamodel-code-generator>=0.87.0",
+    "hypothesis>=6.170.14",
     "openapi-python-client>=0.29.1",
     "pagerwise-client-sse",
     "pytest>=9.2.0",
@@ -17,14 +19,18 @@ dev = [
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "packages/clients/python", "packages/client-sse"]
+members = ["apps/api", "apps/consumer", "apps/simulator", "packages/kafka", "packages/clients/python", "packages/client-sse"]
 
 [tool.uv.sources]
 pagerwise-api = { workspace = true }
+pagerwise-consumer = { workspace = true }
+pagerwise-kafka = { workspace = true }
+pagerwise-simulator = { workspace = true }
 pagerwise-client = { workspace = true }
 pagerwise-client-sse = { workspace = true }
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests"]
+testpaths = ["apps/api/tests", "apps/consumer/tests", "packages/kafka/tests"]
 markers = ["integration: needs Docker (testcontainers); run with make test-int"]
-addopts = "--strict-markers"
+# importlib: test files in different packages may share a name.
+addopts = "--strict-markers --import-mode=importlib"

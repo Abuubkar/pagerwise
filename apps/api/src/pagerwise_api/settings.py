@@ -30,5 +30,24 @@ class Settings(BaseSettings):
     triage_heartbeat_s: int = 15
     triage_abandoned_after_s: int = 120
 
+    kafka_bootstrap: str = "localhost:19092"
+    consumer_group: str = "pagerwise-consumer"
+    # Backpressure: fetching pauses when this many records are queued for processing and resumes once the queue
+    # drains to the low mark. The gap between the two marks is what stops it flapping.
+    consumer_queue_high: int = 500
+    consumer_queue_low: int = 100
+    # The consumer's own pool (one transaction per partition batch). Fetching also pauses while this share of it is
+    # checked out, and resumes below the low share.
+    consumer_db_pool_size: int = 20
+    consumer_pool_high: float = 0.9
+    consumer_pool_low: float = 0.5
+    consumer_drain_s: float = 20.0  # on SIGTERM: time allowed to finish queued records before committing and exiting
+    # Fault injection for load tests, off by default: this share of events fails transiently, picked by a hash of
+    # event_id so every replica agrees. Four in five of those fail once, one in five fails twice.
+    consumer_fault_transient_rate: float = 0.0
+    # Delay before a message on a retry topic is processed. Tests shorten these; the topic names stay.
+    retry_delay_30s_s: float = 30.0
+    retry_delay_5m_s: float = 300.0
+
 
 settings = Settings()

@@ -16,5 +16,30 @@ services:
       timeout: 3s
       retries: 20
 
+  redpanda:
+    # Kafka API, one node. Topics come from scripts/topics.py, not auto-creation.
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.6
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=1
+      - --memory=1G
+      - --set
+      - redpanda.auto_create_topics_enabled=false
+      # Two listeners: containers use redpanda:9092; the host (consumer, simulator, scripts) uses localhost:19092.
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+    ports:
+      - "19092:19092"
+    volumes:
+      - redpanda:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true'"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
 volumes:
   pgdata:
+  redpanda:

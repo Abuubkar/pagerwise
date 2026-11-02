@@ -2,6 +2,7 @@ from enum import StrEnum
 
 
 class ProblemCode(StrEnum):
+    BROKER_UNAVAILABLE = "broker_unavailable"
     FORMAT_INVALID = "format_invalid"
     INVALID_CURSOR = "invalid_cursor"
     INVALID_REQUEST = "invalid_request"

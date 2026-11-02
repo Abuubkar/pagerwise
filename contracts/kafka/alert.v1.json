@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Abuubkar/pagerwise/contracts/kafka/alert.v1.json",
+  "title": "AlertV1",
+  "description": "One alert firing, as published on alerts.v1. The message key is the service name. A new required field or a changed meaning is a new topic version (alerts.v2), not an edit here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "source", "service", "fingerprint", "severity", "occurred_at", "summary"],
+  "properties": {
+    "event_id": {
+      "description": "Unique per event, set by the producer. Consumers deduplicate on it, so a retried send is harmless.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "source": {
+      "description": "The system that raised the alert, e.g. prometheus or the simulator.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "service": {
+      "description": "The service the alert is about. Also the message key, so one service's alerts stay in order.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "fingerprint": {
+      "description": "Stable for one alert rule on one target: the same problem firing again has the same fingerprint.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "warning", "info"]
+    },
+    "occurred_at": {
+      "description": "When the alert fired, with a UTC offset.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "labels": {
+      "description": "Free-form key/value labels from the source, e.g. alertname, instance, region.",
+      "type": "object",
+      "additionalProperties": {"type": "string", "maxLength": 512},
+      "default": {}
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  }
+}

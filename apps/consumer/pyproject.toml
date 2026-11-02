@@ -1,0 +1,17 @@
+[project]
+name = "pagerwise-consumer"
+version = "0.1.0"
+description = "Long-running Kafka consumer: alerts.v1 and its retry topics into Postgres"
+requires-python = ">=3.13"
+dependencies = [
+    "pagerwise-api",
+    "pagerwise-kafka",
+]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+pagerwise-api = { workspace = true }
+pagerwise-kafka = { workspace = true }

@@ -9,6 +9,8 @@ from .brief_section import BriefSection
 from .brief_sections import BriefSections
 from .citation import Citation
 from .citation_event import CitationEvent
+from .dlq_replay_accepted import DlqReplayAccepted
+from .dlq_replay_request import DlqReplayRequest
 from .error_event import ErrorEvent
 from .incident import Incident
 from .incident_create import IncidentCreate
@@ -35,6 +37,8 @@ __all__ = (
     "BriefSections",
     "Citation",
     "CitationEvent",
+    "DlqReplayAccepted",
+    "DlqReplayRequest",
     "ErrorEvent",
     "Incident",
     "IncidentCreate",

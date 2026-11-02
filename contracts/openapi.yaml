@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Pagerwise
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Incident-response copilot. This file is the contract: the code is checked against it with
     `make contract-check`, and the Python client is generated from it with `make codegen`.
@@ -145,6 +145,30 @@ paths:
         '404': {$ref: '#/components/responses/Problem'}
         '409': {$ref: '#/components/responses/Problem'}
 
+  /v1/admin/dlq/replay:
+    post:
+      summary: Republish dead letters to alerts.v1
+      description: |
+        Picks dead letters either by DLQ offset range (inclusive) or by message key (the service name), and
+        republishes each stored payload to `alerts.v1` with an `x-replayed-from` header holding its DLQ offset.
+        The consumer then processes them as new messages, so replay after fixing whatever sent them to the DLQ: a
+        payload that is still malformed is dead-lettered again. Returns once Kafka has acknowledged every
+        message, before the consumer has processed them. No authentication yet.
+      operationId: replayDeadLetters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DlqReplayRequest'}
+      responses:
+        '202':
+          description: Republished; the consumer processes them asynchronously.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/DlqReplayAccepted'}
+        '400': {$ref: '#/components/responses/Problem'}
+        '503': {$ref: '#/components/responses/Problem'}
+
 components:
   parameters:
     IncidentId:
@@ -164,7 +188,7 @@ components:
     ProblemCode:
       type: string
       enum: [invalid_request, invalid_cursor, not_found, triage_in_progress, model_unavailable, prompt_too_long,
-             format_invalid, triage_abandoned]
+             format_invalid, triage_abandoned, broker_unavailable]
     Problem:
       type: object
       description: RFC 9457 problem details, plus our stable `code`.
@@ -362,3 +386,25 @@ components:
           items: {type: string}
           description: Why a REJECTED answer failed the citation contract.
         usage: {$ref: '#/components/schemas/AskUsage'}
+
+    DlqReplayRequest:
+      type: object
+      description: Either `from_offset` and `to_offset`, or `keys`.
+      properties:
+        from_offset: {type: integer, minimum: 0, description: First DLQ offset to replay.}
+        to_offset: {type: integer, minimum: 0, description: Last DLQ offset to replay (inclusive); at most 10000 after from_offset.}
+        keys:
+          type: array
+          items: {type: string, minLength: 1, maxLength: 255}
+          minItems: 1
+          maxItems: 100
+          description: Replay every dead letter with one of these message keys (service names).
+    DlqReplayAccepted:
+      type: object
+      required: [replayed, dlq_offsets]
+      properties:
+        replayed: {type: integer, description: Messages republished to alerts.v1.}
+        dlq_offsets:
+          type: array
+          items: {type: integer}
+          description: DLQ offsets of the replayed dead letters, in order.

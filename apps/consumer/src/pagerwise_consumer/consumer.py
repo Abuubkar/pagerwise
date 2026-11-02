@@ -1,0 +1,397 @@
+"""Consumes alerts.v1 and its two retry topics into alert_events.
+
+Delivery is at-least-once with idempotent writes: a partition's offset is committed only up to records whose rows
+are committed in Postgres, and a record seen twice inserts nothing the second time (ON CONFLICT on event_id).
+
+  poll loop ──> per-partition queue ──> one worker per partition ──> Postgres
+     │  pauses every partition when the queues or the DB pool are too full (flow.Backpressure)
+     │  pauses a retry partition until its head message is due (seek back, so nothing waits in memory)
+     └─ commits each partition's safe offset (offsets.OffsetTracker) every second
+
+Records in one partition are processed in order, by one worker; partitions run in parallel. A record that fails
+transiently is republished to the next retry topic and committed; a malformed one, or one out of retries, goes to
+alerts.dlq and dead_letters. If Postgres or Kafka itself is down, the batch is retried in place: the partition
+stalls, the queues fill, and backpressure stops fetching."""
+
+import asyncio
+import hashlib
+import json
+import logging
+import os
+import signal
+import socket
+import time
+import uuid
+from collections import deque
+from collections.abc import Callable
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+
+from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener, ConsumerRecord, TopicPartition
+from aiokafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
+from aiokafka.errors import KafkaError
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+
+import pagerwise_kafka as k
+from pagerwise_api.db import AlertEvent, DeadLetter
+from pagerwise_api.settings import settings
+from pagerwise_consumer.flow import Backpressure
+from pagerwise_consumer.offsets import OffsetTracker
+
+log = logging.getLogger("pagerwise.consumer")
+
+BATCH_MAX = 500  # records per insert; 500 rows x 10 columns stays well under asyncpg's 32k parameter limit
+Fault = Callable[[uuid.UUID, int], bool]  # (event_id, attempt) -> fail this attempt transiently?
+
+
+def no_faults(event_id: uuid.UUID, attempt: int) -> bool:
+    return False
+
+
+def hashed_faults(rate: float) -> Fault:
+    """Load-test fault injection. The hash of event_id picks the events, so every replica (and every redelivery)
+    agrees on which ones fail: `rate` of all events fail their first attempt, a fifth of those their second too."""
+
+    def fails(event_id: uuid.UUID, attempt: int) -> bool:
+        share = int.from_bytes(hashlib.sha256(event_id.bytes).digest()[:8]) / 2**64
+        return share < rate and (attempt == 0 or (attempt == 1 and share < rate / 5))
+
+    return fails
+
+
+@dataclass
+class Stats:
+    records: int = 0
+    inserted: int = 0
+    duplicates: int = 0  # valid records whose event_id was already stored (redelivery after a crash or rebalance)
+    retried: int = 0
+    dead_lettered: int = 0
+    pauses: int = 0  # times backpressure paused fetching
+    infra_retries: int = 0  # batches retried in place because Postgres or Kafka failed
+
+
+class AlertConsumer:
+    def __init__(
+        self,
+        engine: AsyncEngine,
+        *,
+        bootstrap: str = settings.kafka_bootstrap,
+        group: str = settings.consumer_group,
+        client_id: str | None = None,
+        faults: Fault = no_faults,
+        retry_delays_s: dict[str, float] | None = None,
+        drain_s: float = settings.consumer_drain_s,
+    ):
+        self.engine = engine
+        self.sessions = async_sessionmaker(engine, expire_on_commit=False)
+        self.faults = faults
+        self.retry_delays_s = retry_delays_s or {
+            k.RETRY_30S: settings.retry_delay_30s_s,
+            k.RETRY_5M: settings.retry_delay_5m_s,
+        }
+        self.drain_s = drain_s
+        self.client_id = client_id or f"consumer-{socket.gethostname()}-{os.getpid()}"
+        self.consumer = AIOKafkaConsumer(
+            bootstrap_servers=bootstrap,
+            group_id=group,
+            client_id=self.client_id,
+            enable_auto_commit=False,
+            auto_offset_reset="earliest",
+            # Round-robin deals each topic's partitions out evenly. The sticky assignor balances only the total over
+            # all three topics, so a second replica could get just retry partitions and none of alerts.v1 (seen in
+            # test_a_consumer_joining_mid_stream...). aiokafka has no cooperative assignor: every rebalance revokes
+            # everything, so stickiness bought little anyway.
+            partition_assignment_strategy=(RoundRobinPartitionAssignor,),
+        )
+        self.producer = k.producer(bootstrap)
+        self.backpressure = Backpressure(settings.consumer_queue_high, settings.consumer_queue_low,
+                                         settings.consumer_pool_high, settings.consumer_pool_low)
+        self.stats = Stats()
+
+        self.queues: dict[TopicPartition, deque[ConsumerRecord]] = {}
+        self.trackers: dict[TopicPartition, OffsetTracker] = {}
+        self.workers: dict[TopicPartition, asyncio.Task] = {}
+        self.wakeups: dict[TopicPartition, asyncio.Event] = {}
+        self.closing: set[TopicPartition] = set()  # being revoked or shut down: worker exits once its queue is empty
+        self.delayed: dict[TopicPartition, int] = {}  # retry partition -> unix ms its head message is due
+        self.seek_to: dict[TopicPartition, int] = {}  # partition was seeked back here; drop records until it shows up
+        self.committed: dict[TopicPartition, int] = {}
+        self.stopping = asyncio.Event()
+        self.failure: BaseException | None = None
+
+    def stop(self) -> None:
+        self.stopping.set()
+
+    async def run(self) -> None:
+        await self.producer.start()
+        await self.consumer.start()
+        self.consumer.subscribe([k.ALERTS, k.RETRY_30S, k.RETRY_5M], listener=_Rebalance(self))
+        log.info("%s started", self.client_id)
+        last_commit = last_status = time.monotonic()
+        try:
+            while not self.stopping.is_set():
+                self._apply_pauses()
+                batches = await self.consumer.getmany(timeout_ms=100, max_records=BATCH_MAX)
+                for tp, records in batches.items():
+                    self._dispatch(tp, records)
+                now = time.monotonic()
+                if now - last_commit >= 1:
+                    await self._commit()
+                    last_commit = now
+                if now - last_status >= 5:
+                    self._log_status()
+                    last_status = now
+        finally:
+            # Not called by aiokafka on stop(), so the final drain and commit are ours.
+            await self._release(list(self.workers), drain=True)
+            await self.consumer.stop()
+            await self.producer.stop()
+            log.info("%s stopped: %s", self.client_id, asdict(self.stats))
+        if self.failure:
+            raise self.failure
+
+    # --- poll loop side ---
+
+    def _apply_pauses(self) -> None:
+        now_ms = int(time.time() * 1000)
+        for tp, due in list(self.delayed.items()):
+            if due <= now_ms:
+                del self.delayed[tp]
+        queued = sum(len(q) for q in self.queues.values())
+        was_paused = self.backpressure.paused
+        if self.backpressure.update(queued, self._pool_used()) and not was_paused:
+            self.stats.pauses += 1
+            log.warning("backpressure: pausing all partitions (%s)", self.backpressure.reason)
+        elif was_paused and not self.backpressure.paused:
+            log.info("backpressure: resuming (queue %d)", queued)
+
+        assigned = self.consumer.assignment()
+        want = set(assigned) if self.backpressure.paused else {tp for tp in assigned if tp in self.delayed}
+        paused = self.consumer.paused()
+        if want - paused:
+            self.consumer.pause(*(want - paused))
+        if paused - want:
+            self.consumer.resume(*(paused - want))
+
+    def _pool_used(self) -> float:
+        pool = self.engine.pool
+        return pool.checkedout() / pool.size()  # type: ignore[attr-defined]  # QueuePool
+
+    def _dispatch(self, tp: TopicPartition, records: list[ConsumerRecord]) -> None:
+        if tp in self.closing:
+            return
+        tracker = self.trackers.setdefault(tp, OffsetTracker())
+        queue = self.queues.setdefault(tp, deque())
+        now_ms = int(time.time() * 1000)
+        for record in records:
+            target = self.seek_to.get(tp)
+            if target is not None:
+                if record.offset != target:
+                    continue  # fetched before the seek back; it will be fetched again
+                del self.seek_to[tp]
+            if tp.topic in self.retry_delays_s:
+                due = k.not_before_ms(tp.topic, record.timestamp, self.retry_delays_s)
+                if due > now_ms:
+                    # Not due yet, and nothing behind it is either (same delay, later publish time). Rewind to it and
+                    # pause until it's due instead of holding records in memory.
+                    self.delayed[tp] = due
+                    self.seek_to[tp] = record.offset
+                    self.consumer.seek(tp, record.offset)
+                    self.consumer.pause(tp)
+                    break
+            tracker.add(record.offset)
+            queue.append(record)
+        if tp not in self.workers:
+            self.wakeups[tp] = asyncio.Event()
+            self.workers[tp] = asyncio.create_task(self._work(tp), name=f"worker {tp.topic}[{tp.partition}]")
+            self.workers[tp].add_done_callback(self._worker_done)
+        self.wakeups[tp].set()
+
+    async def _commit(self) -> None:
+        offsets = {}
+        for tp, tracker in self.trackers.items():
+            offset = tracker.committable()
+            if offset is not None and offset != self.committed.get(tp):
+                offsets[tp] = offset
+        if not offsets:
+            return
+        try:
+            await self.consumer.commit(offsets)
+            self.committed.update(offsets)
+        except KafkaError as e:
+            # Mid-rebalance: the partition's next owner re-reads from the last successful commit; rows dedupe.
+            log.warning("commit failed (%s: %s)", type(e).__name__, e)
+
+    def _log_status(self) -> None:
+        lag = 0
+        for tp in self.consumer.assignment():
+            highwater = self.consumer.highwater(tp)
+            if highwater is not None and tp.topic == k.ALERTS:
+                lag += highwater - self.committed.get(tp, highwater)
+        log.info(
+            "partitions=%d queued=%d paused=%s alerts_lag=%d pool=%.0f%% %s",
+            len(self.consumer.assignment()), sum(len(q) for q in self.queues.values()),
+            self.backpressure.paused, lag, 100 * self._pool_used(), asdict(self.stats),
+        )
+
+    async def _release(self, tps: list[TopicPartition], drain: bool) -> None:
+        """Hands partitions back: on revoke, drop what's queued (the next owner re-reads it from the last commit)
+        and let in-flight batches finish; on shutdown, drain the queues first. Then commit, within drain_s."""
+        tps = [tp for tp in tps if tp in self.workers]
+        for tp in tps:
+            self.closing.add(tp)
+            queue = self.queues[tp]
+            if not drain and queue:
+                self.trackers[tp].discard_from(queue[0].offset)
+                queue.clear()
+            self.wakeups[tp].set()
+        tasks = [self.workers[tp] for tp in tps]
+        if tasks:
+            _, unfinished = await asyncio.wait(tasks, timeout=self.drain_s)
+            for task in unfinished:
+                task.cancel()  # its batch isn't marked done, so it isn't committed: redelivered, deduped
+            if unfinished:
+                log.warning("%d partitions didn't finish within %.0fs", len(unfinished), self.drain_s)
+        await self._commit()
+        for tp in tps:
+            for state in (self.queues, self.trackers, self.workers, self.wakeups, self.delayed, self.seek_to,
+                          self.committed):
+                state.pop(tp, None)
+            self.closing.discard(tp)
+
+    # --- worker side ---
+
+    def _worker_done(self, task: asyncio.Task) -> None:
+        if not task.cancelled() and task.exception() is not None:
+            # A bug, not a bad message: stop the process rather than stall the partition silently.
+            log.error("%s crashed", task.get_name(), exc_info=task.exception())
+            self.failure = task.exception()
+            self.stop()
+
+    async def _work(self, tp: TopicPartition) -> None:
+        queue, wakeup, tracker = self.queues[tp], self.wakeups[tp], self.trackers[tp]
+        while True:
+            if not queue:
+                if tp in self.closing:
+                    return
+                wakeup.clear()
+                await wakeup.wait()
+                continue
+            batch = [queue.popleft() for _ in range(min(len(queue), BATCH_MAX))]
+            await self._process(batch)
+            for record in batch:
+                tracker.done(record.offset)
+
+    async def _process(self, records: list[ConsumerRecord]) -> None:
+        rows, failures = [], []
+        for record in records:
+            attempt = k.attempt_of(record.headers)
+            try:
+                alert = k.decode_alert(record.value)
+                if self.faults(alert.event_id, attempt):
+                    raise k.TransientError("injected fault")
+            except (k.TransientError, k.PermanentError) as e:
+                failures.append((record, e))
+                continue
+            rows.append({**alert.model_dump(), "severity": alert.severity.value, "attempt": attempt})
+
+        delay = 0.5
+        while True:
+            try:
+                inserted = await self._insert(rows)
+                await asyncio.gather(*(self._route(record, error) for record, error in failures))
+                break
+            except (OSError, SQLAlchemyError, KafkaError) as e:
+                # Postgres or Kafka is failing, not this message. Retrying in place keeps the partition's order and
+                # offsets; a retried route may publish twice, which the event_id and dead_letters keys absorb.
+                self.stats.infra_retries += 1
+                log.warning("batch failed (%s: %s); retrying in %.1fs", type(e).__name__, e, delay)
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 30)
+        self.stats.records += len(records)
+        self.stats.inserted += inserted
+        self.stats.duplicates += len(rows) - inserted
+
+    async def _insert(self, rows: list[dict]) -> int:
+        if not rows:
+            return 0
+        statement = (
+            insert(AlertEvent).values(rows).on_conflict_do_nothing(index_elements=["event_id"])
+            .returning(AlertEvent.event_id)
+        )
+        async with self.sessions() as session:
+            inserted = len((await session.execute(statement)).all())
+            await session.commit()
+        return inserted
+
+    async def _route(self, record: ConsumerRecord, error: Exception) -> None:
+        target, headers = k.route_failure(record.topic, record.partition, record.offset, record.headers, error)
+        sent = await self.producer.send_and_wait(target, record.value, key=record.key, headers=headers)
+        if target != k.DLQ:
+            self.stats.retried += 1
+            return
+        origin = k.origin_of(record.topic, record.partition, record.offset, record.headers)
+        named = {name: value.decode(errors="replace") for name, value in headers}
+        row = {
+            "original_topic": origin.topic,
+            "original_partition": origin.partition,
+            "original_offset": origin.offset,
+            "dlq_offset": sent.offset,
+            "key": record.key.decode(errors="replace") if record.key else None,
+            "payload": record.value or b"",
+            "headers": named,
+            "error_class": type(error).__name__,
+            "error": str(error)[:2000],
+            "attempt": int(named[k.H_ATTEMPT]),
+            "first_failed_at": datetime.fromtimestamp(int(named[k.H_FIRST_FAILED_AT]) / 1000, UTC),
+        }
+        statement = insert(DeadLetter).values(row).on_conflict_do_nothing(
+            index_elements=["original_topic", "original_partition", "original_offset"]
+        )
+        async with self.sessions() as session:
+            await session.execute(statement)
+            await session.commit()
+        self.stats.dead_lettered += 1
+
+
+class _Rebalance(ConsumerRebalanceListener):
+    """aiokafka awaits these and holds getmany() until they return."""
+
+    def __init__(self, owner: AlertConsumer):
+        self.owner = owner
+
+    async def on_partitions_revoked(self, revoked: set[TopicPartition]) -> None:
+        if revoked:
+            log.info("revoked %d partitions", len(revoked))
+        await self.owner._release(list(revoked), drain=False)
+
+    async def on_partitions_assigned(self, assigned: set[TopicPartition]) -> None:
+        log.info("assigned %d partitions: %s", len(assigned), _summarize(assigned))
+
+
+def _summarize(tps: set[TopicPartition]) -> str:
+    by_topic: dict[str, list[int]] = {}
+    for tp in tps:
+        by_topic.setdefault(tp.topic, []).append(tp.partition)
+    return " ".join(f"{topic}{sorted(parts)}" for topic, parts in sorted(by_topic.items()))
+
+
+async def _main() -> None:
+    engine = create_async_engine(settings.database_url, pool_size=settings.consumer_db_pool_size, max_overflow=0)
+    consumer = AlertConsumer(engine, faults=hashed_faults(settings.consumer_fault_transient_rate))
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, consumer.stop)
+    try:
+        await consumer.run()
+    finally:
+        await engine.dispose()
+        print(json.dumps({"client_id": consumer.client_id, **asdict(consumer.stats)}), flush=True)
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    logging.getLogger("aiokafka").setLevel(logging.WARNING)
+    asyncio.run(_main())
