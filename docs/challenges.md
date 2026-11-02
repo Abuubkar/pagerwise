@@ -91,3 +91,29 @@ freshness p95 was 6.3 s against the plan's 5 s target.
 - `testcontainers.kafka` is deprecated in testcontainers 4.15; the Redpanda container is in
   `testcontainers.community.kafka` and needs no extra.
 - aiokafka's `describe_consumer_groups` returns raw protocol tuples, not objects.
+
+## Slice 4a: corpus, import, hybrid search
+
+**The plan's reranker can't meet the plan's latency target on a CPU.** bge-reranker-base took 15 s at the median
+to rescore 40 candidates; ms-marco-MiniLM-L-6-v2 took 2.4 s. Not a bug: a cross-encoder reads every candidate in
+full, about 17k tokens per query here. Neither beat plain RRF by much on the planted-fact questions (hit@1 0.94
+before reranking).
+- *Did:* MiniLM-L-6 on the top 10 fused candidates (about 0.55 s, hit@1 0.96). ADR 0006 has the table.
+- *Not done:* retrieval p95 is 595 ms against the 250 ms target. `RERANK_CANDIDATES=0` meets it; slice 6's harder
+  questions decide whether reranking earns its cost.
+
+**Full-text search finds little for natural questions.** `websearch_to_tsquery` requires every word to match, so
+"what caused the card-auth OOM kills in October?" has no full-text hits at all; full-text alone has hit@8 0.71.
+It's still what finds exact tokens: for the error code `LED-POOL-626` it ranked the right runbook 1st where
+vector search ranked it 18th.
+- *Not done:* an OR-of-terms query; measure it in slice 6.
+
+**A 304 carries no body, so it doesn't say where the next page is.** A Link header on a 304 isn't guaranteed.
+- *Did:* the importer stores each page's next link next to its ETag (`import_state.pages`), so a run of 304s still
+  walks the whole listing.
+
+**Generated text needed care to read like the real thing.** The first render used the service's first alert for
+every failure mode, lowercased "OOM" and "TLS", dated some postmortems after the anchor day, and filled contributing
+factors with Faker's Latin placeholder sentences.
+- *Did:* an alert name per service and failure mode, phrase-case mode titles, dates clamped to the anchor, and
+  written factor sentences. Faker is only used for people's names.
