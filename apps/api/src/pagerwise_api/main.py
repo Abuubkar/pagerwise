@@ -9,12 +9,12 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from pagerwise_api import llm, prompts, schemas, service
+from pagerwise_api import llm, prompts, retrieval, schemas, service
 from pagerwise_api.db import TriageRun, get_session
 from pagerwise_api.graphql import graphql_router
 from pagerwise_api.schemas import ApiProblem, Problem, ProblemCode
 
-app = FastAPI(title="Pagerwise", version="0.3.0")
+app = FastAPI(title="Pagerwise", version="0.4.0")
 app.include_router(graphql_router, prefix="/graphql", include_in_schema=False)
 
 PROBLEM_JSON = "application/problem+json"
@@ -70,6 +70,23 @@ async def ask(body: schemas.AskRequest, session: Session) -> schemas.AskResponse
             output_tokens=result.chat.output_tokens,
             total_ms=result.chat.total_ms,
         ),
+    )
+
+
+@app.get("/v1/search", operation_id="search", responses=_problems(400))
+async def search(
+    session: Session,
+    q: Annotated[str, Query(min_length=2, max_length=500)],
+    k: Annotated[int, Query(ge=1, le=40)] = 8,
+) -> schemas.SearchResponse:
+    result = await retrieval.hybrid_search(session, q, k)
+    return schemas.SearchResponse(
+        query=q,
+        candidates=result.candidates,
+        results=[schemas.SearchHit(excerpt=h.text[: service.EXCERPT_CHARS], **{
+            f: getattr(h, f) for f in schemas.SearchHit.model_fields if f != "excerpt"
+        }) for h in result.hits],
+        timings_ms=schemas.SearchTimings(**result.timings_ms),
     )
 
 

@@ -16,22 +16,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import pagerwise_kafka as k
 from pagerwise_api import citations, cursor, llm, prompts, schemas
 from pagerwise_api.citations import Verdict, parse_answer
-from pagerwise_api.db import Answer, Chunk, DeadLetter, Document, Incident, TriageRun
-from pagerwise_api.embedding import count_tokens, embed_query
+from pagerwise_api.db import Answer, DeadLetter, Incident, TriageRun
+from pagerwise_api.embedding import count_tokens
+from pagerwise_api.retrieval import Hit, hybrid_search
 from pagerwise_api.schemas import ApiProblem, ProblemCode
 from pagerwise_api.settings import settings
 
 EXCERPT_CHARS = 280
-
-
-@dataclass
-class RetrievedChunk:
-    chunk_id: uuid.UUID
-    document_path: str
-    heading_path: str
-    text: str
-    token_count: int
-    distance: float  # cosine distance, 0 = same direction
 
 
 @dataclass
@@ -50,25 +41,13 @@ class AskResult:
     verdict: Verdict
     citations: list[Citation]
     problems: list[str] = field(default_factory=list)
-    retrieved: list[RetrievedChunk] = field(default_factory=list)
+    retrieved: list[Hit] = field(default_factory=list)
     chat: llm.ChatResult | None = None
 
 
-async def search_chunks(session: AsyncSession, question: str, k: int) -> list[RetrievedChunk]:
-    # Embedding is CPU-bound ONNX work; keep it off the event loop.
-    vector = await asyncio.to_thread(embed_query, question)
-    distance = Chunk.embedding.cosine_distance(vector).label("distance")
-    rows = await session.execute(
-        select(Chunk, Document.path, distance).join(Document).order_by(distance).limit(k)
-    )
+def _evidence(retrieved: list[Hit]) -> list[prompts.EvidenceChunk]:
     return [
-        RetrievedChunk(c.id, path, c.heading_path, c.text, c.token_count, float(d)) for c, path, d in rows.all()
-    ]
-
-
-def _evidence(retrieved: list[RetrievedChunk]) -> list[prompts.EvidenceChunk]:
-    return [
-        prompts.EvidenceChunk(tag=f"C{i}", source=f"runbook {r.document_path.rsplit('/', 1)[-1]}",
+        prompts.EvidenceChunk(tag=f"C{i}", source=f"{r.source_type} {r.document_path.rsplit('/', 1)[-1]}",
                               heading_path=r.heading_path, text=r.text)
         for i, r in enumerate(retrieved, start=1)
     ]
@@ -80,7 +59,7 @@ def _estimate_tokens(messages: list[dict[str, str]]) -> int:
 
 
 async def ask(session: AsyncSession, question: str) -> AskResult:
-    retrieved = await search_chunks(session, question, settings.retrieval_top_k)
+    retrieved = (await hybrid_search(session, question)).hits
     evidence = _evidence(retrieved)
     messages = prompts.ask_messages(question, evidence)
     result = await llm.chat(messages, estimated_prompt_tokens=_estimate_tokens(messages))
@@ -256,11 +235,11 @@ async def triage_events(session: AsyncSession, run: TriageRun, claimed: bool) ->
 
     incident = await session.get(Incident, run.incident_id)
     assert incident is not None  # triage_runs.incident_id is a foreign key
-    # Slice 1's retrieval, queried with the incident itself. Slice 5 builds a better query (neighbours, alerts).
-    retrieved = await search_chunks(session, f"{incident.title}\n{incident.summary}", settings.retrieval_top_k)
+    # Queried with the incident itself. Slice 5 builds a better query (neighbours, alerts, deploys).
+    retrieved = (await hybrid_search(session, f"{incident.title}\n{incident.summary}")).hits
     evidence = _evidence(retrieved)
     run.evidence = [
-        {"tag": e.tag, "source_type": "runbook", "source_id": r.document_path, "chunk_id": str(r.chunk_id),
+        {"tag": e.tag, "source_type": r.source_type, "source_id": r.document_path, "chunk_id": str(r.chunk_id),
          "heading_path": r.heading_path, "text": r.text}
         for e, r in zip(evidence, retrieved, strict=True)
     ]

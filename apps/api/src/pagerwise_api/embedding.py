@@ -1,8 +1,9 @@
-"""The local embedding model. Loaded once per process: loading the ONNX model takes about a second."""
+"""The local models: the embedding model and the reranker. Each is loaded once per process, on first use."""
 
 from functools import cache
 
 from fastembed import TextEmbedding
+from fastembed.rerank.cross_encoder import TextCrossEncoder
 
 from pagerwise_api.settings import settings
 
@@ -31,3 +32,15 @@ def count_tokens(text: str) -> int:
         return 0
     # Each line is encoded with its own [CLS] and [SEP]; keep one pair, as a single encode would.
     return _model().token_count(lines) - 2 * (len(lines) - 1)
+
+
+@cache
+def _reranker() -> TextCrossEncoder:
+    return TextCrossEncoder(model_name=settings.reranker_model)
+
+
+def rerank(query: str, texts: list[str]) -> list[float]:
+    """Relevance of each text to the query, read together by a cross-encoder. Higher is better; only the order
+    means anything (scores are raw logits, not probabilities)."""
+    return [float(s) for s in _reranker().rerank(query, texts, batch_size=len(texts) or 1)]
+

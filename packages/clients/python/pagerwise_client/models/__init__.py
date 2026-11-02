@@ -18,6 +18,10 @@ from .incident_page import IncidentPage
 from .incident_status import IncidentStatus
 from .problem import Problem
 from .problem_code import ProblemCode
+from .search_hit import SearchHit
+from .search_hit_source_type import SearchHitSourceType
+from .search_response import SearchResponse
+from .search_timings import SearchTimings
 from .section_complete_event import SectionCompleteEvent
 from .section_name import SectionName
 from .severity import Severity
@@ -46,6 +50,10 @@ __all__ = (
     "IncidentStatus",
     "Problem",
     "ProblemCode",
+    "SearchHit",
+    "SearchHitSourceType",
+    "SearchResponse",
+    "SearchTimings",
     "SectionCompleteEvent",
     "SectionName",
     "Severity",

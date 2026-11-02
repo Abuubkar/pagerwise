@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     # Chunks retrieved per question; each goes into the prompt as one [Cn] tag.
     retrieval_top_k: int = 8
+    # Cross-encoder that reorders hybrid search's 40 candidates. Chosen by measurement: docs/adr/0006.
+    reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
+    # Fused candidates the reranker reads. 0 turns reranking off (results in fused order).
+    rerank_candidates: int = 10
 
     # Signs pagination cursors so clients can't forge or edit them. Override in every real deployment.
     cursor_secret: str = "dev-only-cursor-secret"

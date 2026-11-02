@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Pagerwise
-  version: 0.3.0
+  version: 0.4.0
   description: |
     Incident-response copilot. This file is the contract: the code is checked against it with
     `make contract-check`, and the Python client is generated from it with `make codegen`.
@@ -27,6 +27,26 @@ paths:
         '400': {$ref: '#/components/responses/Problem'}
         '422': {$ref: '#/components/responses/Problem'}
         '503': {$ref: '#/components/responses/Problem'}
+
+  /v1/search:
+    get:
+      summary: Hybrid search over runbooks and postmortems, with every stage's rank
+      description: |
+        The retrieval that `ask` and triage use, exposed for debugging and evals. Full-text search and vector
+        search each return their top 40 chunks; Reciprocal Rank Fusion (k=60) merges them; a cross-encoder
+        reranker rescores the fused 40 and the top `k` are returned. Each result carries its rank and score at
+        every stage (null where a chunk wasn't in that stage's top 40), and the response has per-stage timings.
+      operationId: search
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 2, maxLength: 500}}
+        - {name: k, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 40, default: 8}}
+      responses:
+        '200':
+          description: Results, best first.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SearchResponse'}
+        '400': {$ref: '#/components/responses/Problem'}
 
   /v1/incidents:
     post:
@@ -408,3 +428,45 @@ components:
           type: array
           items: {type: integer}
           description: DLQ offsets of the replayed dead letters, in order.
+
+    SearchHit:
+      type: object
+      required: [chunk_id, document_path, source_type, service, heading_path, excerpt, rrf_rank, rrf_score]
+      properties:
+        chunk_id: {type: string, format: uuid}
+        document_path: {type: string}
+        source_type: {type: string, enum: [runbook, postmortem]}
+        service: {type: string}
+        heading_path: {type: string}
+        excerpt: {type: string, description: The chunk's first 280 characters.}
+        fts_rank: {anyOf: [{type: integer}, {type: 'null'}], description: Rank in full-text search; null if not in its top 40.}
+        fts_score: {anyOf: [{type: number}, {type: 'null'}], description: ts_rank_cd; higher is better.}
+        vector_rank: {anyOf: [{type: integer}, {type: 'null'}], description: Rank in vector search; null if not in its top 40.}
+        vector_distance: {anyOf: [{type: number}, {type: 'null'}], description: Cosine distance; lower is better.}
+        rrf_rank: {type: integer}
+        rrf_score: {type: number}
+        rerank_rank: {anyOf: [{type: integer}, {type: 'null'}]}
+        rerank_score: {anyOf: [{type: number}, {type: 'null'}], description: Cross-encoder logit; only the order is meaningful.}
+    SearchTimings:
+      type: object
+      description: Milliseconds per stage. fts and vector overlap (they run concurrently); searches is both.
+      required: [embed, fts, vector, searches, fuse, rerank, total]
+      properties:
+        embed: {type: number}
+        fts: {type: number}
+        vector: {type: number}
+        searches: {type: number}
+        fuse: {type: number}
+        rerank: {type: number}
+        total: {type: number}
+    SearchResponse:
+      type: object
+      required: [query, candidates, results, timings_ms]
+      properties:
+        query: {type: string}
+        candidates: {type: integer, description: Fused chunks the reranker scored.}
+        results:
+          type: array
+          items: {$ref: '#/components/schemas/SearchHit'}
+        timings_ms: {$ref: '#/components/schemas/SearchTimings'}
+
