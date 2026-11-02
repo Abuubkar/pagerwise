@@ -22,5 +22,12 @@ def embed_query(text: str) -> list[float]:
 
 def count_tokens(text: str) -> int:
     """Tokens as the embedding model counts them. Chunks are sized with this because bge-small ignores anything
-    past 512 tokens; it's also a close stand-in for the chat model's count on English text."""
-    return _model().token_count(text)
+    past 512 tokens; it's also a close stand-in for the chat model's count on English text (the prompt budget).
+
+    fastembed's token_count stops at that same 512-token window, so a long prompt would be undercounted. Counting
+    line by line is exact (WordPiece has no token for a line break) unless one line alone passes 512 tokens."""
+    lines = [line for line in text.splitlines() if line.strip()]
+    if not lines:
+        return 0
+    # Each line is encoded with its own [CLS] and [SEP]; keep one pair, as a single encode would.
+    return _model().token_count(lines) - 2 * (len(lines) - 1)

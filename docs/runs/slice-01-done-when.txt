@@ -1,0 +1,209 @@
+Q: Payments p99 latency is climbing. At what ledger connection pool level does that start, and how do I check it?
+verdict: ANSWERED   (qwen3.5:9b-q4_K_M, ask/1, 3255 prompt + 78 output tokens, 23614 ms)
+
+Payments p99 rises when the ledger connection pool drops below 20 idle connections [C1]. To check the pool
+status, run `kubectl -n ledger exec deploy/ledger -- ledgerctl pool stats` [C1][C3]. If the output shows
+`idle` under 20 and `waiting` above 0, the pool is exhausted [C1].
+
+[C1] data/runbooks/payments-high-p99-latency.md :: Payments: high p99 latency  (chunk 01a19a40-00ef-71a8-9b2d-02fd74644180)
+    | # Payments: high p99 latency
+    | 
+    | Alert: `PaymentsP99LatencyHigh` fires when the p99 of `POST /v1/charges` stays above 800 ms for 5 minutes.
+    | The normal p99 is 180–250 ms. Customers notice at about 1.5 s, when the mobile checkout starts showing a spinner
+    | and retry button.
+    | 
+    | ## Symptoms
+    | 
+    | - p99 rises first; p50 usually stays under 120 ms until the problem gets worse.
+    | - `payments_ledger_call_seconds` (the time payments waits on the ledger service) accounts for most of the increase.
+    | - Error rate is normally flat at first. Errors only start once requests hit the 5 s client timeout.
+    | 
+    | ## Likely causes
+    | 
+    | ### Ledger connection pool running low
+    | 
+    | Payments p99 rises when the ledger connection pool drops below 20 idle connections. Every charge writes a ledger
+    | entry synchronously, so when ledger pods are waiting for database connections, payments waits with them. This is
+    | the cause in roughly 70% of past pages for this alert.
+    | 
+    | Check the ledger pool from any ledger pod:
+    | 
+    | ```bash
+    | kubectl -n ledger exec deploy/ledger -- ledgerctl pool stats
+    | # idle=14 in_use=26 waiting=9 max=40
+    | ```
+    | 
+    | If `idle` is under 20 and `waiting` is above 0, follow the ledger runbook "Ledger: connection pool exhaustion".
+    | 
+    | ### Card network slowness
+    | 
+    | If `payments_ledger_call_seconds` is normal but `payments_acquirer_call_seconds` is high, the card network is slow.
+    | See "Payments: card authorization timeouts".
+    | 
+    | ### A recent payments deploy
+    | 
+    | Payments deploys roll out 25% of pods at a time. A bad build shows up as latency on only part of the pods; compare
+    | p99 per pod in the "Payments / Overview" dashboard.
+
+[C3] data/runbooks/ledger-connection-pool-exhaustion.md :: Ledger: connection pool exhaustion  (chunk 01a19a3f-ff23-7f5c-860e-e5be025f8689)
+    | # Ledger: connection pool exhaustion
+    | 
+    | Alert: `LedgerPoolIdleLow` fires when idle database connections in any ledger pod stay below 20 for 3 minutes.
+    | 
+    | ## How the pool is sized
+    | 
+    | Each ledger pod keeps a pool of at most 40 connections to postgres-primary. There are 6 ledger pods, so ledger can
+    | hold up to 240 connections. postgres-primary has `max_connections = 300`, and the remaining 60 are reserved for
+    | migrations, replication and humans.
+    | 
+    | A connection is returned to the pool when its transaction ends. Long transactions are the usual reason the pool
+    | drains: a single report query holding a connection for minutes takes it out of rotation for everyone.
+    | 
+    | ## Diagnosis
+    | 
+    | ### Check the pool
+    | 
+    | ```bash
+    | kubectl -n ledger exec deploy/ledger -- ledgerctl pool stats
+    | # idle=8 in_use=32 waiting=17 max=40
+    | ```
+    | 
+    | `waiting` above 0 means requests are queueing for a connection. Queueing over 2 seconds shows up as payments
+    | latency, because payments writes a ledger entry on every charge.
+    | 
+    | ### Find long transactions
+    | 
+    | ```sql
+    | SELECT pid, now() - xact_start AS age, state, left(query, 80) AS query
+    | FROM pg_stat_activity
+    | WHERE usename = 'ledger' AND xact_start IS NOT NULL
+    | ORDER BY age DESC
+    | LIMIT 10;
+    | ```
+    | 
+    | Anything older than 30 seconds is suspect. The nightly reconciliation job runs at 02:00 UTC and is the most common
+    | offender when it overlaps with peak traffic in APAC.
+    | 
+    | ## First steps
+    | 
+    | 1. Run `ledgerctl pool stats` on two or three pods to confirm the pool is low everywhere, not on one pod.
+    | 2. Find long transactions with the query above. Cancel a reconciliation query with `SELECT pg_cancel_backend(pid)`;
+    |    it is safe to cancel and resumes from its last checkpoint.
+    | 3. Do not raise the pool size above 40. Six pods at 50 would need 300 connections, which is all of postgres-primary.
+    | 4. If the pool stays low with no long transactions, check postgres-primary itself for lock waits or replication
+    |    problems.
+    | 
+    | ## Escalation
+    | 
+    | Page the database on-call if pool exhaustion lasts over 15 minutes with no long transaction to cancel.
+
+
+(eval):1: =============================================================== not found
+
+----------------------------------------------------------------
+Q: Ledger writes started failing with 'cannot execute INSERT in a read-only transaction' right after postgres-primary had a failover. Why, and what exactly should I do?
+verdict: ANSWERED   (qwen3.5:9b-q4_K_M, ask/1, 3263 prompt + 199 output tokens, 24570 ms)
+
+Ledger writes fail because ledger pods hold pooled connections to the old primary for up to 10 minutes, which
+is no longer the leader after a failover [C1]. These stale connections can still read but every write fails as
+read-only since the old primary was demoted [C3]. To fix this, first confirm the failover has finished and a
+new primary is accepting writes [C1]. Then recycle the ledger connection pools so every pod reconnects to the
+new primary right away using: `kubectl -n ledger exec deploy/ledger -- ledgerctl pool recycle --all-pods`
+[C1]. Watch the write error rate; it should drop to zero within one minute of the recycle [C1]. Do not restart
+ledger pods instead of recycling, as a rolling restart takes about 6 minutes and drops in-flight requests
+[C1]. If errors continue after a recycle, the new primary may itself be read-only, so page the database on-
+call [C1].
+
+[C1] data/runbooks/ledger-read-only-write-errors.md :: Ledger: writes fail with read-only transaction errors  (chunk 01a19a3f-ff84-70df-a53b-3796515c8fe6)
+    | # Ledger: writes fail with read-only transaction errors
+    | 
+    | Alert: `LedgerWriteErrors` fires when more than 1% of ledger writes fail over 5 minutes.
+    | 
+    | ## What the error means
+    | 
+    | When ledger writes fail with `cannot execute INSERT in a read-only transaction` (SQLSTATE 25006), ledger is still
+    | connected to a Postgres server that is no longer the primary. This almost always follows a postgres-primary
+    | failover or switchover: the old primary was demoted to a replica, but connections opened before the failover still
+    | point at it.
+    | 
+    | Ledger pods hold pooled connections for up to 10 minutes (`max_lifetime = 600s`). Without action, write errors
+    | continue until every stale connection has been replaced, which can take the full 10 minutes.
+    | 
+    | ## Diagnosis
+    | 
+    | Confirm the error code in the ledger logs:
+    | 
+    | ```bash
+    | kubectl -n ledger logs deploy/ledger --since=10m | grep -c 25006
+    | ```
+    | 
+    | Then confirm that a failover happened. The postgres-primary runbook "Postgres primary: failover and switchover"
+    | explains how to see the current leader.
+    | 
+    | ## First steps
+    | 
+    | 1. Confirm the failover has finished and a new primary is accepting writes (see the postgres-primary runbook).
+    | 2. Recycle the ledger connection pools so every pod reconnects to the new primary right away:
+    | 
+    | ```bash
+    | kubectl -n ledger exec deploy/ledger -- ledgerctl pool recycle --all-pods
+    | ```
+    | 
+    | 3. Watch the write error rate. It should drop to zero within one minute of the recycle.
+    | 4. Do not restart ledger pods instead of recycling. A rolling restart takes about 6 minutes for 6 pods and drops
+    |    in-flight requests.
+    | 
+    | ## Escalation
+    | 
+    | If errors continue after a recycle, the new primary may itself be read-only. Page the database on-call.
+
+[C3] data/runbooks/postgres-primary-failover.md :: Postgres primary: failover and switchover  (chunk 01a19a40-0158-7d29-918e-9d086ffcb6d2)
+    | # Postgres primary: failover and switchover
+    | 
+    | postgres-primary is a 3-node Patroni cluster. Patroni promotes a replica automatically when the leader stops
+    | renewing its lock for 30 seconds (`ttl = 30`). A switchover is the planned version of the same thing.
+    | 
+    | ## Check the cluster state
+    | 
+    | ```bash
+    | kubectl -n postgres exec postgres-primary-0 -- patronictl list
+    | ```
+    | 
+    | The `Leader` row is the current primary. A node in `running` state with role `Replica` is a healthy standby.
+    | After a failover, confirm that the new leader accepts writes:
+    | 
+    | ```sql
+    | SELECT pg_is_in_recovery();  -- false on the primary
+    | ```
+    | 
+    | ## What clients see during a failover
+    | 
+    | - Writes fail for 30–45 seconds while Patroni detects the failure and promotes a replica.
+    | - The `postgres-primary-rw` service follows the leader, but existing connections stay attached to the old node.
+    |   After the old leader is demoted, those connections can still read but every write fails as read-only.
+    | - Clients with connection pools must reconnect. Services that cache connections for a long time (ledger keeps them
+    |   up to 10 minutes) keep failing writes until they recycle their pools.
+    | 
+    | ## Planned switchover
+    | 
+    | ```bash
+    | kubectl -n postgres exec postgres-primary-0 -- patronictl switchover --candidate postgres-primary-1 --force
+    | ```
+    | 
+    | Announce a switchover in #db-changes 15 minutes ahead, and run it outside 12:00–14:00 UTC, the payments peak.
+    | 
+    | ## After any failover
+    | 
+    | 1. Confirm the new leader with `patronictl list` and `pg_is_in_recovery()`.
+    | 2. Tell the ledger on-call or run the ledger pool recycle yourself; ledger is the main client with long-lived
+    |    connections.
+    | 3. Check replication lag on the remaining replicas; the old leader rejoins as a replica once it is healthy.
+    | 4. Open a postmortem if the failover was not planned.
+
+
+----------------------------------------------------------------
+Q: The search service is returning stale results after the Elasticsearch reindex. How do I fix it?
+verdict: INSUFFICIENT_EVIDENCE   (qwen3.5:9b-q4_K_M, ask/1, 3249 prompt + 7 output tokens, 15691 ms)
+
+INSUFFICIENT_EVIDENCE
+
