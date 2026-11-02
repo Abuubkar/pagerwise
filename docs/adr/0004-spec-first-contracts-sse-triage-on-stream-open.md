@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: accepted; "Where the model call runs" superseded by ADR 0008
 date: 2026-11-02
 ---
 

@@ -22,6 +22,8 @@ uv run python scripts/seed.py alerts      # 500k historical alert_events via COP
 uv run python -m pagerwise_docs_mock      # mock docs API on :8002 serving data/runbooks + data/corpus (--fail-rate 0.1)
 uv run python -m pagerwise_indexer        # import runbooks + postmortems from it; reruns send If-None-Match (304s)
 uv run uvicorn pagerwise_api.main:app --port 8001
+uv run python -m pagerwise_api.worker     # triage worker: generates queued briefs (needs Ollama and docs_mock)
+cd apps/web && pnpm install && pnpm dev   # UI on :3001 (proxies HTTP to :8001; subscriptions use ws://localhost:8001)
 uv run python scripts/ask.py "Why is payments p99 high?"   # answer + citations resolved to chunk text
 curl 'localhost:8001/v1/search?q=ledger+pool+exhaustion'    # hybrid search with every stage's rank and timings
 make smoke            # generated client end to end: 3 incidents, paging, one streamed triage, GraphQL
@@ -30,8 +32,9 @@ uv run python -m pagerwise_simulator --rate 200 --duration 10 --malformed-rate 0
 uv run python scripts/incidents.py        # busiest open incidents and the alerts clustered into each
 make storm            # done-when load test: 2,000/s for 3 min, a replica killed; takes ~10 min (5 min retries)
 make test             # unit tests, offline (no Ollama, no DB, no model download)
-make test-int         # service tests (testcontainers Postgres + pgvector; needs Docker)
-make codegen          # regenerate the client, contracts/schema.graphql and the Kafka alert model
+make test-int         # service tests (testcontainers Postgres + pgvector, Redpanda, Redis; needs Docker)
+make web-test         # Jest + TypeScript check for apps/web
+make codegen          # regenerate the clients (Python, web TS), contracts/schema.graphql, the Kafka alert model
 make contract-check   # oasdiff: the app's emitted OpenAPI vs contracts/openapi.yaml
 ```
 
@@ -78,4 +81,9 @@ Run scripts from the repo root: document paths are stored relative to it.
   up alerts by id should also bound `occurred_at` (pruning), and inserts use `ON CONFLICT DO NOTHING` without a
   target. Partitions are created a week ahead by the consumer (`create_alert_partitions`). docs/migrations.md
   has the online migration procedure and rollback.
+- Triage briefs are generated only by the worker (`triage.generate`), and read only through `triage.events` (Redis
+  stream, then the stored result). Don't generate in a request handler. Redis is used only through `bus`.
+- An evidence source may fail: keep each one in its own timeout and `try` inside `gather_evidence`, and never let
+  the prompt or the brief say anything about a degraded source.
+- `apps/web/src/gql` and `apps/web/src/api/schema.d.ts` are generated (`make codegen`); never edit them by hand.
 
