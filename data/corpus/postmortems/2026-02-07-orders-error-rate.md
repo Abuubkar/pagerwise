@@ -40,6 +40,6 @@ Category: elevated error rate. Component: inventory.
 
 ## Action items
 
-- ORDE-1624 (commerce): Add an alert on error_ratio_pct for inventory.
-- ORDE-9902 (discovery): Add a regression test for: 2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.
-- ORDE-3635 (discovery): Link the runbook from the alert.
+- ORDE-1624 (discovery): Add an alert on error_ratio_pct for inventory.
+- ORDE-9902 (commerce): Add a regression test for: 2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.
+- ORDE-3635 (commerce): Link the runbook from the alert.

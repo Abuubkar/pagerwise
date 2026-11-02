@@ -40,6 +40,6 @@ Category: memory pressure and OOM kills. Component: redis-cache.
 
 ## Action items
 
-- CARD-1539 (platform): Add an alert on rss_pct_of_limit for redis-cache.
-- CARD-2833 (platform): Add a regression test for: redis-cache buffered whole export files in memory after a change in 6.38.7.
-- CARD-3651 (payments): Link the runbook from the alert.
+- CARD-1539 (payments): Add an alert on rss_pct_of_limit for redis-cache.
+- CARD-2833 (payments): Add a regression test for: redis-cache buffered whole export files in memory after a change in 6.38.7.
+- CARD-3651 (platform): Link the runbook from the alert.

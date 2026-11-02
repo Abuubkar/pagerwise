@@ -41,6 +41,6 @@ Category: connection pool exhaustion. Component: redis-cache.
 
 ## Action items
 
-- CARD-6253 (payments): Add an alert on pool_wait_ms for redis-cache.
-- CARD-1877 (payments): Add a regression test for: a retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
-- CARD-9476 (platform): Link the runbook from the alert.
+- CARD-6253 (platform): Add an alert on pool_wait_ms for redis-cache.
+- CARD-1877 (platform): Add a regression test for: a retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
+- CARD-9476 (payments): Link the runbook from the alert.

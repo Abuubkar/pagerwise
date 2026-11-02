@@ -4,30 +4,40 @@
            data/corpus/, plus evals/planted_facts.json: one specific, checkable fact per runbook section that has
            one, and each postmortem's root cause, with a question an on-call engineer would ask.
   deploys  30 days of deploys into the deploys table, including the deploys the recent postmortems blame.
+  graph    data/service_graph.yaml into the services and service_edges tables (clustering reads them).
+  alerts   500k historical alert_events over the 30 days before the anchor, via COPY: a daily cycle (busiest at
+           14:00 UTC, quieter at weekends) plus 3 storms. No incident_id: history predates clustering.
 
 Same --seed, same output. Dates are relative to --anchor (default 2026-11-01), not today, so the files don't change
 from run to run. docs_mock serves data/corpus/ (and the hand-written data/runbooks/) to the importer.
 
 uv run python scripts/seed.py corpus [--seed 7]
 uv run python scripts/seed.py deploys [--seed 7]
+uv run python scripts/seed.py graph
+uv run python scripts/seed.py alerts [--seed 7] [--count 500000]
 """
 
 import argparse
 import asyncio
 import hashlib
 import json
+import math
 import random
 import shutil
+import time
+import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from faker import Faker
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
+import asyncpg
 from sqlalchemy import delete
 
-from pagerwise_api.db import Deploy, SessionLocal, engine
-from pagerwise_simulator import Service, load_graph
+from pagerwise_api.db import Deploy, Service as ServiceRow, ServiceEdge, SessionLocal, engine
+from pagerwise_api.settings import settings
+from pagerwise_simulator import Service, fingerprint, load_graph, summary
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "data" / "corpus"
@@ -298,7 +308,7 @@ def corpus(seed: int, anchor: datetime) -> None:
         ]
         slug = f"{incident.date()}-{service.name}-{mode.slug}"
         path = f"data/corpus/postmortems/{slug}.md"
-        teams = [graph[s].team for s in {service.name, component}]
+        teams = sorted({graph[s].team for s in (service.name, component)})  # sorted: set order varies per process
         text = env.get_template("postmortem.md.j2").render(
             service={"name": service.name}, mode=mode, updated_at=min(incident + timedelta(days=rng.randint(2, 9)), anchor).date(),
             incident_date=incident.date(), title=f"{service.name} {mode.title}", duration=duration,
@@ -374,17 +384,99 @@ async def deploys(seed: int, anchor: datetime) -> None:
     print(f"seeded {len(rows)} deploys over 30 days ({len(blamed)} blamed by postmortems)")
 
 
+async def graph_tables() -> None:
+    graph = load_graph()
+    async with SessionLocal() as session:
+        await session.execute(delete(ServiceEdge))
+        await session.execute(delete(ServiceRow))
+        session.add_all(ServiceRow(name=s.name, tier=s.tier, team=s.team) for s in graph.values())
+        await session.flush()
+        session.add_all(ServiceEdge(from_service=s.name, to_service=d) for s in graph.values() for d in s.depends_on)
+        await session.commit()
+    await engine.dispose()
+    print(f"seeded {len(graph)} services and {sum(len(s.depends_on) for s in graph.values())} edges")
+
+
+# (day offset from the start, start hour, minutes, services that alert, share of the total)
+STORMS = [(6, 14.3, 45, ["postgres-primary", "ledger", "payments", "orders"], 0.05),
+          (15, 9.1, 30, ["api-gateway", "auth"], 0.04),
+          (24, 21.7, 60, ["kafka-broker", "notifications", "ledger"], 0.05)]
+HISTORY_COLUMNS = ["event_id", "source", "service", "fingerprint", "severity", "occurred_at", "labels", "summary",
+                   "attempt", "ingested_at"]
+
+
+async def alerts(seed: int, anchor: datetime, count: int) -> None:
+    """Replaces earlier seeded history (source = 'simulator-history'); leaves alerts from real runs alone."""
+    rng = random.Random(seed + 2)
+    graph = load_graph()
+    names, weights = list(graph), [s.weight for s in graph.values()]
+    start = anchor - timedelta(days=30)
+    hours = [start + timedelta(hours=h) for h in range(30 * 24)]
+    # Busiest at 14:00 UTC, quietest at 02:00; weekends at 70%.
+    load = [(1 + 0.6 * math.sin(2 * math.pi * (h.hour - 8) / 24)) * (0.7 if h.weekday() >= 5 else 1) for h in hours]
+    background = count - sum(round(count * share) for *_, share in STORMS)
+    per_hour = [background * w / sum(load) for w in load]
+
+    def row(service: str, at: datetime) -> tuple:
+        alertname, severity, template = rng.choice(graph[service].rules)
+        instance = f"{service}-{rng.randint(0, 5)}"
+        labels = {"alertname": alertname, "instance": instance, "region": rng.choice(["eu-west-1", "us-east-1"]),
+                  "seed": "history"}
+        return (uuid.UUID(int=rng.getrandbits(128), version=4), "simulator-history", service,
+                fingerprint(service, alertname, instance), severity, at, json.dumps(labels),
+                summary(template, rng, instance), 0, at + timedelta(seconds=rng.uniform(0.05, 2)))
+
+    def generate():
+        owed = 0.0
+        for hour, n in zip(hours, per_hour, strict=True):
+            owed += n
+            for _ in range(int(owed)):
+                yield row(rng.choices(names, weights)[0], hour + timedelta(seconds=rng.uniform(0, 3600)))
+            owed -= int(owed)
+        for _ in range(round(owed)):  # the fraction left over from rounding each hour down
+            yield row(rng.choices(names, weights)[0], hours[-1] + timedelta(seconds=rng.uniform(0, 3600)))
+        for day, at_hour, minutes, services, share in STORMS:
+            begin = start + timedelta(days=day, hours=at_hour)
+            for _ in range(round(count * share)):
+                yield row(rng.choice(services), begin + timedelta(seconds=rng.uniform(0, minutes * 60)))
+
+    started = time.monotonic()
+    conn = await asyncpg.connect(settings.database_url.replace("postgresql+asyncpg://", "postgresql://"))
+    try:
+        deleted = await conn.execute("DELETE FROM alert_events WHERE source = 'simulator-history'")
+        batch, total = [], 0
+        for record in generate():
+            batch.append(record)
+            if len(batch) == 50_000:
+                await conn.copy_records_to_table("alert_events", records=batch, columns=HISTORY_COLUMNS)
+                total += len(batch)
+                batch = []
+        if batch:
+            await conn.copy_records_to_table("alert_events", records=batch, columns=HISTORY_COLUMNS)
+            total += len(batch)
+        await conn.execute("ANALYZE alert_events")
+    finally:
+        await conn.close()
+    print(f"replaced seeded history ({deleted}) with {total:,} alerts from {start.date()} to {anchor.date()}, "
+          f"including {len(STORMS)} storms, in {time.monotonic() - started:.1f}s")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("what", choices=["corpus", "deploys"])
+    parser.add_argument("what", choices=["corpus", "deploys", "graph", "alerts"])
+    parser.add_argument("--count", type=int, default=500_000, help="alerts: how many to seed")
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--anchor", default="2026-11-01", help="dates are generated relative to this day (UTC)")
     args = parser.parse_args()
     anchor = datetime.fromisoformat(args.anchor).replace(tzinfo=UTC)
     if args.what == "corpus":
         corpus(args.seed, anchor)
-    else:
+    elif args.what == "deploys":
         asyncio.run(deploys(args.seed, anchor))
+    elif args.what == "graph":
+        asyncio.run(graph_tables())
+    else:
+        asyncio.run(alerts(args.seed, anchor, args.count))
 
 
 main()

@@ -50,21 +50,29 @@ _NAMES = list(SERVICES)
 _WEIGHTS = [s.weight for s in SERVICES.values()]
 
 
+def fingerprint(service: str, alertname: str, instance: str) -> str:
+    """Stable for one alert rule on one target, like Prometheus/Alertmanager's: the same problem firing again."""
+    return hashlib.sha1(f"{service}/{alertname}/{instance}".encode()).hexdigest()[:16]
+
+
+def summary(template: str, rng: random.Random, instance: str) -> str:
+    return template.format(instance=instance, pct=rng.randint(2, 40), ms=rng.randint(400, 5000), n=rng.randint(5, 900))
+
+
 def make_alert(rng: random.Random, run_id: str) -> k.AlertV1:
     service = rng.choices(_NAMES, _WEIGHTS)[0]
-    alertname, severity, summary = rng.choice(SERVICES[service].rules)
+    alertname, severity, template = rng.choice(SERVICES[service].rules)
     instance = f"{service}-{rng.randint(0, 5)}"
     return k.AlertV1(
         event_id=uuid.uuid4(),
         source="simulator",
         service=service,
-        fingerprint=hashlib.sha1(f"{service}/{alertname}/{instance}".encode()).hexdigest()[:16],
+        fingerprint=fingerprint(service, alertname, instance),
         severity=k.Severity(severity),
         occurred_at=datetime.now(UTC),
         labels={"alertname": alertname, "instance": instance, "region": rng.choice(["eu-west-1", "us-east-1"]),
                 "run": run_id},
-        summary=summary.format(instance=instance, pct=rng.randint(2, 40), ms=rng.randint(400, 5000),
-                               n=rng.randint(5, 900)),
+        summary=summary(template, rng, instance),
     )
 
 

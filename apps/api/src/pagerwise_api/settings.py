@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     triage_heartbeat_s: int = 15
     triage_abandoned_after_s: int = 120
 
+    redis_url: str = "redis://localhost:6379/0"
+    incident_updates_channel: str = "incidents"  # JSON per changed incident; slice 5's GraphQL subscription reads it
+
     kafka_bootstrap: str = "localhost:19092"
     consumer_group: str = "pagerwise-consumer"
     # Backpressure: fetching pauses when this many records are queued for processing and resumes once the queue
