@@ -1,0 +1,17 @@
+{
+ "run": "20261102T180447",
+ "metrics": {
+  "retrieval.recall_at_8": 1.0,
+  "retrieval.mrr_at_10": 1.0,
+  "retrieval.mrr_at_10_before_rerank": 1.0,
+  "retrieval.latency_p50_ms": 27.6,
+  "retrieval.latency_p95_ms": 41.9,
+  "clustering.precision": 0.9832635983263598,
+  "clustering.recall": 0.7432432432432432,
+  "clustering.f1": 0.846569510397904,
+  "clustering.alerts": 508,
+  "clustering.cases": 41,
+  "clustering.incidents": 53,
+  "clustering.seconds": 4.6
+ }
+}

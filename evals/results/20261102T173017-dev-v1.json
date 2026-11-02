@@ -1,0 +1,273 @@
+{
+ "run": "20261102T173017",
+ "at": "2026-11-02T17:30:17+00:00",
+ "split": "dev",
+ "embedding": "v1",
+ "reranker": "Xenova/ms-marco-MiniLM-L-6-v2",
+ "rerank_candidates": 10,
+ "metrics": {
+  "clustering.precision": 0.9832635983263598,
+  "clustering.recall": 0.7432432432432432,
+  "clustering.f1": 0.846569510397904,
+  "clustering.alerts": 508,
+  "clustering.cases": 41,
+  "clustering.incidents": 53,
+  "clustering.seconds": 4.8
+ },
+ "clustering": [
+  {
+   "id": "ans-03",
+   "service": "kafka-broker",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-04",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-06",
+   "service": "notifications",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-08",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-09",
+   "service": "payments",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-10",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-11",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-12",
+   "service": "search",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-14",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": [
+    "ans-32"
+   ]
+  },
+  {
+   "id": "ans-15",
+   "service": "auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-17",
+   "service": "ledger",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-18",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-21",
+   "service": "inventory",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-22",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-23",
+   "service": "search",
+   "incidents": 2,
+   "merged_with": [
+    "deg-09"
+   ]
+  },
+  {
+   "id": "ans-26",
+   "service": "orders",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-27",
+   "service": "payments",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-28",
+   "service": "search",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-29",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-31",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-32",
+   "service": "api-gateway",
+   "incidents": 3,
+   "merged_with": [
+    "ans-14"
+   ]
+  },
+  {
+   "id": "ans-33",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-34",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-36",
+   "service": "api-gateway",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-38",
+   "service": "ledger",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "una-05",
+   "service": "kafka-broker",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-07",
+   "service": "card-auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-08",
+   "service": "orders",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-09",
+   "service": "postgres-primary",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-10",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-11",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-12",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-13",
+   "service": "notifications",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-14",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-15",
+   "service": "auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-01",
+   "service": "notifications",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-02",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-03",
+   "service": "postgres-primary",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-07",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-09",
+   "service": "search",
+   "incidents": 2,
+   "merged_with": [
+    "ans-23"
+   ]
+  },
+  {
+   "id": "deg-10",
+   "service": "ledger",
+   "incidents": 1,
+   "merged_with": []
+  }
+ ]
+}

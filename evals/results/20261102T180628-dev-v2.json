@@ -1,0 +1,1486 @@
+{
+ "run": "20261102T180628",
+ "at": "2026-11-02T18:06:28+00:00",
+ "split": "dev",
+ "embedding": "v2",
+ "reranker": "Xenova/ms-marco-MiniLM-L-6-v2",
+ "rerank_candidates": 0,
+ "metrics": {
+  "retrieval.recall_at_8": 1.0,
+  "retrieval.mrr_at_10": 1.0,
+  "retrieval.mrr_at_10_before_rerank": 1.0,
+  "retrieval.latency_p50_ms": 27.7,
+  "retrieval.latency_p95_ms": 37.5,
+  "clustering.precision": 0.9832635983263598,
+  "clustering.recall": 0.7432432432432432,
+  "clustering.f1": 0.846569510397904,
+  "clustering.alerts": 508,
+  "clustering.cases": 41,
+  "clustering.incidents": 53,
+  "clustering.seconds": 4.3
+ },
+ "retrieval": [
+  {
+   "id": "ans-03",
+   "query": "KafkaBrokerLatencyHigh on kafka-broker. service kafka-broker. related services ledger, notifications, payments. kafka_broker_p99_latency_ms at 2725 on kafka-broker-4",
+   "gold": [
+    "data/corpus/runbooks/kafka-broker-high-latency.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "kafka-broker-high-latency.md (gold)",
+    "kafka-broker-high-latency.md (gold)",
+    "2026-03-04-kafka-broker-high-latency.md",
+    "2026-04-16-kafka-broker-high-latency.md",
+    "2026-09-15-kafka-broker-high-latency.md",
+    "notifications-high-latency.md",
+    "notifications-high-latency.md",
+    "ledger-high-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 388.0,
+    "fts": 9.6,
+    "vector": 22.2,
+    "searches": 25.1,
+    "fuse": 22.8,
+    "rerank": 0.0,
+    "siblings": 19.0,
+    "total": 454.9
+   }
+  },
+  {
+   "id": "ans-04",
+   "query": "RedisCacheDiskFull on redis-cache. service redis-cache. related services auth, card-auth, search. redis_cache_disk_used_pct at 93 on redis-cache-0",
+   "gold": [
+    "data/corpus/runbooks/redis-cache-disk-full.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "redis-cache-disk-full.md (gold)",
+    "redis-cache-disk-full.md (gold)",
+    "card-auth-disk-full.md",
+    "card-auth-disk-full.md",
+    "auth-disk-full.md",
+    "auth-disk-full.md",
+    "2026-08-07-search-disk-full.md",
+    "redis-cache-cpu-saturation.md"
+   ],
+   "timings_ms": {
+    "embed": 34.2,
+    "fts": 2.0,
+    "vector": 3.0,
+    "searches": 4.2,
+    "fuse": 10.7,
+    "rerank": 0.0,
+    "siblings": 17.8,
+    "total": 67.0
+   }
+  },
+  {
+   "id": "ans-06",
+   "query": "NotificationsPoolExhausted on notifications. service notifications. related services kafka-broker, orders. notifications_pool_wait_ms at 1231 on notifications-3",
+   "gold": [
+    "data/corpus/runbooks/notifications-connection-pool.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "notifications-connection-pool.md (gold)",
+    "notifications-connection-pool.md (gold)",
+    "notifications-queue-backlog.md",
+    "kafka-broker-connection-pool.md",
+    "kafka-broker-connection-pool.md",
+    "2025-12-05-notifications-cpu-saturation.md",
+    "notifications-cpu-saturation.md",
+    "notifications-cpu-saturation.md"
+   ],
+   "timings_ms": {
+    "embed": 28.1,
+    "fts": 2.2,
+    "vector": 2.8,
+    "searches": 4.0,
+    "fuse": 11.7,
+    "rerank": 0.0,
+    "siblings": 18.2,
+    "total": 62.0
+   }
+  },
+  {
+   "id": "ans-08",
+   "query": "PaymentsUpstreamTimeouts on payments. service payments. related services api-gateway, card-auth, kafka-broker, ledger, orders. payments_upstream_timeout_pct at 21 on payments-0",
+   "gold": [
+    "data/corpus/runbooks/payments-dependency-timeout.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "payments-dependency-timeout.md (gold)",
+    "payments-dependency-timeout.md (gold)",
+    "orders-dependency-timeout.md",
+    "orders-dependency-timeout.md",
+    "card-auth-dependency-timeout.md",
+    "card-auth-dependency-timeout.md",
+    "ledger-dependency-timeout.md",
+    "ledger-dependency-timeout.md"
+   ],
+   "timings_ms": {
+    "embed": 31.5,
+    "fts": 2.0,
+    "vector": 2.4,
+    "searches": 3.7,
+    "fuse": 11.3,
+    "rerank": 0.0,
+    "siblings": 18.3,
+    "total": 64.7
+   }
+  },
+  {
+   "id": "ans-09",
+   "query": "PaymentsDiskFull on payments. service payments. related services api-gateway, card-auth, kafka-broker, ledger, orders. payments_disk_used_pct at 97 on payments-1",
+   "gold": [
+    "data/corpus/runbooks/payments-disk-full.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "payments-disk-full.md (gold)",
+    "payments-disk-full.md (gold)",
+    "card-auth-disk-full.md",
+    "card-auth-disk-full.md",
+    "kafka-broker-disk-full.md",
+    "kafka-broker-disk-full.md",
+    "orders-disk-full.md",
+    "orders-disk-full.md"
+   ],
+   "timings_ms": {
+    "embed": 30.9,
+    "fts": 2.1,
+    "vector": 3.1,
+    "searches": 4.2,
+    "fuse": 12.2,
+    "rerank": 0.0,
+    "siblings": 19.4,
+    "total": 66.8
+   }
+  },
+  {
+   "id": "ans-10",
+   "query": "KafkaBrokerMemoryPressure on kafka-broker. service kafka-broker. related services ledger, notifications, payments. kafka_broker_rss_pct_of_limit at 97 on kafka-broker-1",
+   "gold": [
+    "data/corpus/runbooks/kafka-broker-memory-pressure.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "kafka-broker-memory-pressure.md (gold)",
+    "kafka-broker-memory-pressure.md (gold)",
+    "2026-05-17-kafka-broker-memory-pressure.md",
+    "ledger-memory-pressure.md",
+    "ledger-memory-pressure.md",
+    "notifications-memory-pressure.md",
+    "notifications-memory-pressure.md",
+    "payments-memory-pressure.md"
+   ],
+   "timings_ms": {
+    "embed": 36.9,
+    "fts": 1.7,
+    "vector": 3.0,
+    "searches": 4.2,
+    "fuse": 10.4,
+    "rerank": 0.0,
+    "siblings": 17.0,
+    "total": 68.4
+   }
+  },
+  {
+   "id": "ans-11",
+   "query": "RedisCacheUpstreamTimeouts on redis-cache. service redis-cache. related services auth, card-auth, search. redis_cache_upstream_timeout_pct at 25 on redis-cache-5",
+   "gold": [
+    "data/corpus/runbooks/redis-cache-dependency-timeout.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "redis-cache-dependency-timeout.md (gold)",
+    "redis-cache-dependency-timeout.md (gold)",
+    "card-auth-dependency-timeout.md",
+    "card-auth-dependency-timeout.md",
+    "auth-dependency-timeout.md",
+    "auth-dependency-timeout.md",
+    "2025-05-24-redis-cache-dependency-timeout.md",
+    "2025-11-10-redis-cache-dependency-timeout.md"
+   ],
+   "timings_ms": {
+    "embed": 36.5,
+    "fts": 1.8,
+    "vector": 3.3,
+    "searches": 4.5,
+    "fuse": 10.9,
+    "rerank": 0.0,
+    "siblings": 17.2,
+    "total": 69.1
+   }
+  },
+  {
+   "id": "ans-12",
+   "query": "SearchConsumerLagHigh on search. service search. related services api-gateway, inventory, redis-cache. search_consumer_lag_msgs at 130687 on search-0",
+   "gold": [
+    "data/corpus/runbooks/search-queue-backlog.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "search-queue-backlog.md (gold)",
+    "redis-cache-queue-backlog.md",
+    "redis-cache-queue-backlog.md",
+    "orders-queue-backlog.md",
+    "api-gateway-queue-backlog.md",
+    "api-gateway-queue-backlog.md",
+    "auth-queue-backlog.md",
+    "auth-queue-backlog.md"
+   ],
+   "timings_ms": {
+    "embed": 30.7,
+    "fts": 1.6,
+    "vector": 2.8,
+    "searches": 4.0,
+    "fuse": 12.0,
+    "rerank": 0.0,
+    "siblings": 16.7,
+    "total": 63.5
+   }
+  },
+  {
+   "id": "ans-14",
+   "query": "KafkaBrokerUpstreamTimeouts on kafka-broker. service kafka-broker. related services ledger, notifications, payments. kafka_broker_upstream_timeout_pct at 27 on kafka-broker-5",
+   "gold": [
+    "data/corpus/runbooks/kafka-broker-dependency-timeout.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "kafka-broker-dependency-timeout.md (gold)",
+    "kafka-broker-dependency-timeout.md (gold)",
+    "notifications-dependency-timeout.md",
+    "notifications-dependency-timeout.md",
+    "ledger-dependency-timeout.md",
+    "ledger-dependency-timeout.md",
+    "payments-dependency-timeout.md",
+    "payments-dependency-timeout.md"
+   ],
+   "timings_ms": {
+    "embed": 37.5,
+    "fts": 1.4,
+    "vector": 2.5,
+    "searches": 3.6,
+    "fuse": 11.8,
+    "rerank": 0.0,
+    "siblings": 17.8,
+    "total": 70.7
+   }
+  },
+  {
+   "id": "ans-15",
+   "query": "AuthMemoryPressure on auth. service auth. related services api-gateway, postgres-primary, redis-cache. auth_rss_pct_of_limit at 99 on auth-3",
+   "gold": [
+    "data/corpus/runbooks/auth-memory-pressure.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "auth-memory-pressure.md (gold)",
+    "auth-memory-pressure.md (gold)",
+    "card-auth-memory-pressure.md",
+    "card-auth-memory-pressure.md",
+    "auth-error-rate.md",
+    "auth-error-rate.md",
+    "2026-07-16-auth-disk-full.md",
+    "2026-01-07-auth-high-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 33.8,
+    "fts": 1.5,
+    "vector": 2.8,
+    "searches": 3.9,
+    "fuse": 11.9,
+    "rerank": 0.0,
+    "siblings": 18.7,
+    "total": 68.3
+   }
+  },
+  {
+   "id": "ans-17",
+   "query": "LedgerPoolExhausted on ledger. service ledger. related services kafka-broker, payments, postgres-primary. ledger_pool_wait_ms at 573 on ledger-1",
+   "gold": [
+    "data/corpus/runbooks/ledger-connection-pool.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "ledger-connection-pool.md (gold)",
+    "ledger-connection-pool.md (gold)",
+    "ledger-connection-pool-exhaustion.md",
+    "ledger-queue-backlog.md",
+    "ledger-cpu-saturation.md",
+    "ledger-cpu-saturation.md",
+    "2026-04-05-ledger-dependency-timeout.md",
+    "ledger-high-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 29.3,
+    "fts": 1.7,
+    "vector": 2.9,
+    "searches": 4.2,
+    "fuse": 11.1,
+    "rerank": 0.0,
+    "siblings": 15.1,
+    "total": 59.7
+   }
+  },
+  {
+   "id": "ans-18",
+   "query": "PaymentsLatencyHigh on payments. service payments. related services api-gateway, card-auth, kafka-broker, ledger, orders. payments_p99_latency_ms at 3372 on payments-5",
+   "gold": [
+    "data/corpus/runbooks/payments-high-latency.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "payments-high-latency.md (gold)",
+    "payments-high-latency.md (gold)",
+    "card-auth-high-latency.md",
+    "card-auth-high-latency.md",
+    "payments-high-p99-latency.md",
+    "payments-high-p99-latency.md",
+    "ledger-high-latency.md",
+    "ledger-high-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 33.6,
+    "fts": 1.5,
+    "vector": 2.7,
+    "searches": 4.3,
+    "fuse": 11.7,
+    "rerank": 0.0,
+    "siblings": 17.0,
+    "total": 66.6
+   }
+  },
+  {
+   "id": "ans-21",
+   "query": "InventoryLatencyHigh on inventory. service inventory. related services orders, postgres-primary, search. inventory_p99_latency_ms at 2622 on inventory-3",
+   "gold": [
+    "data/corpus/runbooks/inventory-high-latency.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "inventory-high-latency.md (gold)",
+    "inventory-high-latency.md (gold)",
+    "orders-high-latency.md",
+    "orders-high-latency.md",
+    "postgres-primary-high-latency.md",
+    "postgres-primary-high-latency.md",
+    "search-high-latency.md",
+    "search-high-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 27.9,
+    "fts": 1.7,
+    "vector": 3.0,
+    "searches": 4.3,
+    "fuse": 11.8,
+    "rerank": 0.0,
+    "siblings": 17.6,
+    "total": 61.6
+   }
+  },
+  {
+   "id": "ans-22",
+   "query": "ApiGatewayDiskFull on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_disk_used_pct at 94 on api-gateway-4",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-disk-full.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-disk-full.md (gold)",
+    "api-gateway-disk-full.md (gold)",
+    "orders-disk-full.md",
+    "orders-disk-full.md",
+    "payments-disk-full.md",
+    "payments-disk-full.md",
+    "auth-disk-full.md",
+    "auth-disk-full.md"
+   ],
+   "timings_ms": {
+    "embed": 29.9,
+    "fts": 1.5,
+    "vector": 2.8,
+    "searches": 4.1,
+    "fuse": 11.6,
+    "rerank": 0.0,
+    "siblings": 17.8,
+    "total": 63.3
+   }
+  },
+  {
+   "id": "ans-23",
+   "query": "SearchCPUSaturated on search. service search. related services api-gateway, inventory, redis-cache. search_cpu_util_pct at 98 on search-1",
+   "gold": [
+    "data/corpus/runbooks/search-cpu-saturation.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "search-cpu-saturation.md (gold)",
+    "2025-09-16-search-cpu-saturation.md",
+    "redis-cache-cpu-saturation.md",
+    "redis-cache-cpu-saturation.md",
+    "inventory-cpu-saturation.md",
+    "search-high-latency.md",
+    "search-high-latency.md",
+    "orders-cpu-saturation.md"
+   ],
+   "timings_ms": {
+    "embed": 27.9,
+    "fts": 1.5,
+    "vector": 2.6,
+    "searches": 3.9,
+    "fuse": 12.2,
+    "rerank": 0.0,
+    "siblings": 18.8,
+    "total": 62.8
+   }
+  },
+  {
+   "id": "ans-26",
+   "query": "OrdersDiskFull on orders. service orders. related services api-gateway, inventory, notifications, payments, postgres-primary. orders_disk_used_pct at 98 on orders-1",
+   "gold": [
+    "data/corpus/runbooks/orders-disk-full.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "orders-disk-full.md (gold)",
+    "orders-disk-full.md (gold)",
+    "postgres-primary-disk-full.md",
+    "postgres-primary-disk-full.md",
+    "inventory-disk-full.md",
+    "2026-05-23-orders-disk-full.md",
+    "payments-disk-full.md",
+    "payments-disk-full.md"
+   ],
+   "timings_ms": {
+    "embed": 30.0,
+    "fts": 1.7,
+    "vector": 2.9,
+    "searches": 4.2,
+    "fuse": 11.8,
+    "rerank": 0.0,
+    "siblings": 18.4,
+    "total": 64.3
+   }
+  },
+  {
+   "id": "ans-27",
+   "query": "PaymentsPoolExhausted on payments. service payments. related services api-gateway, card-auth, kafka-broker, ledger, orders. payments_pool_wait_ms at 1187 on payments-3",
+   "gold": [
+    "data/corpus/runbooks/payments-connection-pool.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "payments-connection-pool.md (gold)",
+    "payments-connection-pool.md (gold)",
+    "card-auth-connection-pool.md",
+    "card-auth-connection-pool.md",
+    "ledger-connection-pool.md",
+    "ledger-connection-pool.md",
+    "payments-queue-backlog.md",
+    "payments-high-p99-latency.md"
+   ],
+   "timings_ms": {
+    "embed": 29.8,
+    "fts": 1.5,
+    "vector": 3.2,
+    "searches": 4.4,
+    "fuse": 11.5,
+    "rerank": 0.0,
+    "siblings": 16.9,
+    "total": 62.6
+   }
+  },
+  {
+   "id": "ans-28",
+   "query": "SearchCertExpiring on search. service search. related services api-gateway, inventory, redis-cache. search_cert_days_left at 2 on search-4",
+   "gold": [
+    "data/corpus/runbooks/search-cert-expiry.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "search-cert-expiry.md (gold)",
+    "search-cert-expiry.md (gold)",
+    "2025-11-27-search-cert-expiry.md",
+    "redis-cache-cert-expiry.md",
+    "redis-cache-cert-expiry.md",
+    "2025-09-16-search-cpu-saturation.md",
+    "2025-07-16-redis-cache-cert-expiry.md",
+    "2025-07-01-redis-cache-cert-expiry.md"
+   ],
+   "timings_ms": {
+    "embed": 26.6,
+    "fts": 1.5,
+    "vector": 2.9,
+    "searches": 4.0,
+    "fuse": 10.5,
+    "rerank": 0.0,
+    "siblings": 16.9,
+    "total": 57.9
+   }
+  },
+  {
+   "id": "ans-29",
+   "query": "ApiGatewayErrorRateHigh on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_error_ratio_pct at 23 on api-gateway-4",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-error-rate.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-error-rate.md (gold)",
+    "api-gateway-error-rate.md (gold)",
+    "orders-error-rate.md",
+    "orders-error-rate.md",
+    "payments-error-rate.md",
+    "payments-error-rate.md",
+    "api-gateway-dependency-timeout.md",
+    "api-gateway-dependency-timeout.md"
+   ],
+   "timings_ms": {
+    "embed": 31.3,
+    "fts": 1.6,
+    "vector": 2.9,
+    "searches": 3.9,
+    "fuse": 11.1,
+    "rerank": 0.0,
+    "siblings": 18.2,
+    "total": 64.5
+   }
+  },
+  {
+   "id": "ans-31",
+   "query": "ApiGatewayConsumerLagHigh on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_consumer_lag_msgs at 224304 on api-gateway-0",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-queue-backlog.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-queue-backlog.md (gold)",
+    "api-gateway-queue-backlog.md (gold)",
+    "orders-queue-backlog.md",
+    "api-gateway-high-latency.md",
+    "api-gateway-high-latency.md",
+    "auth-queue-backlog.md",
+    "auth-queue-backlog.md",
+    "payments-queue-backlog.md"
+   ],
+   "timings_ms": {
+    "embed": 32.2,
+    "fts": 1.4,
+    "vector": 2.7,
+    "searches": 3.7,
+    "fuse": 11.9,
+    "rerank": 0.0,
+    "siblings": 17.2,
+    "total": 65.1
+   }
+  },
+  {
+   "id": "ans-32",
+   "query": "ApiGatewayCertExpiring on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_cert_days_left at 1 on api-gateway-0",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-cert-expiry.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-cert-expiry.md (gold)",
+    "api-gateway-cert-expiry.md (gold)",
+    "api-gateway-dependency-timeout.md",
+    "api-gateway-dependency-timeout.md",
+    "api-gateway-queue-backlog.md",
+    "api-gateway-queue-backlog.md",
+    "auth-cert-expiry.md",
+    "auth-cert-expiry.md"
+   ],
+   "timings_ms": {
+    "embed": 32.7,
+    "fts": 1.4,
+    "vector": 3.0,
+    "searches": 7.0,
+    "fuse": 13.7,
+    "rerank": 0.0,
+    "siblings": 16.9,
+    "total": 70.4
+   }
+  },
+  {
+   "id": "ans-33",
+   "query": "ApiGatewayCPUSaturated on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_cpu_util_pct at 98 on api-gateway-1",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-cpu-saturation.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-cpu-saturation.md (gold)",
+    "api-gateway-cpu-saturation.md (gold)",
+    "api-gateway-high-latency.md",
+    "api-gateway-high-latency.md",
+    "api-gateway-queue-backlog.md",
+    "api-gateway-queue-backlog.md",
+    "api-gateway-error-rate.md",
+    "api-gateway-error-rate.md"
+   ],
+   "timings_ms": {
+    "embed": 32.5,
+    "fts": 1.4,
+    "vector": 2.7,
+    "searches": 3.8,
+    "fuse": 11.6,
+    "rerank": 0.0,
+    "siblings": 18.4,
+    "total": 66.4
+   }
+  },
+  {
+   "id": "ans-34",
+   "query": "KafkaBrokerErrorRateHigh on kafka-broker. service kafka-broker. related services ledger, notifications, payments. kafka_broker_error_ratio_pct at 9 on kafka-broker-1",
+   "gold": [
+    "data/corpus/runbooks/kafka-broker-error-rate.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 0.5,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "kafka-broker-error-rate.md (gold)",
+    "kafka-broker-error-rate.md (gold)",
+    "notifications-error-rate.md",
+    "notifications-error-rate.md",
+    "ledger-error-rate.md",
+    "ledger-error-rate.md",
+    "payments-error-rate.md",
+    "payments-error-rate.md"
+   ],
+   "timings_ms": {
+    "embed": 35.4,
+    "fts": 1.6,
+    "vector": 2.5,
+    "searches": 3.7,
+    "fuse": 11.6,
+    "rerank": 0.0,
+    "siblings": 19.6,
+    "total": 70.3
+   }
+  },
+  {
+   "id": "ans-36",
+   "query": "ApiGatewayMemoryPressure on api-gateway. service api-gateway. related services auth, orders, payments, search. api_gateway_rss_pct_of_limit at 98 on api-gateway-3",
+   "gold": [
+    "data/corpus/runbooks/api-gateway-memory-pressure.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "api-gateway-memory-pressure.md (gold)",
+    "api-gateway-memory-pressure.md (gold)",
+    "api-gateway-disk-full.md",
+    "api-gateway-disk-full.md",
+    "payments-memory-pressure.md",
+    "payments-memory-pressure.md",
+    "api-gateway-error-rate.md",
+    "api-gateway-error-rate.md"
+   ],
+   "timings_ms": {
+    "embed": 31.2,
+    "fts": 1.4,
+    "vector": 2.9,
+    "searches": 4.0,
+    "fuse": 10.9,
+    "rerank": 0.0,
+    "siblings": 16.4,
+    "total": 62.4
+   }
+  },
+  {
+   "id": "ans-38",
+   "query": "LedgerDiskFull on ledger. service ledger. related services kafka-broker, payments, postgres-primary. ledger_disk_used_pct at 99 on ledger-5",
+   "gold": [
+    "data/corpus/runbooks/ledger-disk-full.md"
+   ],
+   "final": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rerank": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "rrf": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "fts": {
+    "recall_at_8": 0.0,
+    "mrr_at_10": 0.0
+   },
+   "vector": {
+    "recall_at_8": 1.0,
+    "mrr_at_10": 1.0
+   },
+   "top8": [
+    "ledger-disk-full.md (gold)",
+    "kafka-broker-disk-full.md",
+    "kafka-broker-disk-full.md",
+    "ledger-cpu-saturation.md",
+    "ledger-cpu-saturation.md",
+    "payments-disk-full.md",
+    "payments-disk-full.md",
+    "postgres-primary-disk-full.md"
+   ],
+   "timings_ms": {
+    "embed": 28.9,
+    "fts": 1.5,
+    "vector": 2.9,
+    "searches": 4.1,
+    "fuse": 9.9,
+    "rerank": 0.0,
+    "siblings": 13.0,
+    "total": 56.0
+   }
+  }
+ ],
+ "ablation": {
+  "fts": {
+   "recall_at_8": 0.0,
+   "mrr_at_10": 0.0,
+   "p95_ms": 4.5
+  },
+  "vector": {
+   "recall_at_8": 0.74,
+   "mrr_at_10": 1.0,
+   "p95_ms": 6.2
+  },
+  "rrf": {
+   "recall_at_8": 0.74,
+   "mrr_at_10": 1.0,
+   "p95_ms": 38.0
+  },
+  "rerank": {
+   "recall_at_8": 0.74,
+   "mrr_at_10": 1.0,
+   "p95_ms": 38.0
+  },
+  "final": {
+   "recall_at_8": 1.0,
+   "mrr_at_10": 1.0,
+   "p95_ms": 37.5
+  },
+  "_queries": {
+   "cases": 25,
+   "latency_queries": 500
+  }
+ },
+ "clustering": [
+  {
+   "id": "ans-03",
+   "service": "kafka-broker",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-04",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-06",
+   "service": "notifications",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-08",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-09",
+   "service": "payments",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-10",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-11",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-12",
+   "service": "search",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-14",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": [
+    "ans-32"
+   ]
+  },
+  {
+   "id": "ans-15",
+   "service": "auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-17",
+   "service": "ledger",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-18",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-21",
+   "service": "inventory",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-22",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-23",
+   "service": "search",
+   "incidents": 2,
+   "merged_with": [
+    "deg-09"
+   ]
+  },
+  {
+   "id": "ans-26",
+   "service": "orders",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-27",
+   "service": "payments",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-28",
+   "service": "search",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-29",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-31",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-32",
+   "service": "api-gateway",
+   "incidents": 3,
+   "merged_with": [
+    "ans-14"
+   ]
+  },
+  {
+   "id": "ans-33",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "ans-34",
+   "service": "kafka-broker",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-36",
+   "service": "api-gateway",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "ans-38",
+   "service": "ledger",
+   "incidents": 2,
+   "merged_with": []
+  },
+  {
+   "id": "una-05",
+   "service": "kafka-broker",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-07",
+   "service": "card-auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-08",
+   "service": "orders",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-09",
+   "service": "postgres-primary",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-10",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-11",
+   "service": "payments",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-12",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-13",
+   "service": "notifications",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-14",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "una-15",
+   "service": "auth",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-01",
+   "service": "notifications",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-02",
+   "service": "redis-cache",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-03",
+   "service": "postgres-primary",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-07",
+   "service": "api-gateway",
+   "incidents": 1,
+   "merged_with": []
+  },
+  {
+   "id": "deg-09",
+   "service": "search",
+   "incidents": 2,
+   "merged_with": [
+    "ans-23"
+   ]
+  },
+  {
+   "id": "deg-10",
+   "service": "ledger",
+   "incidents": 1,
+   "merged_with": []
+  }
+ ]
+}
