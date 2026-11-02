@@ -1,34 +1,6 @@
-from collections.abc import AsyncIterator, Iterator
-from pathlib import Path
+from collections.abc import AsyncIterator
 
 import pytest
-
-REPO = Path(__file__).resolve().parents[3]
-
-
-@pytest.fixture
-def anyio_backend() -> str:
-    return "asyncio"
-
-
-@pytest.fixture(scope="session")
-def postgres_url() -> Iterator[str]:
-    """A throwaway Postgres with pgvector and every migration applied, then rolled back and re-applied, so each
-    run also proves the migrations are reversible."""
-    from alembic import command
-    from alembic.config import Config
-    from testcontainers.community.postgres import PostgresContainer
-
-    from pagerwise_api.settings import settings
-
-    with PostgresContainer("pgvector/pgvector:0.8.7-pg18-trixie", driver="asyncpg") as container:
-        url = container.get_connection_url()
-        settings.database_url = url  # migrations/env.py reads it from here
-        config = Config(str(REPO / "alembic.ini"))
-        command.upgrade(config, "head")
-        command.downgrade(config, "base")
-        command.upgrade(config, "head")
-        yield url
 
 
 @pytest.fixture
