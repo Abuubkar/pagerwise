@@ -1,0 +1,105 @@
+{
+ "seed": 11,
+ "deploys": [
+  {
+   "id": "gdep-01",
+   "service": "notifications",
+   "version": "8.27.26",
+   "commit_sha": "62181103278bc31efe1a0aafaabbe07407222b6b",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T08:16:04.847826+00:00"
+  },
+  {
+   "id": "gdep-02",
+   "service": "redis-cache",
+   "version": "2.35.24",
+   "commit_sha": "bbadbfbf0d7b2dc41624c9a981adc07ca0178cd0",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T09:27:21.507060+00:00"
+  },
+  {
+   "id": "gdep-03",
+   "service": "postgres-primary",
+   "version": "8.25.11",
+   "commit_sha": "ee7543fcf3b9e0642e9a05212ac6f9df9a649f81",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T07:57:57.279467+00:00"
+  },
+  {
+   "id": "gdep-04",
+   "service": "auth",
+   "version": "6.31.5",
+   "commit_sha": "460505a4a3a7fa064d9380fd52a0228df7fbf48c",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T10:01:37.003725+00:00"
+  },
+  {
+   "id": "gdep-05",
+   "service": "payments",
+   "version": "3.16.16",
+   "commit_sha": "e944ba3b38159532bfbb5a8c509e8eb0d731ba6b",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T08:59:55.051026+00:00"
+  },
+  {
+   "id": "gdep-06",
+   "service": "orders",
+   "version": "2.35.4",
+   "commit_sha": "a7a41bb54ca87b829961808de57a589a07e65741",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T06:13:30.557091+00:00"
+  },
+  {
+   "id": "gdep-07",
+   "service": "api-gateway",
+   "version": "2.31.1",
+   "commit_sha": "2ddd3869d95075029a01d879224a865949fd70d5",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T08:08:43.659038+00:00"
+  },
+  {
+   "id": "gdep-08",
+   "service": "card-auth",
+   "version": "1.15.9",
+   "commit_sha": "a0ed1709d8bf802aa84a5bbf6f7719a22a1358ec",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T09:18:52.129798+00:00"
+  },
+  {
+   "id": "gdep-09",
+   "service": "search",
+   "version": "2.5.22",
+   "commit_sha": "072c44b1d233d5b2f54482efa0d43b92be49598a",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T10:15:21.529837+00:00"
+  },
+  {
+   "id": "gdep-10",
+   "service": "ledger",
+   "version": "6.3.4",
+   "commit_sha": "045622cdb647c0c901eead4da9a4349111569a5e",
+   "author": "Golden Set",
+   "summary": "Release with the regression",
+   "status": "succeeded",
+   "deployed_at": "2026-10-28T07:50:45.498366+00:00"
+  }
+ ]
+}

@@ -1,0 +1,1477 @@
+{
+ "seed": 11,
+ "cases": [
+  {
+   "id": "deg-01",
+   "kind": "degraded",
+   "service": "notifications",
+   "title": "NotificationsPostDeployErrors on notifications",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 20.0,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-2",
+     "fingerprint": "ed575febd54d69d1",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 58% on notifications-2"
+    },
+    {
+     "offset_s": 20.5,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-2",
+     "fingerprint": "ed575febd54d69d1",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 24% on notifications-2"
+    },
+    {
+     "offset_s": 71.8,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-2",
+     "fingerprint": "ed575febd54d69d1",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 39% on notifications-2"
+    },
+    {
+     "offset_s": 81.7,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-2",
+     "fingerprint": "ed575febd54d69d1",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 7% on notifications-2"
+    },
+    {
+     "offset_s": 96.9,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-0",
+     "fingerprint": "adf34cd2249ccd58",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 60% on notifications-0"
+    },
+    {
+     "offset_s": 138.2,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-0",
+     "fingerprint": "adf34cd2249ccd58",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 37% on notifications-0"
+    },
+    {
+     "offset_s": 143.9,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-0",
+     "fingerprint": "adf34cd2249ccd58",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 50% on notifications-0"
+    },
+    {
+     "offset_s": 160.6,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-2",
+     "fingerprint": "ed575febd54d69d1",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 36% on notifications-2"
+    },
+    {
+     "offset_s": 161.0,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-0",
+     "fingerprint": "adf34cd2249ccd58",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 17% on notifications-0"
+    },
+    {
+     "offset_s": 163.9,
+     "service": "notifications",
+     "alertname": "NotificationsPostDeployErrors",
+     "instance": "notifications-0",
+     "fingerprint": "adf34cd2249ccd58",
+     "severity": "critical",
+     "summary": "notifications_post_deploy_error_pct at 14% on notifications-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "notifications"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/notifications-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Notifications: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/notifications-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Notifications: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-01",
+    "service": "notifications",
+    "version": "8.27.26",
+    "commit_sha": "62181103278bc31efe1a0aafaabbe07407222b6b",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T08:16:04.847826+00:00"
+   },
+   "opened_at": "2026-10-28T08:55:04.847826+00:00",
+   "severity": "sev1",
+   "summary": "notifications_post_deploy_error_pct at 58% on notifications-2",
+   "split": "dev"
+  },
+  {
+   "id": "deg-02",
+   "kind": "degraded",
+   "service": "redis-cache",
+   "title": "RedisCachePostDeployErrors on redis-cache",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 72.4,
+     "service": "redis-cache",
+     "alertname": "RedisCachePostDeployErrors",
+     "instance": "redis-cache-2",
+     "fingerprint": "80d9f256695a0cda",
+     "severity": "critical",
+     "summary": "redis_cache_post_deploy_error_pct at 15% on redis-cache-2"
+    },
+    {
+     "offset_s": 78.8,
+     "service": "redis-cache",
+     "alertname": "RedisCachePostDeployErrors",
+     "instance": "redis-cache-1",
+     "fingerprint": "e6bd4f1a3e417b16",
+     "severity": "critical",
+     "summary": "redis_cache_post_deploy_error_pct at 56% on redis-cache-1"
+    },
+    {
+     "offset_s": 81.2,
+     "service": "redis-cache",
+     "alertname": "RedisCachePostDeployErrors",
+     "instance": "redis-cache-2",
+     "fingerprint": "80d9f256695a0cda",
+     "severity": "critical",
+     "summary": "redis_cache_post_deploy_error_pct at 41% on redis-cache-2"
+    },
+    {
+     "offset_s": 96.6,
+     "service": "redis-cache",
+     "alertname": "RedisCachePostDeployErrors",
+     "instance": "redis-cache-1",
+     "fingerprint": "e6bd4f1a3e417b16",
+     "severity": "critical",
+     "summary": "redis_cache_post_deploy_error_pct at 54% on redis-cache-1"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "redis-cache"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/redis-cache-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Redis cache: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/redis-cache-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Redis cache: regression after a deploy"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-02",
+    "service": "redis-cache",
+    "version": "2.35.24",
+    "commit_sha": "bbadbfbf0d7b2dc41624c9a981adc07ca0178cd0",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T09:27:21.507060+00:00"
+   },
+   "opened_at": "2026-10-28T09:50:21.507060+00:00",
+   "severity": "sev1",
+   "summary": "redis_cache_post_deploy_error_pct at 15% on redis-cache-2",
+   "split": "dev"
+  },
+  {
+   "id": "deg-03",
+   "kind": "degraded",
+   "service": "postgres-primary",
+   "title": "PostgresPrimaryPostDeployErrors on postgres-primary",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 10.7,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-1",
+     "fingerprint": "aa43799d6cb40b44",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 9% on postgres-primary-1"
+    },
+    {
+     "offset_s": 42.8,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-3",
+     "fingerprint": "ec8fbae1507c4b76",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 31% on postgres-primary-3"
+    },
+    {
+     "offset_s": 60.6,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-3",
+     "fingerprint": "ec8fbae1507c4b76",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 20% on postgres-primary-3"
+    },
+    {
+     "offset_s": 62.2,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-3",
+     "fingerprint": "ec8fbae1507c4b76",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 51% on postgres-primary-3"
+    },
+    {
+     "offset_s": 83.8,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-3",
+     "fingerprint": "ec8fbae1507c4b76",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 15% on postgres-primary-3"
+    },
+    {
+     "offset_s": 92.0,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-1",
+     "fingerprint": "aa43799d6cb40b44",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 12% on postgres-primary-1"
+    },
+    {
+     "offset_s": 103.0,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-1",
+     "fingerprint": "aa43799d6cb40b44",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 44% on postgres-primary-1"
+    },
+    {
+     "offset_s": 119.1,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-1",
+     "fingerprint": "aa43799d6cb40b44",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 14% on postgres-primary-1"
+    },
+    {
+     "offset_s": 179.2,
+     "service": "postgres-primary",
+     "alertname": "PostgresPrimaryPostDeployErrors",
+     "instance": "postgres-primary-3",
+     "fingerprint": "ec8fbae1507c4b76",
+     "severity": "critical",
+     "summary": "postgres_primary_post_deploy_error_pct at 11% on postgres-primary-3"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "postgres-primary"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/postgres-primary-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Postgres primary: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/postgres-primary-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Postgres primary: regression after a deploy"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-03",
+    "service": "postgres-primary",
+    "version": "8.25.11",
+    "commit_sha": "ee7543fcf3b9e0642e9a05212ac6f9df9a649f81",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T07:57:57.279467+00:00"
+   },
+   "opened_at": "2026-10-28T08:36:57.279467+00:00",
+   "severity": "sev1",
+   "summary": "postgres_primary_post_deploy_error_pct at 9% on postgres-primary-1",
+   "split": "dev"
+  },
+  {
+   "id": "deg-04",
+   "kind": "degraded",
+   "service": "auth",
+   "title": "AuthPostDeployErrors on auth",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 33.0,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-2",
+     "fingerprint": "e7bae5e02a41c6fd",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 17% on auth-2"
+    },
+    {
+     "offset_s": 54.1,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-2",
+     "fingerprint": "e7bae5e02a41c6fd",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 16% on auth-2"
+    },
+    {
+     "offset_s": 61.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 42% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 61.6,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 15% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 71.9,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 5% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 83.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 40% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 100.8,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-0",
+     "fingerprint": "209b75cda14f2f0e",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 23% on auth-0"
+    },
+    {
+     "offset_s": 102.9,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 5% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 104.1,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-2",
+     "fingerprint": "e7bae5e02a41c6fd",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 28% on auth-2"
+    },
+    {
+     "offset_s": 108.5,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-0",
+     "fingerprint": "209b75cda14f2f0e",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 23% on auth-0"
+    },
+    {
+     "offset_s": 110.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 37% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 111.4,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-0",
+     "fingerprint": "209b75cda14f2f0e",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 27% on auth-0"
+    },
+    {
+     "offset_s": 113.8,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 53% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 115.1,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 38% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 115.5,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-1",
+     "fingerprint": "ca36320b9d2d916e",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 42% on auth-1"
+    },
+    {
+     "offset_s": 125.4,
+     "service": "auth",
+     "alertname": "AuthPostDeployErrors",
+     "instance": "auth-1",
+     "fingerprint": "ca36320b9d2d916e",
+     "severity": "critical",
+     "summary": "auth_post_deploy_error_pct at 21% on auth-1"
+    },
+    {
+     "offset_s": 161.1,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 28% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 171.1,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 37% on api-gateway-3",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/auth-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Auth: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/auth-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Auth: regression after a deploy"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-04",
+    "service": "auth",
+    "version": "6.31.5",
+    "commit_sha": "460505a4a3a7fa064d9380fd52a0228df7fbf48c",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T10:01:37.003725+00:00"
+   },
+   "opened_at": "2026-10-28T10:13:37.003725+00:00",
+   "severity": "sev1",
+   "summary": "auth_post_deploy_error_pct at 17% on auth-2",
+   "split": "test"
+  },
+  {
+   "id": "deg-05",
+   "kind": "degraded",
+   "service": "payments",
+   "title": "PaymentsPostDeployErrors on payments",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 33.5,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-2",
+     "fingerprint": "4d5db9b1e8270e58",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 8% on payments-2"
+    },
+    {
+     "offset_s": 35.8,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-0",
+     "fingerprint": "26986589573ddda3",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 37% on payments-0"
+    },
+    {
+     "offset_s": 46.8,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-0",
+     "fingerprint": "26986589573ddda3",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 55% on payments-0"
+    },
+    {
+     "offset_s": 50.3,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-2",
+     "fingerprint": "4d5db9b1e8270e58",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 57% on payments-2"
+    },
+    {
+     "offset_s": 62.1,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-2",
+     "fingerprint": "4d5db9b1e8270e58",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 48% on payments-2"
+    },
+    {
+     "offset_s": 73.0,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-2",
+     "fingerprint": "4d5db9b1e8270e58",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 27% on payments-2"
+    },
+    {
+     "offset_s": 85.1,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-0",
+     "fingerprint": "26986589573ddda3",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 42% on payments-0"
+    },
+    {
+     "offset_s": 94.1,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-0",
+     "fingerprint": "26986589573ddda3",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 45% on payments-0"
+    },
+    {
+     "offset_s": 103.2,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-2",
+     "fingerprint": "4d5db9b1e8270e58",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 15% on payments-2"
+    },
+    {
+     "offset_s": 110.3,
+     "service": "payments",
+     "alertname": "PaymentsPostDeployErrors",
+     "instance": "payments-0",
+     "fingerprint": "26986589573ddda3",
+     "severity": "critical",
+     "summary": "payments_post_deploy_error_pct at 44% on payments-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "payments"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/payments-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Payments: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/payments-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Payments: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-05",
+    "service": "payments",
+    "version": "3.16.16",
+    "commit_sha": "e944ba3b38159532bfbb5a8c509e8eb0d731ba6b",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T08:59:55.051026+00:00"
+   },
+   "opened_at": "2026-10-28T09:09:55.051026+00:00",
+   "severity": "sev1",
+   "summary": "payments_post_deploy_error_pct at 8% on payments-2",
+   "split": "test"
+  },
+  {
+   "id": "deg-06",
+   "kind": "degraded",
+   "service": "orders",
+   "title": "OrdersPostDeployErrors on orders",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 6.8,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-4",
+     "fingerprint": "3f92e9309c6c91bc",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 41% on orders-4"
+    },
+    {
+     "offset_s": 17.6,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-0",
+     "fingerprint": "e6fc21c88741ec75",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 38% on orders-0"
+    },
+    {
+     "offset_s": 19.6,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-2",
+     "fingerprint": "e505c150ce06da0c",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 49% on orders-2"
+    },
+    {
+     "offset_s": 23.2,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-5",
+     "fingerprint": "49a17d74f5446df8",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 13% on orders-5"
+    },
+    {
+     "offset_s": 39.2,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 20% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 70.5,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-0",
+     "fingerprint": "e6fc21c88741ec75",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 60% on orders-0"
+    },
+    {
+     "offset_s": 113.8,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-4",
+     "fingerprint": "3f92e9309c6c91bc",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 17% on orders-4"
+    },
+    {
+     "offset_s": 161.0,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 37% on api-gateway-3",
+     "cascade": true
+    },
+    {
+     "offset_s": 212.8,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-5",
+     "fingerprint": "49a17d74f5446df8",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 12% on orders-5"
+    },
+    {
+     "offset_s": 216.4,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-2",
+     "fingerprint": "e505c150ce06da0c",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 47% on orders-2"
+    },
+    {
+     "offset_s": 222.1,
+     "service": "orders",
+     "alertname": "OrdersPostDeployErrors",
+     "instance": "orders-5",
+     "fingerprint": "49a17d74f5446df8",
+     "severity": "critical",
+     "summary": "orders_post_deploy_error_pct at 55% on orders-5"
+    },
+    {
+     "offset_s": 240.5,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-3",
+     "fingerprint": "c7df4484697140e7",
+     "severity": "critical",
+     "summary": "5xx rate 46% on api-gateway-3",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "orders"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/orders-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Orders: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/orders-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Orders: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-06",
+    "service": "orders",
+    "version": "2.35.4",
+    "commit_sha": "a7a41bb54ca87b829961808de57a589a07e65741",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T06:13:30.557091+00:00"
+   },
+   "opened_at": "2026-10-28T06:45:30.557091+00:00",
+   "severity": "sev1",
+   "summary": "orders_post_deploy_error_pct at 41% on orders-4",
+   "split": "test"
+  },
+  {
+   "id": "deg-07",
+   "kind": "degraded",
+   "service": "api-gateway",
+   "title": "ApiGatewayPostDeployErrors on api-gateway",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 0.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-2",
+     "fingerprint": "f876c5eb04577892",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 9% on api-gateway-2"
+    },
+    {
+     "offset_s": 22.7,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-2",
+     "fingerprint": "f876c5eb04577892",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 60% on api-gateway-2"
+    },
+    {
+     "offset_s": 44.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-0",
+     "fingerprint": "ddb1957d4bae60b7",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 22% on api-gateway-0"
+    },
+    {
+     "offset_s": 71.2,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-0",
+     "fingerprint": "ddb1957d4bae60b7",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 19% on api-gateway-0"
+    },
+    {
+     "offset_s": 84.1,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-4",
+     "fingerprint": "b21a99a6f001963b",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 14% on api-gateway-4"
+    },
+    {
+     "offset_s": 139.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-0",
+     "fingerprint": "ddb1957d4bae60b7",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 38% on api-gateway-0"
+    },
+    {
+     "offset_s": 155.6,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-1",
+     "fingerprint": "763553413f6bcc69",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 47% on api-gateway-1"
+    },
+    {
+     "offset_s": 156.2,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-1",
+     "fingerprint": "763553413f6bcc69",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 15% on api-gateway-1"
+    },
+    {
+     "offset_s": 161.5,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-4",
+     "fingerprint": "b21a99a6f001963b",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 48% on api-gateway-4"
+    },
+    {
+     "offset_s": 182.4,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-0",
+     "fingerprint": "ddb1957d4bae60b7",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 25% on api-gateway-0"
+    },
+    {
+     "offset_s": 189.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-2",
+     "fingerprint": "f876c5eb04577892",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 6% on api-gateway-2"
+    },
+    {
+     "offset_s": 192.8,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-1",
+     "fingerprint": "763553413f6bcc69",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 14% on api-gateway-1"
+    },
+    {
+     "offset_s": 198.0,
+     "service": "api-gateway",
+     "alertname": "ApiGatewayPostDeployErrors",
+     "instance": "api-gateway-4",
+     "fingerprint": "b21a99a6f001963b",
+     "severity": "critical",
+     "summary": "api_gateway_post_deploy_error_pct at 58% on api-gateway-4"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "api-gateway"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/api-gateway-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Api gateway: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/api-gateway-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Api gateway: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-07",
+    "service": "api-gateway",
+    "version": "2.31.1",
+    "commit_sha": "2ddd3869d95075029a01d879224a865949fd70d5",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T08:08:43.659038+00:00"
+   },
+   "opened_at": "2026-10-28T08:43:43.659038+00:00",
+   "severity": "sev1",
+   "summary": "api_gateway_post_deploy_error_pct at 9% on api-gateway-2",
+   "split": "dev"
+  },
+  {
+   "id": "deg-08",
+   "kind": "degraded",
+   "service": "card-auth",
+   "title": "CardAuthPostDeployErrors on card-auth",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 31.3,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-2",
+     "fingerprint": "aedb64a7e34a2d11",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 21% on card-auth-2"
+    },
+    {
+     "offset_s": 38.6,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-2",
+     "fingerprint": "aedb64a7e34a2d11",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 19% on card-auth-2"
+    },
+    {
+     "offset_s": 46.2,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-4",
+     "fingerprint": "61627e8d87a94c22",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 26% on card-auth-4"
+    },
+    {
+     "offset_s": 70.1,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-2",
+     "fingerprint": "aedb64a7e34a2d11",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 48% on card-auth-2"
+    },
+    {
+     "offset_s": 106.5,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-4",
+     "fingerprint": "61627e8d87a94c22",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 52% on card-auth-4"
+    },
+    {
+     "offset_s": 109.3,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-4",
+     "fingerprint": "61627e8d87a94c22",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 21% on card-auth-4"
+    },
+    {
+     "offset_s": 136.2,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-4",
+     "fingerprint": "61627e8d87a94c22",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 31% on card-auth-4"
+    },
+    {
+     "offset_s": 140.9,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-2",
+     "fingerprint": "aedb64a7e34a2d11",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 55% on card-auth-2"
+    },
+    {
+     "offset_s": 141.7,
+     "service": "card-auth",
+     "alertname": "CardAuthPostDeployErrors",
+     "instance": "card-auth-2",
+     "fingerprint": "aedb64a7e34a2d11",
+     "severity": "critical",
+     "summary": "card_auth_post_deploy_error_pct at 44% on card-auth-2"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "card-auth"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/card-auth-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Card auth: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/card-auth-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Card auth: regression after a deploy"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-08",
+    "service": "card-auth",
+    "version": "1.15.9",
+    "commit_sha": "a0ed1709d8bf802aa84a5bbf6f7719a22a1358ec",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T09:18:52.129798+00:00"
+   },
+   "opened_at": "2026-10-28T09:36:52.129798+00:00",
+   "severity": "sev1",
+   "summary": "card_auth_post_deploy_error_pct at 21% on card-auth-2",
+   "split": "test"
+  },
+  {
+   "id": "deg-09",
+   "kind": "degraded",
+   "service": "search",
+   "title": "SearchPostDeployErrors on search",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 8.5,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-1",
+     "fingerprint": "a545a1147ab0320c",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 9% on search-1"
+    },
+    {
+     "offset_s": 16.6,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-3",
+     "fingerprint": "d8047526a267a7e2",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 48% on search-3"
+    },
+    {
+     "offset_s": 17.5,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-3",
+     "fingerprint": "d8047526a267a7e2",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 18% on search-3"
+    },
+    {
+     "offset_s": 39.0,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-4",
+     "fingerprint": "53404e829ab33870",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 7% on search-4"
+    },
+    {
+     "offset_s": 44.9,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 51% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 45.4,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-0",
+     "fingerprint": "66ab79cd7bce3817",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 12% on search-0"
+    },
+    {
+     "offset_s": 46.3,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-3",
+     "fingerprint": "d8047526a267a7e2",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 23% on search-3"
+    },
+    {
+     "offset_s": 46.4,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-4",
+     "fingerprint": "53404e829ab33870",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 9% on search-4"
+    },
+    {
+     "offset_s": 88.6,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-1",
+     "fingerprint": "a545a1147ab0320c",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 47% on search-1"
+    },
+    {
+     "offset_s": 95.4,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-4",
+     "fingerprint": "53404e829ab33870",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 26% on search-4"
+    },
+    {
+     "offset_s": 98.2,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 16% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 111.2,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-0",
+     "fingerprint": "66ab79cd7bce3817",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 8% on search-0"
+    },
+    {
+     "offset_s": 113.4,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-0",
+     "fingerprint": "f83a3ee7677a200a",
+     "severity": "critical",
+     "summary": "5xx rate 33% on api-gateway-0",
+     "cascade": true
+    },
+    {
+     "offset_s": 113.5,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-0",
+     "fingerprint": "66ab79cd7bce3817",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 14% on search-0"
+    },
+    {
+     "offset_s": 114.5,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-4",
+     "fingerprint": "53404e829ab33870",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 9% on search-4"
+    },
+    {
+     "offset_s": 115.2,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-1",
+     "fingerprint": "a545a1147ab0320c",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 9% on search-1"
+    },
+    {
+     "offset_s": 117.2,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-1",
+     "fingerprint": "a545a1147ab0320c",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 25% on search-1"
+    },
+    {
+     "offset_s": 120.8,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-3",
+     "fingerprint": "d8047526a267a7e2",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 28% on search-3"
+    },
+    {
+     "offset_s": 122.0,
+     "service": "search",
+     "alertname": "SearchPostDeployErrors",
+     "instance": "search-0",
+     "fingerprint": "66ab79cd7bce3817",
+     "severity": "critical",
+     "summary": "search_post_deploy_error_pct at 31% on search-0"
+    },
+    {
+     "offset_s": 127.7,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 32% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 129.2,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 20% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 138.3,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 20% on api-gateway-5",
+     "cascade": true
+    },
+    {
+     "offset_s": 197.7,
+     "service": "api-gateway",
+     "alertname": "GatewayHigh5xxRate",
+     "instance": "api-gateway-5",
+     "fingerprint": "13f95319edd45a9a",
+     "severity": "critical",
+     "summary": "5xx rate 45% on api-gateway-5",
+     "cascade": true
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "search"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/search-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Search: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/search-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Search: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-09",
+    "service": "search",
+    "version": "2.5.22",
+    "commit_sha": "072c44b1d233d5b2f54482efa0d43b92be49598a",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T10:15:21.529837+00:00"
+   },
+   "opened_at": "2026-10-28T10:26:21.529837+00:00",
+   "severity": "sev1",
+   "summary": "search_post_deploy_error_pct at 9% on search-1",
+   "split": "dev"
+  },
+  {
+   "id": "deg-10",
+   "kind": "degraded",
+   "service": "ledger",
+   "title": "LedgerPostDeployErrors on ledger",
+   "category": "bad-deploy",
+   "alerts": [
+    {
+     "offset_s": 2.3,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-1",
+     "fingerprint": "0652f6d553840f9f",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 24% on ledger-1"
+    },
+    {
+     "offset_s": 3.5,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-1",
+     "fingerprint": "0652f6d553840f9f",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 53% on ledger-1"
+    },
+    {
+     "offset_s": 5.5,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-0",
+     "fingerprint": "922ca7e43ab585d8",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 14% on ledger-0"
+    },
+    {
+     "offset_s": 62.8,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-4",
+     "fingerprint": "d86da865967c2611",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 56% on ledger-4"
+    },
+    {
+     "offset_s": 71.5,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-4",
+     "fingerprint": "d86da865967c2611",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 15% on ledger-4"
+    },
+    {
+     "offset_s": 74.8,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-1",
+     "fingerprint": "0652f6d553840f9f",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 39% on ledger-1"
+    },
+    {
+     "offset_s": 80.7,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-0",
+     "fingerprint": "922ca7e43ab585d8",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 23% on ledger-0"
+    },
+    {
+     "offset_s": 85.6,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-4",
+     "fingerprint": "d86da865967c2611",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 59% on ledger-4"
+    },
+    {
+     "offset_s": 126.8,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-1",
+     "fingerprint": "0652f6d553840f9f",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 43% on ledger-1"
+    },
+    {
+     "offset_s": 134.5,
+     "service": "ledger",
+     "alertname": "LedgerPostDeployErrors",
+     "instance": "ledger-0",
+     "fingerprint": "922ca7e43ab585d8",
+     "severity": "critical",
+     "summary": "ledger_post_deploy_error_pct at 10% on ledger-0"
+    }
+   ],
+   "gold_cause": {
+    "category": "bad-deploy",
+    "component": "ledger"
+   },
+   "gold_evidence": [
+    {
+     "doc": "data/corpus/runbooks/ledger-bad-deploy.md",
+     "ordinal": 0,
+     "heading_path": "Ledger: regression after a deploy"
+    },
+    {
+     "doc": "data/corpus/runbooks/ledger-bad-deploy.md",
+     "ordinal": 1,
+     "heading_path": "Ledger: regression after a deploy > Escalation"
+    }
+   ],
+   "deploy": {
+    "id": "gdep-10",
+    "service": "ledger",
+    "version": "6.3.4",
+    "commit_sha": "045622cdb647c0c901eead4da9a4349111569a5e",
+    "author": "Golden Set",
+    "summary": "Release with the regression",
+    "status": "succeeded",
+    "deployed_at": "2026-10-28T07:50:45.498366+00:00"
+   },
+   "opened_at": "2026-10-28T08:02:45.498366+00:00",
+   "severity": "sev1",
+   "summary": "ledger_post_deploy_error_pct at 24% on ledger-1",
+   "split": "dev"
+  }
+ ]
+}

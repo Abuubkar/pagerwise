@@ -40,7 +40,7 @@ pagerwise-client = { workspace = true }
 pagerwise-client-sse = { workspace = true }
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests", "apps/consumer/tests", "apps/indexer/tests", "packages/kafka/tests"]
+testpaths = ["apps/api/tests", "apps/consumer/tests", "apps/indexer/tests", "packages/kafka/tests", "evals/tests"]
 markers = ["integration: needs Docker (testcontainers); run with make test-int"]
 # importlib: test files in different packages may share a name.
 addopts = "--strict-markers --import-mode=importlib"
