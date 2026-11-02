@@ -1,5 +1,6 @@
 """End to end through the generated client: create 3 incidents, page through them 2 at a time, stream one triage,
-then read the same incidents over GraphQL. Needs the API running (and Ollama, for the triage).
+then read the same incidents over GraphQL. Needs the API, the triage worker (python -m pagerwise_api.worker),
+docs_mock (the deploy source) and Ollama running.
 
 uv run python scripts/smoke.py [--api http://localhost:8001]
 """
@@ -14,6 +15,7 @@ from pagerwise_client import Client
 from pagerwise_client.api.default import create_incident, list_incidents, start_triage
 from pagerwise_client.models import (
     CitationEvent,
+    DegradedSourceEvent,
     ErrorEvent,
     IncidentCreate,
     IncidentPage,
@@ -89,6 +91,8 @@ for event in stream_triage(client, target.id):
             first_token = first_token or time.monotonic()
             sys.stdout.write(event.text)
             sys.stdout.flush()
+        case DegradedSourceEvent():
+            print(f"    >> degraded_source {event.source.value}: {event.reason}")
         case CitationEvent():
             print(f"\n    >> citation {event.tag} in {event.section}: {event.source_id}")
         case SectionCompleteEvent():

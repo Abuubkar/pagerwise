@@ -27,7 +27,7 @@ async def migrate(revision: str) -> None:
     from conftest import REPO
 
     config = Config(str(REPO / "alembic.ini"))
-    upgrade = command.upgrade if revision >= "0006" else command.downgrade
+    upgrade = command.upgrade if revision == "head" or revision >= "0006" else command.downgrade
     await asyncio.to_thread(upgrade, config, revision)  # env.py runs its own event loop
 
 
@@ -66,6 +66,7 @@ async def test_partition_swap_under_concurrent_inserts_loses_no_rows(postgres_ur
     await asyncio.sleep(1)  # keep writing into the partitioned table for a moment
     stop.set()
     await writing
+    await migrate("head")  # leave the shared test database where the other tests expect it
 
     async with engine.connect() as conn:
         stored = set(await conn.scalars(text("SELECT event_id FROM alert_events")))
