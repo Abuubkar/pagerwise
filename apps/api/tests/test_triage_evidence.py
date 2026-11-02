@@ -84,5 +84,5 @@ def test_degraded_sources_reach_the_prompt_with_the_rule_against_claims():
     evidence = [prompts.EvidenceChunk("C1", "runbook a.md", "A > Diagnosis", "text")]
     messages = prompts.triage_messages("Title: x", evidence, ["deploys"])
     assert "Unavailable sources (rule 7 applies): deploys" in messages[1]["content"]
-    assert "never say there was or wasn't a recent deploy" in messages[0]["content"]
+    assert "never say this incident followed a deploy" in messages[0]["content"]
     assert "Unavailable sources" not in prompts.triage_messages("Title: x", evidence, [])[1]["content"]

@@ -9,6 +9,7 @@ from .brief_section import BriefSection
 from .brief_sections import BriefSections
 from .citation import Citation
 from .citation_event import CitationEvent
+from .citation_event_source_type import CitationEventSourceType
 from .citation_source_type import CitationSourceType
 from .degraded_source import DegradedSource
 from .degraded_source_event import DegradedSourceEvent
@@ -46,6 +47,7 @@ __all__ = (
     "BriefSections",
     "Citation",
     "CitationEvent",
+    "CitationEventSourceType",
     "CitationSourceType",
     "DegradedSource",
     "DegradedSourceEvent",

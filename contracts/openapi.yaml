@@ -379,9 +379,11 @@ components:
       required: [tag, source_type, source_id, chunk_id, chunk_excerpt, section]
       properties:
         tag: {type: string}
-        source_type: {type: string, const: runbook}
-        source_id: {type: string}
-        chunk_id: {type: string, format: uuid}
+        source_type: {type: string, enum: [runbook, postmortem, deploy]}
+        source_id: {type: string, description: 'A document path (runbook, postmortem) or a deploy id.'}
+        chunk_id:
+          anyOf: [{type: string, format: uuid}, {type: 'null'}]
+          description: The cited chunk of the document; null for a deploy.
         chunk_excerpt: {type: string}
         section:
           description: The section the tag was written in.
