@@ -146,3 +146,31 @@ known incidents, but each still takes advisory locks, looks up recent fingerprin
 **Small things.** asyncpg runs one statement per `execute`, so multi-statement migration strings failed until split.
 `pg_class.relkind` is Postgres's `"char"` type: it comes back as bytes and won't concatenate with text without a
 cast. `docker compose logs --since` reads a timestamp without a zone as local time.
+
+## Slice 5: triage worker, evidence sources, live UI
+
+**A refactor silently deleted the DLQ replay route.** Replacing the triage routes in `main.py` cut everything up to
+the next marker, including `POST /v1/admin/dlq/replay`. `make contract-check` failed with
+`api-path-removed-without-deprecation` before anything else noticed.
+- *Did:* restored it. The contract check is what makes a refactor of the route file safe.
+
+**The subscription crashed with `MissingGreenlet`, a mistake CLAUDE.md already warns about.** It ended the read
+transaction (rollback) and then built the response from the row, whose attributes the rollback had expired. The UI
+saw a WebSocket that connected and never delivered.
+- *Did:* copy the row out first; a service test now runs the subscription against real Redis and Postgres and fails
+  with the old order.
+
+**uvicorn can't accept WebSockets without a WebSocket library.** The browser's WebSocket failed with "Unsupported
+upgrade request" in the API log; HTTP and SSE had worked all along because they're plain HTTP.
+- *Did:* added `websockets` (asked first; `uvicorn[standard]` would also change the event loop and HTTP parser).
+
+**Live updates that arrive before the first page were lost.** The list replaced its rows when the first page
+landed, dropping any incident the subscription had already put on top. The Jest test caught it.
+- *Did:* live updates are kept and re-applied on top of the first page.
+
+**The plan's evidence timeouts don't fit the reranker.** 300 ms for runbooks and postmortems would degrade both on
+every triage: hybrid search with reranking takes ~0.5 s, and two run at once.
+- *Did:* 2 s for the document sources (500 ms for deploys), and the worker warms both models before its first run.
+
+**Slice 4a's postmortem citations were labelled `runbook`.** `Citation.source_type` was the constant `runbook`.
+- *Did:* `runbook | postmortem | deploy`; deploys cite with a null `chunk_id`.
