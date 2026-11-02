@@ -1,0 +1,46 @@
+{
+  "name": "pagerwise-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-call UI: live incident list, incident timeline, and the streamed triage brief with its sources",
+  "packageManager": "pnpm@11.15.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "codegen": "graphql-codegen && openapi-typescript ../../contracts/openapi.yaml -o src/api/schema.d.ts"
+  },
+  "dependencies": {
+    "@urql/core": "6.0.3",
+    "graphql": "17.0.2",
+    "graphql-ws": "6.4.1",
+    "next": "16.4.3",
+    "openapi-fetch": "0.17.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "urql": "5.0.4"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "7.4.6",
+    "@graphql-codegen/client-preset": "6.2.3",
+    "@graphql-typed-document-node/core": "3.2.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@types/jest": "30.0.0",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "jest": "30.5.2",
+    "jest-environment-jsdom": "30.5.2",
+    "jest-fixed-jsdom": "0.0.11",
+    "msw": "3.0.3",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}
