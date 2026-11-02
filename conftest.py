@@ -7,6 +7,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parent
 REDPANDA_IMAGE = "docker.redpanda.com/redpandadata/redpanda:v26.2.6"  # same as docker-compose.yml
+REDIS_IMAGE = "redis:8.10.3"  # same as docker-compose.yml
 
 
 @pytest.fixture
@@ -47,3 +48,13 @@ def kafka_bootstrap() -> Iterator[str]:
         bootstrap = container.get_bootstrap_server()
         asyncio.run(create_topics(bootstrap))
         yield bootstrap
+
+
+@pytest.fixture(scope="session")
+def redis_url() -> Iterator[str]:
+    """A throwaway Redis, so tests never publish into (or flush) the development one."""
+    from testcontainers.community.redis import RedisContainer
+
+    with RedisContainer(REDIS_IMAGE) as container:
+        yield f"redis://{container.get_container_host_ip()}:{container.get_exposed_port(6379)}/0"
+
