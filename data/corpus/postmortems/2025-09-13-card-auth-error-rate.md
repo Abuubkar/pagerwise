@@ -41,6 +41,6 @@ Category: elevated error rate. Component: redis-cache.
 
 ## Action items
 
-- CARD-1194 (payments): Add an alert on error_ratio_pct for redis-cache.
-- CARD-3659 (platform): Add a regression test for: a credential for redis-cache was rotated without restarting consumers, so every call was refused.
-- CARD-6307 (payments): Link the runbook from the alert.
+- CARD-1194 (platform): Add an alert on error_ratio_pct for redis-cache.
+- CARD-3659 (payments): Add a regression test for: a credential for redis-cache was rotated without restarting consumers, so every call was refused.
+- CARD-6307 (platform): Link the runbook from the alert.

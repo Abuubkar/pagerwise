@@ -40,6 +40,19 @@ services:
       timeout: 5s
       retries: 30
 
+  redis:
+    # Pub/sub for live incident updates (the consumer publishes; slice 5's GraphQL subscription listens). No
+    # persistence: a missed update is re-read from Postgres.
+    image: redis:8.10.3
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
 volumes:
   pgdata:
   redpanda:

@@ -81,8 +81,9 @@ class Answer(Base):
 
 
 class Incident(Base):
-    """Created by hand for now; alerts open them from slice 4. `version` goes up on every change, and a triage
-    belongs to the version it was run on."""
+    """Opened by alert clustering (pagerwise_consumer.clustering) or by hand. `version` goes up when the incident's
+    facts change (a new kind of alert joins, severity rises), not on every repeat alert; a triage belongs to the
+    version it was run on."""
 
     __tablename__ = "incidents"
     __table_args__ = (Index("ix_incidents_opened_at_id", text("opened_at DESC"), text("id DESC")),)
@@ -96,6 +97,10 @@ class Incident(Base):
     opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     version: Mapped[int] = mapped_column(Integer, server_default="1")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    alert_count: Mapped[int] = mapped_column(Integer, server_default="0")
+    last_alert_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Embedding of the summary of the alert that opened it; later alerts are compared with this.
+    embedding: Mapped[list[float] | None] = mapped_column(VECTOR(EMBEDDING_DIM))
 
 
 class TriageRun(Base):
@@ -139,7 +144,8 @@ class TriageRun(Base):
 
 class AlertEvent(Base):
     """One alert as consumed from Kafka. event_id comes from the producer, so a redelivered message inserts nothing
-    (ON CONFLICT DO NOTHING). Slice 4 turns this into a table partitioned by day."""
+    (ON CONFLICT DO NOTHING). Partitioned by day on occurred_at from migration 0007, which is why the primary key is
+    (event_id, occurred_at)."""
 
     __tablename__ = "alert_events"
 
@@ -148,10 +154,11 @@ class AlertEvent(Base):
     service: Mapped[str] = mapped_column(String(128), index=True)
     fingerprint: Mapped[str] = mapped_column(String(128))
     severity: Mapped[str] = mapped_column(String(16))
-    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True, index=True)
     labels: Mapped[dict[str, str]] = mapped_column(JSONB, server_default="{}")
     summary: Mapped[str]
     attempt: Mapped[int] = mapped_column(SmallInteger, server_default="0")  # transient failures before it landed
+    incident_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("incidents.id"))  # NULL for seeded history
     ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -205,4 +212,23 @@ class ImportState(Base):
     pages: Mapped[dict[str, dict[str, str | None]]] = mapped_column(JSONB, server_default="{}")  # url -> {etag, next}
     last_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Service(Base):
+    """A service in the simulated system (data/service_graph.yaml, loaded by scripts/seed.py graph)."""
+
+    __tablename__ = "services"
+
+    name: Mapped[str] = mapped_column(String(128), primary_key=True)
+    tier: Mapped[str] = mapped_column(String(32))
+    team: Mapped[str] = mapped_column(String(64))
+
+
+class ServiceEdge(Base):
+    """from_service calls (depends on) to_service."""
+
+    __tablename__ = "service_edges"
+
+    from_service: Mapped[str] = mapped_column(ForeignKey("services.name", ondelete="CASCADE"), primary_key=True)
+    to_service: Mapped[str] = mapped_column(ForeignKey("services.name", ondelete="CASCADE"), primary_key=True)
 

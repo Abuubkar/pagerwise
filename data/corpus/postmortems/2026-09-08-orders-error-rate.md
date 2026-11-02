@@ -41,6 +41,6 @@ Category: elevated error rate. Component: inventory.
 
 ## Action items
 
-- ORDE-4101 (discovery): Add an alert on error_ratio_pct for inventory.
-- ORDE-5279 (discovery): Add a regression test for: a credential for inventory was rotated without restarting consumers, so every call was refused.
-- ORDE-9952 (discovery): Link the runbook from the alert.
+- ORDE-4101 (commerce): Add an alert on error_ratio_pct for inventory.
+- ORDE-5279 (commerce): Add a regression test for: a credential for inventory was rotated without restarting consumers, so every call was refused.
+- ORDE-9952 (commerce): Link the runbook from the alert.

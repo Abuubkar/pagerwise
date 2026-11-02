@@ -27,16 +27,21 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 
+import redis.asyncio as aioredis
 from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener, ConsumerRecord, TopicPartition
 from aiokafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
 from aiokafka.errors import KafkaError
+from redis.exceptions import RedisError
+from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 import pagerwise_kafka as k
-from pagerwise_api.db import AlertEvent, DeadLetter
+from pagerwise_api.db import DeadLetter, ServiceEdge
+from pagerwise_api.embedding import embed_passages
 from pagerwise_api.settings import settings
+from pagerwise_consumer import clustering
 from pagerwise_consumer.flow import Backpressure
 from pagerwise_consumer.offsets import OffsetTracker
 
@@ -70,6 +75,9 @@ class Stats:
     dead_lettered: int = 0
     pauses: int = 0  # times backpressure paused fetching
     infra_retries: int = 0  # batches retried in place because Postgres or Kafka failed
+    incidents_opened: int = 0
+    published: int = 0  # incident updates sent to Redis
+    publish_failures: int = 0  # best effort: a missed update is re-read from Postgres
 
 
 class AlertConsumer:
@@ -83,6 +91,7 @@ class AlertConsumer:
         faults: Fault = no_faults,
         retry_delays_s: dict[str, float] | None = None,
         drain_s: float = settings.consumer_drain_s,
+        redis_url: str | None = settings.redis_url,  # None: don't publish incident updates (tests)
     ):
         self.engine = engine
         self.sessions = async_sessionmaker(engine, expire_on_commit=False)
@@ -106,6 +115,8 @@ class AlertConsumer:
             partition_assignment_strategy=(RoundRobinPartitionAssignor,),
         )
         self.producer = k.producer(bootstrap)
+        self.redis = aioredis.from_url(redis_url) if redis_url else None
+        self.edges: set[tuple[str, str]] = set()  # the service graph, for clustering
         self.backpressure = Backpressure(settings.consumer_queue_high, settings.consumer_queue_low,
                                          settings.consumer_pool_high, settings.consumer_pool_low)
         self.stats = Stats()
@@ -125,11 +136,13 @@ class AlertConsumer:
         self.stopping.set()
 
     async def run(self) -> None:
+        await self._load_edges()
+        await self._ensure_partitions()
         await self.producer.start()
         await self.consumer.start()
         self.consumer.subscribe([k.ALERTS, k.RETRY_30S, k.RETRY_5M], listener=_Rebalance(self))
         log.info("%s started", self.client_id)
-        last_commit = last_status = time.monotonic()
+        last_commit = last_status = last_partitions = time.monotonic()
         try:
             while not self.stopping.is_set():
                 self._apply_pauses()
@@ -143,14 +156,36 @@ class AlertConsumer:
                 if now - last_status >= 5:
                     self._log_status()
                     last_status = now
+                if now - last_partitions >= 3600:
+                    await self._ensure_partitions()
+                    last_partitions = now
         finally:
             # Not called by aiokafka on stop(), so the final drain and commit are ours.
             await self._release(list(self.workers), drain=True)
             await self.consumer.stop()
             await self.producer.stop()
+            if self.redis:
+                await self.redis.aclose()
             log.info("%s stopped: %s", self.client_id, asdict(self.stats))
         if self.failure:
             raise self.failure
+
+    async def _load_edges(self) -> None:
+        async with self.sessions() as session:
+            self.edges = {(a, b) for a, b in (await session.execute(
+                select(ServiceEdge.from_service, ServiceEdge.to_service))).all()}
+        log.info("service graph: %d edges", len(self.edges))
+
+    async def _ensure_partitions(self) -> None:
+        """Keeps a week of daily alert_events partitions ahead (create_alert_partitions is a no-op before the table
+        is partitioned). Without this, alerts would pile into the DEFAULT partition."""
+        try:
+            async with self.sessions() as session, session.begin():
+                created = await session.scalar(text("SELECT create_alert_partitions(7)"))
+            if created:
+                log.info("created %d alert_events partitions", created)
+        except SQLAlchemyError as e:
+            log.warning("couldn't ensure alert_events partitions (%s)", type(e).__name__)
 
     # --- poll loop side ---
 
@@ -315,16 +350,34 @@ class AlertConsumer:
         self.stats.duplicates += len(rows) - inserted
 
     async def _insert(self, rows: list[dict]) -> int:
+        """Clusters and stores the batch in one transaction, then tells Redis which incidents changed."""
         if not rows:
             return 0
-        statement = (
-            insert(AlertEvent).values(rows).on_conflict_do_nothing(index_elements=["event_id"])
-            .returning(AlertEvent.event_id)
-        )
-        async with self.sessions() as session:
-            inserted = len((await session.execute(statement)).all())
-            await session.commit()
-        return inserted
+        async with self.sessions() as session, session.begin():
+            result = await clustering.store_alerts(session, rows, self.edges, self._embed)
+        self.stats.incidents_opened += sum(t.opened for t in result.touched.values())
+        await self._publish(result.touched.values())
+        return result.inserted
+
+    @staticmethod
+    async def _embed(texts: list[str]) -> list[list[float]]:
+        return await asyncio.to_thread(embed_passages, texts) if texts else []  # CPU-bound ONNX work
+
+    async def _publish(self, touched) -> None:  # noqa: ANN001 - Iterable[clustering.Touched]
+        if not touched or self.redis is None:
+            return
+        messages = [json.dumps({"type": "opened" if t.opened else "updated", "incident_id": str(t.incident_id),
+                                "alerts_added": t.alerts, **t.after}) for t in touched]
+        try:
+            async with self.redis.pipeline(transaction=False) as pipe:
+                for message in messages:
+                    pipe.publish(settings.incident_updates_channel, message)
+                await pipe.execute()
+            self.stats.published += len(messages)
+        except (RedisError, OSError) as e:
+            self.stats.publish_failures += len(messages)
+            if self.stats.publish_failures == len(messages):  # log the first failure, not every batch
+                log.warning("publishing incident updates failed (%s); continuing without them", e)
 
     async def _route(self, record: ConsumerRecord, error: Exception) -> None:
         target, headers = k.route_failure(record.topic, record.partition, record.offset, record.headers, error)
