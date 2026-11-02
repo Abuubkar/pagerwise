@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Literal, TypeVar, cast
+from typing import Any, TypeVar, cast
 from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..models.citation_event_source_type import CitationEventSourceType
 from ..models.section_name import SectionName
 
 T = TypeVar("T", bound="CitationEvent")
@@ -18,17 +19,17 @@ class CitationEvent:
 
     Attributes:
         tag (str):
-        source_type (Literal['runbook']):
-        source_id (str):
-        chunk_id (UUID):
+        source_type (CitationEventSourceType):
+        source_id (str): A document path (runbook, postmortem) or a deploy id.
+        chunk_id (None | UUID): The cited chunk of the document; null for a deploy.
         chunk_excerpt (str):
         section (None | SectionName): The section the tag was written in.
     """
 
     tag: str
-    source_type: Literal["runbook"]
+    source_type: CitationEventSourceType
     source_id: str
-    chunk_id: UUID
+    chunk_id: None | UUID
     chunk_excerpt: str
     section: None | SectionName
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -36,11 +37,15 @@ class CitationEvent:
     def to_dict(self) -> dict[str, Any]:
         tag = self.tag
 
-        source_type = self.source_type
+        source_type = self.source_type.value
 
         source_id = self.source_id
 
-        chunk_id = str(self.chunk_id)
+        chunk_id: None | str
+        if isinstance(self.chunk_id, UUID):
+            chunk_id = str(self.chunk_id)
+        else:
+            chunk_id = self.chunk_id
 
         chunk_excerpt = self.chunk_excerpt
 
@@ -70,13 +75,24 @@ class CitationEvent:
         d = dict(src_dict)
         tag = d.pop("tag")
 
-        source_type = cast(Literal["runbook"], d.pop("source_type"))
-        if source_type != "runbook":
-            raise ValueError(f"source_type must match const 'runbook', got '{source_type}'")
+        source_type = CitationEventSourceType(d.pop("source_type"))
 
         source_id = d.pop("source_id")
 
-        chunk_id = UUID(d.pop("chunk_id"))
+        def _parse_chunk_id(data: object) -> None | UUID:
+            if data is None:
+                return data
+            try:
+                if not isinstance(data, str):
+                    raise TypeError()
+                chunk_id_type_0 = UUID(data)
+
+                return chunk_id_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | UUID, data)
+
+        chunk_id = _parse_chunk_id(d.pop("chunk_id"))
 
         chunk_excerpt = d.pop("chunk_excerpt")
 

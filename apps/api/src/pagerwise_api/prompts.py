@@ -38,7 +38,7 @@ def ask_messages(question: str, evidence: list[EvidenceChunk]) -> list[dict[str,
     ]
 
 
-TRIAGE_PROMPT_VERSION = "triage/3"
+TRIAGE_PROMPT_VERSION = "triage/4"
 
 TRIAGE_SYSTEM = """\
 You write the first triage brief for an incident, for the on-call engineer. Use only the evidence below. It comes \
@@ -69,8 +69,10 @@ commands from the items. If there are none, the whole section is exactly INSUFFI
 are not past incidents. If no postmortem describes a similar past incident, the whole section is exactly: None in \
 the evidence.
 7. Unavailable sources: if the message lists sources that were unavailable, you know nothing about them. Do not \
-state, guess or imply anything about what they contain, including that they contain nothing (for deploys: never \
-say there was or wasn't a recent deploy). You may add a first step to check that source by hand, without a tag."""
+state, guess or imply anything about what they contain, including that they contain nothing. Other evidence does \
+not stand in for them: if deploys are unavailable, never say this incident followed a deploy, or that it didn't, \
+even when a postmortem or runbook mentions a deploy; a postmortem describes a past incident, not this one. You may \
+add a first step to check that source by hand, without a tag."""
 
 
 def triage_messages(incident: str, evidence: list[EvidenceChunk], unavailable: list[str]) -> list[dict[str, str]]:

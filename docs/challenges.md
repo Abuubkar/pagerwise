@@ -174,3 +174,23 @@ every triage: hybrid search with reranking takes ~0.5 s, and two run at once.
 
 **Slice 4a's postmortem citations were labelled `runbook`.** `Citation.source_type` was the constant `runbook`.
 - *Did:* `runbook | postmortem | deploy`; deploys cite with a null `chunk_id`.
+
+**With the deploy source down, the replayed incident's brief still claimed a deploy.** The first sentence said the
+incident followed the redis-cache 6.38.7 deploy, cited to the postmortem. Banner shown, no deploy citations, so the
+script's automatic check said PASS; reading it, rule 7 ("never say there was or wasn't a recent deploy") was broken.
+Tightening the rule (`triage/4`: other evidence doesn't stand in for an unavailable source; a postmortem describes a
+past incident) changed nothing for the replay. The same incident opened *today*, so that the postmortem really is
+about a past incident, gave a clean brief: "since deploys are unavailable … we cannot confirm".
+- *Learned:* the replay is a special case: the postmortem describes this exact incident, so it does "know" about
+  the deploy. It's also a warning that the automatic check (citations only) misses claims sourced elsewhere.
+- *Not done:* a deterministic guard (reject or flag deploy claims in Likely cause / Blast radius when deploys are
+  degraded). Slice 6's degraded-honesty eval with the calibrated judge measures this over the golden set first.
+
+**A blocking Redis read was cut off by redis-py's default 5 s socket timeout.** The SSE reader waited up to 5 s per
+`XREAD`; the live run, where the model takes 20+ s to its first token, crashed the stream. Tests never waited that long.
+- *Did:* 2 s blocking reads and a 30 s socket timeout in `bus.connect`.
+
+**The contract's `CitationEvent` schema still said `source_type: runbook`.** I'd updated `Citation` and missed its
+copy; `make contract-check` can't see SSE event schemas (no operation references them). The generated Python client
+rejected the first postmortem citation of the live run.
+- *Did:* fixed the contract; a unit test now parses every event payload the API builds with the generated client.

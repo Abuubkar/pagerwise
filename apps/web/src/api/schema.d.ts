@@ -290,11 +290,12 @@ export interface components {
         /** @description Data of the stream's `citation` event. */
         CitationEvent: {
             tag: string;
-            /** @constant */
-            source_type: "runbook";
+            /** @enum {string} */
+            source_type: "runbook" | "postmortem" | "deploy";
+            /** @description A document path (runbook, postmortem) or a deploy id. */
             source_id: string;
-            /** Format: uuid */
-            chunk_id: string;
+            /** @description The cited chunk of the document; null for a deploy. */
+            chunk_id: string | null;
             chunk_excerpt: string;
             /** @description The section the tag was written in. */
             section: components["schemas"]["SectionName"] | null;

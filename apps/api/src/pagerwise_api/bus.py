@@ -27,7 +27,8 @@ FINAL_EVENTS = ("done", "error")
 
 
 def connect(url: str | None = None) -> aioredis.Redis:
-    return aioredis.from_url(url or settings.redis_url, decode_responses=True)
+    # redis-py's default 5 s socket timeout would cut off a blocking XREAD; reads here block for at most 2 s.
+    return aioredis.from_url(url or settings.redis_url, decode_responses=True, socket_timeout=30)
 
 
 async def publish_incidents(redis: aioredis.Redis, messages: list[dict[str, Any]]) -> None:
@@ -65,7 +66,7 @@ async def has_triage_events(redis: aioredis.Redis, triage_id: uuid.UUID) -> bool
 
 
 async def triage_events(redis: aioredis.Redis, triage_id: uuid.UUID,
-                        block_ms: int = 5000) -> AsyncIterator[tuple[str, str] | None]:
+                        block_ms: int = 2000) -> AsyncIterator[tuple[str, str] | None]:
     """Every event of the run from the start, then new ones as they arrive, until done or error. Yields None after
     each block_ms of silence, so the caller can check whether the run is still alive."""
     last = "0"

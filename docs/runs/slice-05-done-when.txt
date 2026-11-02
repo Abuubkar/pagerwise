@@ -1,0 +1,152 @@
+# Slice 5 done-when, 2026-11-02. API, triage worker, docs_mock (deploy source), Redis and Ollama (qwen3.5:9b-q4_K_M)
+# running locally; run after the Shelfsense session had finished with Ollama. Prompt triage/4 for all three briefs.
+# (An earlier triage/3 run of the replay with deploys down asserted a deploy too; rule 7 was tightened, without effect on the replay.)
+
+## 1. Replaying the seeded incident (postmortem 2026-10-25 card-auth memory pressure): the brief cites planted facts
+$ uv run python scripts/triage_replay.py
+== Incident 01a19d30-e5e3-7471-b1ea-1595406e68fb: CardAuthMemoryPressure on card-auth (opened 2026-10-25 11:05 UTC)
+   triage 01a19d30-e5f8-760f-9ba3-52917a4c6934 queued; streaming
+
+## Likely cause
+The incident occurred shortly after the deployment of redis-cache version 6.38.7 [C8], which is a candidate cause given that past incidents involving memory pressure and OOM kills were also caused by changes in redis-cache [C5]. The evidence indicates that large payloads are the most common cause for this alert on card-auth [C1], but the recent deploy makes a regression less likely than a payload issue [C1].
+
+## Blast radius
+The affected service is card-auth, which is a core-tier service owned by the payments team [C1]. The callers affected are payments [C1]. 38,440 customers saw errors in a similar past incident involving memory pressure on this service [C5].
+
+## First steps
+1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_rss_pct_of_limit` with the same hour last week [C1].
+2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246
+   ```
+   [C1]
+4. If `card_auth_rss_pct_of_limit` stays above 84 for 8 minutes, treat it as memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own [C1].
+5. Compare memory growth rate before and after the last deploy [C1].
+
+## Similar incidents
+On 2026-10-25, card-auth kept restarting for 132 minutes due to redis-cache buffering whole export files in memory after a change in 6.38.7 [C5].
+
+== Result
+verdict CAUSE_IDENTIFIED, qwen3.5:9b-q4_K_M, triage/4; first token after 6.4s, done after 30.2s; degraded: none
+citations:
+  [C1] runbook    data/corpus/runbooks/card-auth-memory-pressure.md
+  [C5] postmortem data/corpus/postmortems/2026-10-25-card-auth-memory-pressure.md
+  [C8] deploy     dep-0323
+planted facts in cited documents, and whether the brief repeats them:
+  [x] rb/card-auth/memory-pressure/threshold: when card_auth_rss_pct_of_limit stays above 84 for 8 minutes
+  [x] rb/card-auth/memory-pressure/error-code: CAR-MEM-246
+  [ ] rb/card-auth/memory-pressure/config: set max_request_body_kb=58
+  [x] pm/2026-10-25-card-auth-memory-pressure: redis-cache buffered whole export files in memory after a change in 6.38.7.
+lines mentioning a deploy: 4; deploy citations: ['C8']
+  | The incident occurred shortly after the deployment of redis-cache version 6.38.7 [C8], which is a candidate cause given that past incidents involving memory pressure and OOM kills were also caused by changes in redis-cache [C5]. The evidence indicates that large payloads are the most common cause for this alert on card-auth [C1], but the recent deploy makes a regression less likely than a payload issue [C1].
+  | 2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+  | kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246
+  | 5. Compare memory growth rate before and after the last deploy [C1].
+
+PASS: 3 planted fact(s) cited and repeated
+
+## 2. The same replay with the deploy source forced down (docs_mock /_faults down=[deploys])
+$ uv run python scripts/triage_replay.py --deploys-down
+== Incident 01a19d2f-55e3-7f75-85d6-ba4923430d07: CardAuthMemoryPressure on card-auth (opened 2026-10-25 11:05 UTC)  [deploy source forced down]
+   triage 01a19d2f-55f7-7bbe-a783-2d1588a26dc1 queued; streaming
+
+>> degraded_source deploys: HTTP 503
+## Likely cause
+The incident occurred shortly after a deploy to redis-cache (6.38.7) which caused memory pressure in the dependent service [C5]. The root cause was that redis-cache buffered whole export files in memory after a change in 6.38.7 [C5]. This aligns with the runbook stating that large payloads or a memory leak in a recent release are likely causes for this alert [C1].
+
+## Blast radius
+The incident affects card-auth, which is a core-tier service owned by the payments team [C1]. Callers affected include payments [C5]. 38,440 customers saw errors during a similar past incident involving memory pressure [C5].
+
+## First steps
+1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_rss_pct_of_limit` with the same hour last week [C1].
+2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246
+   ```
+   [C1]
+4. If `card_auth_rss_pct_of_limit` stays above 84 for 8 minutes, treat it as memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own [C1].
+5. Compare memory growth rate before and after the last deploy [C1].
+
+## Similar incidents
+On 2026-10-25, card-auth kept restarting for 132 minutes due to redis-cache causing memory pressure [C5]. On 2025-10-20, card-auth ran out of database connections because redis-cache leaked connections [C6]. On 2025-09-13, card-auth returned errors because a credential for redis-cache was rotated without restarting consumers [C7].
+
+== Result
+verdict CAUSE_IDENTIFIED, qwen3.5:9b-q4_K_M, triage/4; first token after 19.5s, done after 41.7s; degraded: ['deploys']
+citations:
+  [C1] runbook    data/corpus/runbooks/card-auth-memory-pressure.md
+  [C5] postmortem data/corpus/postmortems/2026-10-25-card-auth-memory-pressure.md
+  [C6] postmortem data/corpus/postmortems/2025-10-20-card-auth-connection-pool.md
+  [C7] postmortem data/corpus/postmortems/2025-09-13-card-auth-error-rate.md
+planted facts in cited documents, and whether the brief repeats them:
+  [x] rb/card-auth/memory-pressure/threshold: when card_auth_rss_pct_of_limit stays above 84 for 8 minutes
+  [x] rb/card-auth/memory-pressure/error-code: CAR-MEM-246
+  [ ] rb/card-auth/memory-pressure/config: set max_request_body_kb=58
+  [x] pm/2026-10-25-card-auth-memory-pressure: redis-cache buffered whole export files in memory after a change in 6.38.7.
+  [x] pm/2025-10-20-card-auth-connection-pool: A retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
+  [x] pm/2025-09-13-card-auth-error-rate: A credential for redis-cache was rotated without restarting consumers, so every call was refused.
+lines mentioning a deploy: 4; deploy citations: none
+  | The incident occurred shortly after a deploy to redis-cache (6.38.7) which caused memory pressure in the dependent service [C5]. The root cause was that redis-cache buffered whole export files in memory after a change in 6.38.7 [C5]. This aligns with the runbook stating that large payloads or a memory leak in a recent release are likely causes for this alert [C1].
+  | 2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+  | kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246
+  | 5. Compare memory growth rate before and after the last deploy [C1].
+
+PASS: deploys marked degraded, no deploy citations (deploy lines above are for a person to judge)
+# Read by a person: NOT a clean pass. Banner shown, no deploy citations, but the first sentence asserts the
+# incident followed the redis-cache 6.38.7 deploy, cited to the postmortem of this very incident (rule 7 violated).
+
+## 3. The same incident opened today (so the postmortem is a genuinely past incident), deploy source down
+$ uv run python scripts/triage_replay.py --deploys-down --opened-at 2026-11-02T16:30:00Z
+== Incident 01a19d30-3794-7256-9773-ba56d92aee90: CardAuthMemoryPressure on card-auth (opened 2026-11-02 16:30 UTC)  [deploy source forced down]
+   triage 01a19d30-37a7-7468-8a77-7a1eb1db1fc0 queued; streaming
+
+>> degraded_source deploys: HTTP 503
+## Likely cause
+The incident involves `CardAuthMemoryPressure` and OOM kills, which the evidence states is most commonly caused by large payloads or a memory leak in a recent release [C1]. A deploy to redis-cache occurred shortly before the incident timeline in a past postmortem, but since deploys are unavailable for this specific incident, we cannot confirm if a recent deploy to card-auth or redis-cache is the cause [C5][C6][C7].
+
+## Blast radius
+The affected service is `card-auth`, which is a core-tier service owned by the payments team [C1]. The callers affected are `payments` [C1]. Users impacted include customers seeing errors, as seen in past incidents where thousands of customers were affected [C5][C6][C7].
+
+## First steps
+1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_rss_pct_of_limit` with the same hour last week [C1].
+2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+3. Search the logs for the error code this failure logs: `kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246` [C1].
+4. If `card_auth_rss_pct_of_limit` stays above 84 for 8 minutes, treat it as memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own [C1].
+
+## Similar incidents
+Postmortem: card-auth memory pressure and OOM kills (2026-10-25) describes a similar past incident where redis-cache caused the issue [C5].
+
+== Result
+verdict CAUSE_IDENTIFIED, qwen3.5:9b-q4_K_M, triage/4; first token after 5.1s, done after 28.7s; degraded: ['deploys']
+citations:
+  [C1] runbook    data/corpus/runbooks/card-auth-memory-pressure.md
+  [C5] postmortem data/corpus/postmortems/2026-10-25-card-auth-memory-pressure.md
+  [C6] postmortem data/corpus/postmortems/2025-10-20-card-auth-connection-pool.md
+  [C7] postmortem data/corpus/postmortems/2025-09-13-card-auth-error-rate.md
+planted facts in cited documents, and whether the brief repeats them:
+  [x] rb/card-auth/memory-pressure/threshold: when card_auth_rss_pct_of_limit stays above 84 for 8 minutes
+  [x] rb/card-auth/memory-pressure/error-code: CAR-MEM-246
+  [ ] rb/card-auth/memory-pressure/config: set max_request_body_kb=58
+  [x] pm/2026-10-25-card-auth-memory-pressure: redis-cache buffered whole export files in memory after a change in 6.38.7.
+  [x] pm/2025-10-20-card-auth-connection-pool: A retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
+  [x] pm/2025-09-13-card-auth-error-rate: A credential for redis-cache was rotated without restarting consumers, so every call was refused.
+lines mentioning a deploy: 3; deploy citations: none
+  | The incident involves `CardAuthMemoryPressure` and OOM kills, which the evidence states is most commonly caused by large payloads or a memory leak in a recent release [C1]. A deploy to redis-cache occurred shortly before the incident timeline in a past postmortem, but since deploys are unavailable for this specific incident, we cannot confirm if a recent deploy to card-auth or redis-cache is the cause [C5][C6][C7].
+  | 2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes "large payloads" less likely than a regression [C1].
+  | 3. Search the logs for the error code this failure logs: `kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-MEM-246` [C1].
+
+PASS: deploys marked degraded, no deploy citations (deploy lines above are for a person to judge)
+# Read by a person: clean. It says deploys are unavailable and that it cannot confirm whether a deploy is the cause.
+
+## 4. UI (Next.js on :3001), checked in the browser
+- Small storm (simulator 40/s for 20 s) with the incident list open: 19 new incidents appeared at the top live,
+  without a reload (39 rows: the first page of 20 plus 19 from the incidentUpdated subscription).
+- Incident page: timeline of alert groups and the triage; Acknowledge set status=acknowledged, version unchanged (6).
+- Brief from run 1 rendered with footnotes [1]->deploy dep-0323, [2]->postmortem, [3]->runbook; sources panel lists all three.
+- Brief from run 3 shows the banner: "Deploys unavailable (HTTP 503). This brief makes no claims about deploys; check them by hand."
+
+## 5. First-token latency: the first brief after the worker started took 28.7 s to its first token (model load +
+## prompt); later ones 1.5-19.5 s, the low end helped by Ollama reusing its cache for a near-identical prompt.
