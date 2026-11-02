@@ -1,0 +1,28 @@
+:root { --fg: #1d1d1b; --muted: #6b6a65; --line: #e3e1da; --bg: #fbfbf9; --warn-bg: #fdf3dc; --warn: #7a4b00;
+  --bad-bg: #fbe9e9; --bad: #8a1f1f; --accent: #2a5fb0; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.55 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+.top { display: flex; gap: 12px; align-items: baseline; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+.top a { font-weight: 600; color: var(--fg); text-decoration: none; }
+main { padding: 16px 24px; max-width: 1200px; }
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+table.incidents { width: 100%; border-collapse: collapse; }
+.incidents th, .incidents td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 0 6px; border-radius: 4px; font-size: 12px; background: #ecebe6; }
+.badge.sev1 { background: var(--bad-bg); color: var(--bad); }
+.badge.sev3 { background: var(--warn-bg); color: var(--warn); }
+.banner { padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
+.banner.warn { background: var(--warn-bg); color: var(--warn); }
+.banner.bad { background: var(--bad-bg); color: var(--bad); }
+button { padding: 6px 12px; margin-top: 12px; border: 1px solid var(--line); border-radius: 6px; background: white; cursor: pointer; }
+.columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; }
+.timeline { padding-left: 18px; }
+.timeline time { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
+.brief section { margin-bottom: 12px; }
+.brief .step { margin: 4px 0 4px 12px; }
+.footnote { text-decoration: none; font-size: 11px; }
+.sources blockquote { margin: 4px 0 10px; padding-left: 10px; border-left: 3px solid var(--line); color: var(--muted); font-size: 13px; }
+.meta { color: var(--muted); font-size: 13px; }
+@media (max-width: 800px) { .columns { grid-template-columns: minmax(0, 1fr); } main { padding: 12px 16px; } }
