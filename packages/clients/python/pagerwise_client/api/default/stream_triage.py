@@ -35,11 +35,6 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 
         return response_404
 
-    if response.status_code == 409:
-        response_409 = Problem.from_dict(response.json())
-
-        return response_409
-
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -62,19 +57,23 @@ def sync_detailed(
 ) -> Response[Problem | str]:
     """Stream the incident's latest triage
 
-     Server-sent events. The first connection generates the brief; later connections replay the stored
-    result in the same event shapes. Each event's `data` is JSON:
+     Server-sent events, from the triage's first event: live while the triage worker generates it,
+    replayed
+    from the stored result once it's finished. Any number of clients can watch the same triage. Each
+    event's
+    `data` is JSON:
 
     | event | data | when |
     |---|---|---|
+    | `degraded_source` | DegradedSourceEvent | before the first token, once per evidence source left
+    out |
     | `token` | TokenEvent | a piece of the brief's markdown, as the model writes it |
     | `citation` | CitationEvent | a complete [Cn] tag has arrived (a tag can be split across tokens) |
     | `section_complete` | SectionCompleteEvent | a section's text is finished |
     | `done` | TriageBrief | the brief passed the section and citation contract; last event |
     | `error` | ErrorEvent | generation failed or the brief broke the contract; last event |
 
-    Concatenating the `token` texts gives exactly what the model wrote. A 409 `triage_in_progress` means
-    another connection is generating this run.
+    Concatenating the `token` texts gives exactly what the model wrote.
 
     Args:
         incident_id (UUID):
@@ -105,19 +104,23 @@ def sync(
 ) -> Problem | str | None:
     """Stream the incident's latest triage
 
-     Server-sent events. The first connection generates the brief; later connections replay the stored
-    result in the same event shapes. Each event's `data` is JSON:
+     Server-sent events, from the triage's first event: live while the triage worker generates it,
+    replayed
+    from the stored result once it's finished. Any number of clients can watch the same triage. Each
+    event's
+    `data` is JSON:
 
     | event | data | when |
     |---|---|---|
+    | `degraded_source` | DegradedSourceEvent | before the first token, once per evidence source left
+    out |
     | `token` | TokenEvent | a piece of the brief's markdown, as the model writes it |
     | `citation` | CitationEvent | a complete [Cn] tag has arrived (a tag can be split across tokens) |
     | `section_complete` | SectionCompleteEvent | a section's text is finished |
     | `done` | TriageBrief | the brief passed the section and citation contract; last event |
     | `error` | ErrorEvent | generation failed or the brief broke the contract; last event |
 
-    Concatenating the `token` texts gives exactly what the model wrote. A 409 `triage_in_progress` means
-    another connection is generating this run.
+    Concatenating the `token` texts gives exactly what the model wrote.
 
     Args:
         incident_id (UUID):
@@ -143,19 +146,23 @@ async def asyncio_detailed(
 ) -> Response[Problem | str]:
     """Stream the incident's latest triage
 
-     Server-sent events. The first connection generates the brief; later connections replay the stored
-    result in the same event shapes. Each event's `data` is JSON:
+     Server-sent events, from the triage's first event: live while the triage worker generates it,
+    replayed
+    from the stored result once it's finished. Any number of clients can watch the same triage. Each
+    event's
+    `data` is JSON:
 
     | event | data | when |
     |---|---|---|
+    | `degraded_source` | DegradedSourceEvent | before the first token, once per evidence source left
+    out |
     | `token` | TokenEvent | a piece of the brief's markdown, as the model writes it |
     | `citation` | CitationEvent | a complete [Cn] tag has arrived (a tag can be split across tokens) |
     | `section_complete` | SectionCompleteEvent | a section's text is finished |
     | `done` | TriageBrief | the brief passed the section and citation contract; last event |
     | `error` | ErrorEvent | generation failed or the brief broke the contract; last event |
 
-    Concatenating the `token` texts gives exactly what the model wrote. A 409 `triage_in_progress` means
-    another connection is generating this run.
+    Concatenating the `token` texts gives exactly what the model wrote.
 
     Args:
         incident_id (UUID):
@@ -184,19 +191,23 @@ async def asyncio(
 ) -> Problem | str | None:
     """Stream the incident's latest triage
 
-     Server-sent events. The first connection generates the brief; later connections replay the stored
-    result in the same event shapes. Each event's `data` is JSON:
+     Server-sent events, from the triage's first event: live while the triage worker generates it,
+    replayed
+    from the stored result once it's finished. Any number of clients can watch the same triage. Each
+    event's
+    `data` is JSON:
 
     | event | data | when |
     |---|---|---|
+    | `degraded_source` | DegradedSourceEvent | before the first token, once per evidence source left
+    out |
     | `token` | TokenEvent | a piece of the brief's markdown, as the model writes it |
     | `citation` | CitationEvent | a complete [Cn] tag has arrived (a tag can be split across tokens) |
     | `section_complete` | SectionCompleteEvent | a section's text is finished |
     | `done` | TriageBrief | the brief passed the section and citation contract; last event |
     | `error` | ErrorEvent | generation failed or the brief broke the contract; last event |
 
-    Concatenating the `token` texts gives exactly what the model wrote. A 409 `triage_in_progress` means
-    another connection is generating this run.
+    Concatenating the `token` texts gives exactly what the model wrote.
 
     Args:
         incident_id (UUID):

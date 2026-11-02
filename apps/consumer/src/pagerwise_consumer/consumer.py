@@ -27,7 +27,6 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 
-import redis.asyncio as aioredis
 from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener, ConsumerRecord, TopicPartition
 from aiokafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
 from aiokafka.errors import KafkaError
@@ -38,7 +37,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 import pagerwise_kafka as k
-from pagerwise_api.db import DeadLetter, ServiceEdge
+from pagerwise_api import bus
+from pagerwise_api.db import DeadLetter, ServiceEdge, TriageRun
 from pagerwise_api.embedding import embed_passages
 from pagerwise_api.settings import settings
 from pagerwise_consumer import clustering
@@ -76,6 +76,7 @@ class Stats:
     pauses: int = 0  # times backpressure paused fetching
     infra_retries: int = 0  # batches retried in place because Postgres or Kafka failed
     incidents_opened: int = 0
+    triages_queued: int = 0
     published: int = 0  # incident updates sent to Redis
     publish_failures: int = 0  # best effort: a missed update is re-read from Postgres
 
@@ -91,7 +92,7 @@ class AlertConsumer:
         faults: Fault = no_faults,
         retry_delays_s: dict[str, float] | None = None,
         drain_s: float = settings.consumer_drain_s,
-        redis_url: str | None = settings.redis_url,  # None: don't publish incident updates (tests)
+        redis_url: str | None = settings.redis_url,  # None: no Redis (tests): no updates, no worker wake-ups
     ):
         self.engine = engine
         self.sessions = async_sessionmaker(engine, expire_on_commit=False)
@@ -115,7 +116,7 @@ class AlertConsumer:
             partition_assignment_strategy=(RoundRobinPartitionAssignor,),
         )
         self.producer = k.producer(bootstrap)
-        self.redis = aioredis.from_url(redis_url) if redis_url else None
+        self.redis = bus.connect(redis_url) if redis_url else None
         self.edges: set[tuple[str, str]] = set()  # the service graph, for clustering
         self.backpressure = Backpressure(settings.consumer_queue_high, settings.consumer_queue_low,
                                          settings.consumer_pool_high, settings.consumer_pool_low)
@@ -350,34 +351,47 @@ class AlertConsumer:
         self.stats.duplicates += len(rows) - inserted
 
     async def _insert(self, rows: list[dict]) -> int:
-        """Clusters and stores the batch in one transaction, then tells Redis which incidents changed."""
+        """Clusters and stores the batch in one transaction, queueing a triage for each incident it opened, then tells
+        Redis which incidents changed and wakes the triage worker."""
         if not rows:
             return 0
         async with self.sessions() as session, session.begin():
             result = await clustering.store_alerts(session, rows, self.edges, self._embed)
-        self.stats.incidents_opened += sum(t.opened for t in result.touched.values())
-        await self._publish(result.touched.values())
+            opened = [t for t in result.touched.values() if t.opened]
+            # In the same transaction: an incident is never committed without its triage queued.
+            runs = [TriageRun(incident_id=t.incident_id, incident_version=1, tenant="default") for t in opened]
+            session.add_all(runs)
+            await session.flush()
+            queued = [(run.id, run.tenant) for run in runs]
+        self.stats.incidents_opened += len(opened)
+        self.stats.triages_queued += len(queued)
+        await self._notify(result.touched.values(), queued)
         return result.inserted
 
     @staticmethod
     async def _embed(texts: list[str]) -> list[list[float]]:
         return await asyncio.to_thread(embed_passages, texts) if texts else []  # CPU-bound ONNX work
 
-    async def _publish(self, touched) -> None:  # noqa: ANN001 - Iterable[clustering.Touched]
-        if not touched or self.redis is None:
+    async def _notify(self, touched, queued: list) -> None:  # noqa: ANN001 - Iterable[clustering.Touched]
+        """Best effort: a missed incident update is re-read from Postgres, and a missed wake-up only delays the
+        triage worker until its next poll. Auto-started triages count against the default tenant's slots (force:
+        never refused), so people asking for more see the queue is busy."""
+        if self.redis is None or not (touched or queued):
             return
-        messages = [json.dumps({"type": "opened" if t.opened else "updated", "incident_id": str(t.incident_id),
-                                "alerts_added": t.alerts, **t.after}) for t in touched]
+        messages = [{"type": "opened" if t.opened else "updated", "incident_id": str(t.incident_id),
+                     "alerts_added": t.alerts, **t.after} for t in touched]
         try:
-            async with self.redis.pipeline(transaction=False) as pipe:
-                for message in messages:
-                    pipe.publish(settings.incident_updates_channel, message)
-                await pipe.execute()
-            self.stats.published += len(messages)
+            if messages:
+                await bus.publish_incidents(self.redis, messages)
+                self.stats.published += len(messages)
+            for run_id, tenant in queued:
+                await bus.acquire_triage_slot(self.redis, tenant, run_id, force=True)
+            if queued:
+                await bus.wake_worker(self.redis)
         except (RedisError, OSError) as e:
             self.stats.publish_failures += len(messages)
             if self.stats.publish_failures == len(messages):  # log the first failure, not every batch
-                log.warning("publishing incident updates failed (%s); continuing without them", e)
+                log.warning("Redis unavailable (%s); continuing without incident updates", e)
 
     async def _route(self, record: ConsumerRecord, error: Exception) -> None:
         target, headers = k.route_failure(record.topic, record.partition, record.offset, record.headers, error)

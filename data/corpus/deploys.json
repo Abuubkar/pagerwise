@@ -1,0 +1,4296 @@
+{
+ "seed": 7,
+ "anchor": "2026-11-01",
+ "deploys": [
+  {
+   "service": "search",
+   "version": "3.13.3",
+   "deployed_at": "2026-10-02T09:39:00+00:00",
+   "author": "Adam Lawson",
+   "commit_sha": "df9ce211fe05ad9eed0ab3391feb72f15848e46e",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0001"
+  },
+  {
+   "service": "search",
+   "version": "3.13.2",
+   "deployed_at": "2026-10-02T09:47:00+00:00",
+   "author": "Laura Lloyd",
+   "commit_sha": "62042b37fdcfe62ad770e2c532b91a3b28f8e0a5",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0002"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.1",
+   "deployed_at": "2026-10-02T09:49:00+00:00",
+   "author": "Kimberly Giles",
+   "commit_sha": "01068fb78788d00363f9b70385167f9e8c5c5de2",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0003"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.1",
+   "deployed_at": "2026-10-02T10:12:00+00:00",
+   "author": "Victor Martinez",
+   "commit_sha": "f0c0cfa3770cb2cb7f58738bf460d587973e4d86",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0004"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.2",
+   "deployed_at": "2026-10-02T10:38:00+00:00",
+   "author": "Tracy Gomez",
+   "commit_sha": "50641c2f73f5a60406045c114e5dcc2fe8355f0b",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0005"
+  },
+  {
+   "service": "search",
+   "version": "3.13.1",
+   "deployed_at": "2026-10-02T11:08:00+00:00",
+   "author": "Angel Jones",
+   "commit_sha": "64e9abe2852668a12b95c68e0cdac643390c3a2e",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0006"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.1",
+   "deployed_at": "2026-10-02T11:26:00+00:00",
+   "author": "Michael Salazar",
+   "commit_sha": "1df3010a121ee01b222f48761a65a8bbe926d3a1",
+   "summary": "Fix flaky pool handling",
+   "status": "succeeded",
+   "id": "dep-0007"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.1",
+   "deployed_at": "2026-10-02T12:25:00+00:00",
+   "author": "Melissa Palmer",
+   "commit_sha": "afcb588ceef17c1b9c7f0897d2f254bd1bca1bf4",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0008"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.1",
+   "deployed_at": "2026-10-02T14:26:00+00:00",
+   "author": "Heather Jackson",
+   "commit_sha": "dc6169275cd583cb8a1b34de97a4ef563608984f",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0009"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.1",
+   "deployed_at": "2026-10-02T18:31:00+00:00",
+   "author": "Tyler Lynch",
+   "commit_sha": "05a1d3e543f070af0a7959805ce238115887efe8",
+   "summary": "Refactor checkout client",
+   "status": "rolled_back",
+   "id": "dep-0010"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.2",
+   "deployed_at": "2026-10-03T08:04:00+00:00",
+   "author": "Jennifer Johnson",
+   "commit_sha": "d123f711d55189f34c3a50dc4ac8f4141377d31a",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0011"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.3",
+   "deployed_at": "2026-10-03T10:22:00+00:00",
+   "author": "Sheila Lowery",
+   "commit_sha": "1236278c155a5174720e5377272ed92b0fdcc1d8",
+   "summary": "Roll out pool behind a flag",
+   "status": "succeeded",
+   "id": "dep-0012"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.2",
+   "deployed_at": "2026-10-03T10:26:00+00:00",
+   "author": "Christopher Waller",
+   "commit_sha": "2c7aee59b6fd4797397ecf3e80b7200fb609c45d",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0013"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.2",
+   "deployed_at": "2026-10-03T10:39:00+00:00",
+   "author": "Heather Miller",
+   "commit_sha": "29f370115b949e27964b6207217718788ae144f7",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0014"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.3",
+   "deployed_at": "2026-10-03T11:49:00+00:00",
+   "author": "Joseph Turner",
+   "commit_sha": "86faf8ef06b7f96ca39235b1b30594825ec5df65",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0015"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.3",
+   "deployed_at": "2026-10-03T12:44:00+00:00",
+   "author": "Scott Young",
+   "commit_sha": "e8b290fffa08e4262604adf7cb50564907700ef6",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0016"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.1",
+   "deployed_at": "2026-10-03T13:16:00+00:00",
+   "author": "Scott Perry",
+   "commit_sha": "c020ea71e2d4cbcb209056585460448b2c8826a9",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0017"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.1",
+   "deployed_at": "2026-10-03T14:02:00+00:00",
+   "author": "Tiffany Molina",
+   "commit_sha": "fd36ae26824a0860a147a4669a969b5f813978ff",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0018"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.1",
+   "deployed_at": "2026-10-03T14:19:00+00:00",
+   "author": "Stephen Owen",
+   "commit_sha": "b2c5246222d17c28980313e28a66125ee231b40f",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0019"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.2",
+   "deployed_at": "2026-10-03T15:53:00+00:00",
+   "author": "Jennifer Cole",
+   "commit_sha": "264d85d9f19fd44b1a1d9a8d6a83a4ab88c56760",
+   "summary": "Roll out ledger behind a flag",
+   "status": "succeeded",
+   "id": "dep-0020"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.5",
+   "deployed_at": "2026-10-04T08:25:00+00:00",
+   "author": "Cheryl Hill",
+   "commit_sha": "d17e3be62f0f7a959dbe1c5b8489e17c62cf2635",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0021"
+  },
+  {
+   "service": "search",
+   "version": "3.13.4",
+   "deployed_at": "2026-10-04T08:55:00+00:00",
+   "author": "Johnny Carter",
+   "commit_sha": "25a7d71dcc35327d40d18454c83ea0a75c802f9d",
+   "summary": "Fix flaky pool handling",
+   "status": "succeeded",
+   "id": "dep-0022"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.4",
+   "deployed_at": "2026-10-04T09:02:00+00:00",
+   "author": "Diana Burton",
+   "commit_sha": "7c7fbbcca89a389d09dccd12a1ce93be206f4edf",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0023"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.5",
+   "deployed_at": "2026-10-04T09:36:00+00:00",
+   "author": "Anthony Gutierrez",
+   "commit_sha": "6dac592705945e7a29bad55547e2fadb281f7284",
+   "summary": "Fix flaky inventory handling",
+   "status": "succeeded",
+   "id": "dep-0024"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.1",
+   "deployed_at": "2026-10-04T10:21:00+00:00",
+   "author": "Emily Roberts",
+   "commit_sha": "79a0a5bbccb9117ecd7fc7e4296f2ec7c461dde8",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0025"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.2",
+   "deployed_at": "2026-10-04T11:25:00+00:00",
+   "author": "Angela Wright",
+   "commit_sha": "9429cc0739aed4b77038db9e42c74cddb0970029",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0026"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.4",
+   "deployed_at": "2026-10-04T12:23:00+00:00",
+   "author": "Jason Taylor",
+   "commit_sha": "a76c25b3ea61f7e8afbc8a86511717fea7d137b4",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0027"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.4",
+   "deployed_at": "2026-10-04T13:11:00+00:00",
+   "author": "Tommy Watson",
+   "commit_sha": "c342753e353d27e8d61c49bdabb0281fa9efc644",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0028"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.3",
+   "deployed_at": "2026-10-04T13:27:00+00:00",
+   "author": "Robert Moore",
+   "commit_sha": "847c2235687b0da7f1771b71a372916bbdfb1a68",
+   "summary": "Increase pool cache TTL",
+   "status": "succeeded",
+   "id": "dep-0029"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.2",
+   "deployed_at": "2026-10-04T14:36:00+00:00",
+   "author": "April Baird",
+   "commit_sha": "978a2cd98c03991dc6af1fd82d69c620fb055a86",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0030"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.3",
+   "deployed_at": "2026-10-04T14:40:00+00:00",
+   "author": "Jamie Bailey",
+   "commit_sha": "3d6a623e6e254a5ee81a7b93d63b3283dd425f2f",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0031"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.2",
+   "deployed_at": "2026-10-04T14:41:00+00:00",
+   "author": "Nicole Lee",
+   "commit_sha": "8b519151e34b79c5b1ee1604f0b049dbe1b12550",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0032"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.4",
+   "deployed_at": "2026-10-04T14:49:00+00:00",
+   "author": "Tiffany Davis",
+   "commit_sha": "47f229c08abaf79900fa4411174972f905a1b199",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0033"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.3",
+   "deployed_at": "2026-10-04T15:24:00+00:00",
+   "author": "Mrs. Maria Stevens MD",
+   "commit_sha": "e42e11b79abdfdb227a4ba3c1ec31814d46b67fb",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0034"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.4",
+   "deployed_at": "2026-10-04T17:42:00+00:00",
+   "author": "Thomas Dixon",
+   "commit_sha": "f5ae1462188444a623aeebcf33790a4c7ca8cf2b",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0035"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.1",
+   "deployed_at": "2026-10-05T09:06:00+00:00",
+   "author": "Kathy Erickson",
+   "commit_sha": "b33372e906e5974fa9991aae713670ba5c073ed7",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0036"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.4",
+   "deployed_at": "2026-10-05T09:31:00+00:00",
+   "author": "Corey Rivas Jr.",
+   "commit_sha": "67b3b2af9bc240776958f73983a63a6145deae6d",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0037"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.6",
+   "deployed_at": "2026-10-05T09:34:00+00:00",
+   "author": "Robert Shelton",
+   "commit_sha": "a0ad0e9b52ba588aaf457886ea8c281a3edb97be",
+   "summary": "Increase checkout cache TTL",
+   "status": "succeeded",
+   "id": "dep-0038"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.3",
+   "deployed_at": "2026-10-05T10:46:00+00:00",
+   "author": "Michael Gray",
+   "commit_sha": "038fc10fe13a2d3bf1bdec62221c6ee1f1c467ca",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0039"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.5",
+   "deployed_at": "2026-10-05T11:51:00+00:00",
+   "author": "Sydney Doyle",
+   "commit_sha": "b0f31ded3444fdc2a12434b461fff83708fbe936",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0040"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.2",
+   "deployed_at": "2026-10-05T12:16:00+00:00",
+   "author": "Daniel Fox",
+   "commit_sha": "c4929ce45f9aa77354d110a2fdfd5877cdc1bf3b",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0041"
+  },
+  {
+   "service": "search",
+   "version": "3.13.6",
+   "deployed_at": "2026-10-05T12:46:00+00:00",
+   "author": "Dr. Jerry Kirby",
+   "commit_sha": "3be8df5411f2c8289ff770d810ae4a95d818b674",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0042"
+  },
+  {
+   "service": "search",
+   "version": "3.13.5",
+   "deployed_at": "2026-10-05T12:57:00+00:00",
+   "author": "Justin Stewart",
+   "commit_sha": "076abbc8e777cc011a16426d5b7c904af4a85ccd",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0043"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.6",
+   "deployed_at": "2026-10-05T14:20:00+00:00",
+   "author": "Tiffany Hanson",
+   "commit_sha": "7171128e93c667083069e62faddc9d5f23715fa8",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0044"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.7",
+   "deployed_at": "2026-10-05T16:00:00+00:00",
+   "author": "Clayton Moore",
+   "commit_sha": "6b0aaf713b2809f437f117fc8b1a9eb4f5cfea26",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0045"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.4",
+   "deployed_at": "2026-10-05T16:06:00+00:00",
+   "author": "Krystal Henson",
+   "commit_sha": "d57db482b6d752191fc85e9edd348923b2242d7e",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0046"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.2",
+   "deployed_at": "2026-10-06T08:41:00+00:00",
+   "author": "Amy Smith",
+   "commit_sha": "aa84d0beac3b139863413fdad02c148cdd9e5a5c",
+   "summary": "Add metrics for notification",
+   "status": "succeeded",
+   "id": "dep-0047"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.6",
+   "deployed_at": "2026-10-06T09:52:00+00:00",
+   "author": "Steven Gray",
+   "commit_sha": "577dfb9d6eea5bb40c4cfc7448fcaa76fe6f3ae2",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0048"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.5",
+   "deployed_at": "2026-10-06T13:03:00+00:00",
+   "author": "Corey Rodriguez",
+   "commit_sha": "0abd308ca83540ce93155f7170aab76540bfd009",
+   "summary": "Refactor inventory client",
+   "status": "rolled_back",
+   "id": "dep-0049"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.5",
+   "deployed_at": "2026-10-06T13:45:00+00:00",
+   "author": "Jeremy Donovan",
+   "commit_sha": "44dcb411b3629c55b213b3ef21f4b945ebb96202",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0050"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.5",
+   "deployed_at": "2026-10-06T14:30:00+00:00",
+   "author": "Alejandro Adams",
+   "commit_sha": "dcdfddcaeda82b6478d7553e05c6823f763fbf16",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0051"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.8",
+   "deployed_at": "2026-10-06T16:16:00+00:00",
+   "author": "Stephanie Kelly",
+   "commit_sha": "9bc97fdfb0b17876a6dbf625915b6c1e58d5395b",
+   "summary": "Increase pool cache TTL",
+   "status": "succeeded",
+   "id": "dep-0052"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.7",
+   "deployed_at": "2026-10-06T16:39:00+00:00",
+   "author": "Morgan Reed",
+   "commit_sha": "ef134c3ebfec8ffe5f48b97e5224be3d639661b1",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0053"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.3",
+   "deployed_at": "2026-10-06T17:32:00+00:00",
+   "author": "James Berry",
+   "commit_sha": "6ee889ba62398da3ca98d68409e5c2f6adbab065",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0054"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.7",
+   "deployed_at": "2026-10-07T08:25:00+00:00",
+   "author": "Emily Cook",
+   "commit_sha": "915c24b02442354668f870b6dab28a5fa84822f2",
+   "summary": "Fix flaky inventory handling",
+   "status": "succeeded",
+   "id": "dep-0055"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.6",
+   "deployed_at": "2026-10-07T09:33:00+00:00",
+   "author": "John Hays",
+   "commit_sha": "d969bf39b71d221ada0f5668566cecad1c305c98",
+   "summary": "Fix flaky notification handling",
+   "status": "succeeded",
+   "id": "dep-0056"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.7",
+   "deployed_at": "2026-10-07T09:42:00+00:00",
+   "author": "David Frey",
+   "commit_sha": "090889f0aa64fad9c6d90ead7819c8ec5f0d6271",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0057"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.3",
+   "deployed_at": "2026-10-07T10:24:00+00:00",
+   "author": "Jorge Olson",
+   "commit_sha": "af611e2b47caf29c381aaeb6ccf97c3fa720dd1e",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0058"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.5",
+   "deployed_at": "2026-10-07T10:34:00+00:00",
+   "author": "David Johnson",
+   "commit_sha": "c0830f5bb75fbde8fa5a4dfe4e319a4317f8205d",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0059"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.2",
+   "deployed_at": "2026-10-07T10:52:00+00:00",
+   "author": "Sarah Cohen",
+   "commit_sha": "efcfee38857e9c9a4474adc7b3266f1fed268593",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0060"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.8",
+   "deployed_at": "2026-10-07T11:28:00+00:00",
+   "author": "Caitlin Hamilton",
+   "commit_sha": "4f732940c731921e7f3ec6fa6fa519e1eb6f22f7",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0061"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.3",
+   "deployed_at": "2026-10-07T11:45:00+00:00",
+   "author": "Samantha Holland",
+   "commit_sha": "03c7c8be6221908303b37c81f5794672cbfa9ea7",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0062"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.3",
+   "deployed_at": "2026-10-07T12:56:00+00:00",
+   "author": "Monica Nicholson",
+   "commit_sha": "e5abca61290b8386be094b464de66e3c769079d5",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0063"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.4",
+   "deployed_at": "2026-10-07T16:24:00+00:00",
+   "author": "Heather Hanna",
+   "commit_sha": "f52cec1c27cddded36475e49ce19396c09954c18",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0064"
+  },
+  {
+   "service": "search",
+   "version": "3.13.7",
+   "deployed_at": "2026-10-07T17:11:00+00:00",
+   "author": "Christopher Powell",
+   "commit_sha": "3d2cd49f17481b27fa482b826803bc132c0f699a",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0065"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.9",
+   "deployed_at": "2026-10-07T17:14:00+00:00",
+   "author": "Meghan Lawson",
+   "commit_sha": "e7c01e59ac92f398389c51c3196fdd104007b76e",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0066"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.6",
+   "deployed_at": "2026-10-07T18:34:00+00:00",
+   "author": "Angela Farrell",
+   "commit_sha": "1e5f34cb6f00150db2d76304badb25f90a62938b",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0067"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.4",
+   "deployed_at": "2026-10-08T09:08:00+00:00",
+   "author": "Heidi Simmons",
+   "commit_sha": "cc7fdc55342e65aba652be39ab1ee4ba5579df00",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0068"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.5",
+   "deployed_at": "2026-10-08T09:27:00+00:00",
+   "author": "Tony Reed",
+   "commit_sha": "e840fbd5d4063db24f5dfc20ae43d37808410d37",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0069"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.10",
+   "deployed_at": "2026-10-08T09:28:00+00:00",
+   "author": "Joshua Myers",
+   "commit_sha": "5e7154102876d03437dd7c9a0c8329ef5cdd7e80",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0070"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.6",
+   "deployed_at": "2026-10-08T10:15:00+00:00",
+   "author": "Tiffany Ortega",
+   "commit_sha": "386a4bedd959b89f390b8f6c6810125a0bd04282",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0071"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.6",
+   "deployed_at": "2026-10-08T10:56:00+00:00",
+   "author": "Charles Adams",
+   "commit_sha": "766b1a2c09dc2dc22e6c5c9211ab5caf95c5385d",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0072"
+  },
+  {
+   "service": "search",
+   "version": "3.13.10",
+   "deployed_at": "2026-10-08T10:57:00+00:00",
+   "author": "Charles Taylor",
+   "commit_sha": "7f9cf95e5c5cd45577a511d4adcab15024d805d8",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0073"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.5",
+   "deployed_at": "2026-10-08T11:26:00+00:00",
+   "author": "Joseph Massey III",
+   "commit_sha": "71db0dc62a848fa8e0762611da548edc3eb9efd0",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0074"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.9",
+   "deployed_at": "2026-10-08T14:26:00+00:00",
+   "author": "Walter Estrada",
+   "commit_sha": "4e1c7f12ecce1077a14c3eda40a88f5fd7de6ded",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0075"
+  },
+  {
+   "service": "search",
+   "version": "3.13.9",
+   "deployed_at": "2026-10-08T14:27:00+00:00",
+   "author": "Colleen Russell",
+   "commit_sha": "fae505032bc0f23533570046a0bb64b450500111",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0076"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.4",
+   "deployed_at": "2026-10-08T14:38:00+00:00",
+   "author": "Dr. Vicki Bullock",
+   "commit_sha": "f44a17c059e2736ee014099d41da9bb79ba0fb62",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0077"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.7",
+   "deployed_at": "2026-10-08T15:08:00+00:00",
+   "author": "Taylor Blackwell",
+   "commit_sha": "5871bfd3ba3347f7115b9f85f2b793d7ed1e3745",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0078"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.4",
+   "deployed_at": "2026-10-08T15:09:00+00:00",
+   "author": "James Johnson",
+   "commit_sha": "4e0c4359677d92ef7675747651104b743dff00b8",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0079"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.11",
+   "deployed_at": "2026-10-08T16:15:00+00:00",
+   "author": "Megan Thornton",
+   "commit_sha": "df18417f64938aaa8ff59b4d7847689101cc56ac",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0080"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.6",
+   "deployed_at": "2026-10-08T16:43:00+00:00",
+   "author": "Lisa Thomas",
+   "commit_sha": "7f2a1d2a943497da49ee95c14d8843281f8e8455",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0081"
+  },
+  {
+   "service": "search",
+   "version": "3.13.8",
+   "deployed_at": "2026-10-08T16:43:00+00:00",
+   "author": "Nicholas Martinez",
+   "commit_sha": "3d0d465b4f2e4238f31b1399ddb2ae096c31dab9",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0082"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.5",
+   "deployed_at": "2026-10-08T18:40:00+00:00",
+   "author": "Charles Thomas",
+   "commit_sha": "e1cd1d9f33a6443282542fa2aa77d6ed388e8f63",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0083"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.6",
+   "deployed_at": "2026-10-09T08:44:00+00:00",
+   "author": "Nicholas Nelson",
+   "commit_sha": "df1abc8478e0f0ae799e41344f5c8e22876c252c",
+   "summary": "Refactor search client",
+   "status": "succeeded",
+   "id": "dep-0084"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.8",
+   "deployed_at": "2026-10-09T08:52:00+00:00",
+   "author": "Michael Gonzalez",
+   "commit_sha": "f818e8e57ab63158da5fdd53689b131fb972f018",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0085"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.12",
+   "deployed_at": "2026-10-09T09:08:00+00:00",
+   "author": "Cheryl Kelley",
+   "commit_sha": "583e3084ddc13a8c890a04d2df4cfc8fc0bb097b",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0086"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.8",
+   "deployed_at": "2026-10-09T10:24:00+00:00",
+   "author": "Ashley Carpenter",
+   "commit_sha": "89e72f047ebee02e2ea87990a567a661419d3117",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0087"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.10",
+   "deployed_at": "2026-10-09T10:48:00+00:00",
+   "author": "Thomas Arnold",
+   "commit_sha": "10bf9eef9efdb3e811fb11f2a664a5e7d452d131",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0088"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.6",
+   "deployed_at": "2026-10-09T10:56:00+00:00",
+   "author": "Robert Johnson",
+   "commit_sha": "70812c9c0f208adda4692ca4b3720d9c49fb69f6",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0089"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.8",
+   "deployed_at": "2026-10-09T11:49:00+00:00",
+   "author": "Bonnie Sampson",
+   "commit_sha": "92412303ae8820d5695e7e8782b2d73db3f251f7",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0090"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.8",
+   "deployed_at": "2026-10-09T12:20:00+00:00",
+   "author": "Pamela Martin",
+   "commit_sha": "22abcaf10199f8de77e0ebbf0840de723e1b8fe5",
+   "summary": "Increase inventory cache TTL",
+   "status": "succeeded",
+   "id": "dep-0091"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.12",
+   "deployed_at": "2026-10-09T12:41:00+00:00",
+   "author": "Brittany Hudson",
+   "commit_sha": "5e032ecfc1198e44ca0cee26dc1c8b1e4c1939c8",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0092"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.7",
+   "deployed_at": "2026-10-09T17:08:00+00:00",
+   "author": "Angela Lopez",
+   "commit_sha": "5c2904382242398ede0ce87ad01b9de7c42eaecc",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0093"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.5",
+   "deployed_at": "2026-10-09T17:18:00+00:00",
+   "author": "Russell Clark",
+   "commit_sha": "ce100574d1c71bc405b835fedff12947d22c1d15",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0094"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.7",
+   "deployed_at": "2026-10-09T18:32:00+00:00",
+   "author": "Kayla Adams",
+   "commit_sha": "f68e2462fe220eaddaff2f0dbe6ed2501fabb8a5",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0095"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.8",
+   "deployed_at": "2026-10-09T18:33:00+00:00",
+   "author": "Manuel Bennett",
+   "commit_sha": "80b2d82ac807d5e35c3bcf3918d34ba2f1dfdf25",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0096"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.11",
+   "deployed_at": "2026-10-09T18:41:00+00:00",
+   "author": "Melissa Gonzales",
+   "commit_sha": "1e7fd682ba1b0741a107d86d553b908e2f7c1175",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0097"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.7",
+   "deployed_at": "2026-10-09T18:53:00+00:00",
+   "author": "Kyle Sandoval",
+   "commit_sha": "51447df1df948ec0ca91dfb1d0ab1df30fb58176",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0098"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.9",
+   "deployed_at": "2026-10-10T08:13:00+00:00",
+   "author": "Vanessa Gibbs",
+   "commit_sha": "047aab3c040ccb89cf66b2a65356799637c6de61",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0099"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.9",
+   "deployed_at": "2026-10-10T08:31:00+00:00",
+   "author": "Gina Vazquez",
+   "commit_sha": "32e61859b6acff8f5732809b8ace59e1021e5f61",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0100"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.9",
+   "deployed_at": "2026-10-10T09:43:00+00:00",
+   "author": "Mary Williams",
+   "commit_sha": "c4d6cc798c81af40ceda429af820af42d4891aed",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0101"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.6",
+   "deployed_at": "2026-10-10T11:40:00+00:00",
+   "author": "Amanda Sanford",
+   "commit_sha": "d2e10f88ad2779cbb967af83d0dee0f519323ce0",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0102"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.7",
+   "deployed_at": "2026-10-10T12:57:00+00:00",
+   "author": "Diana Valdez",
+   "commit_sha": "e2b303d75ec1f72eda884ae5780e5a758932896e",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0103"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.10",
+   "deployed_at": "2026-10-10T13:05:00+00:00",
+   "author": "Frank Mcdonald",
+   "commit_sha": "3cedff13522d9356fc346b7424f30d3faac3dc48",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0104"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.13",
+   "deployed_at": "2026-10-10T13:30:00+00:00",
+   "author": "Jacqueline Smith",
+   "commit_sha": "b371b31cb502f147a66f9c2930891058ae89a23f",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0105"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.9",
+   "deployed_at": "2026-10-10T15:36:00+00:00",
+   "author": "Susan Martin",
+   "commit_sha": "a7a2e2a551e307586c562ec710e0ffb8a906f30d",
+   "summary": "Increase pool cache TTL",
+   "status": "succeeded",
+   "id": "dep-0106"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.10",
+   "deployed_at": "2026-10-10T17:29:00+00:00",
+   "author": "Mr. Steven Perkins Jr.",
+   "commit_sha": "f5b3ffecefbdbffee5f2acd6f98e3122bd85e398",
+   "summary": "Roll out pool behind a flag",
+   "status": "succeeded",
+   "id": "dep-0107"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.7",
+   "deployed_at": "2026-10-10T17:43:00+00:00",
+   "author": "Bruce Calderon",
+   "commit_sha": "c581b956193a325c1faf009f43815c39d4085e78",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0108"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.8",
+   "deployed_at": "2026-10-11T08:33:00+00:00",
+   "author": "Catherine Johnson",
+   "commit_sha": "54b37b4697768ace411c3596aae94b261087d4aa",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0109"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.9",
+   "deployed_at": "2026-10-11T09:12:00+00:00",
+   "author": "Larry Crawford",
+   "commit_sha": "9ee1b8b95b7dc3b1b8d6d918e5d345171a3bd54f",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0110"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.10",
+   "deployed_at": "2026-10-11T09:14:00+00:00",
+   "author": "Dustin Cross",
+   "commit_sha": "6b85de2287adb50547cc3717982b902c1ff06311",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0111"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.9",
+   "deployed_at": "2026-10-11T11:27:00+00:00",
+   "author": "Mark Sanford",
+   "commit_sha": "b5133506a74c328fef8be94279333218b939e909",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0112"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.10",
+   "deployed_at": "2026-10-11T12:08:00+00:00",
+   "author": "Courtney Sanders",
+   "commit_sha": "dd3e02374293cace85957e843961a448cdd43541",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0113"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.10",
+   "deployed_at": "2026-10-11T12:31:00+00:00",
+   "author": "Isaiah Sheppard",
+   "commit_sha": "b2abadea143bf15e3fde31af79a8e619d7ab724d",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0114"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.9",
+   "deployed_at": "2026-10-11T12:43:00+00:00",
+   "author": "Destiny Beasley",
+   "commit_sha": "4e7751ba14ec1e3abf2abca180df9e7f7d0de8ab",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0115"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.9",
+   "deployed_at": "2026-10-11T13:35:00+00:00",
+   "author": "Austin Freeman",
+   "commit_sha": "a86cdd80dfd778ebb76f498b0206d1ad19f3a9ad",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0116"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.8",
+   "deployed_at": "2026-10-11T13:39:00+00:00",
+   "author": "Bethany Brandt",
+   "commit_sha": "0cf6c2107d51edd19460dfc061c149c9a32d8ebe",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0117"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.7",
+   "deployed_at": "2026-10-11T13:51:00+00:00",
+   "author": "Wanda Carpenter",
+   "commit_sha": "a381c7426f06633fbabf200588349601dc22f8b7",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0118"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.11",
+   "deployed_at": "2026-10-11T13:59:00+00:00",
+   "author": "Lisa Johnson",
+   "commit_sha": "bb9b4d713ceadd77bff8fb30a75bffa3ce14e90a",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0119"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.11",
+   "deployed_at": "2026-10-11T14:08:00+00:00",
+   "author": "Tracy Burns",
+   "commit_sha": "a3bcde65cca641874f69055edf43219466413d89",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0120"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.13",
+   "deployed_at": "2026-10-11T15:05:00+00:00",
+   "author": "Lori Carter",
+   "commit_sha": "e1c8671351561803c1e15811b043830baa4d96f5",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0121"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.8",
+   "deployed_at": "2026-10-11T15:55:00+00:00",
+   "author": "Eddie Brock",
+   "commit_sha": "742736187f053c0d32ac7a70024a47178509413c",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0122"
+  },
+  {
+   "service": "search",
+   "version": "3.13.12",
+   "deployed_at": "2026-10-11T16:14:00+00:00",
+   "author": "Cassidy Silva",
+   "commit_sha": "a8724f87a2e8ac3d742ac4ab1081c23f5828347b",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0123"
+  },
+  {
+   "service": "search",
+   "version": "3.13.11",
+   "deployed_at": "2026-10-11T16:30:00+00:00",
+   "author": "Mrs. Tammy Stevens",
+   "commit_sha": "7a6a2ad5f264b278e568e0ec91c985a81c122d5e",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0124"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.14",
+   "deployed_at": "2026-10-11T16:33:00+00:00",
+   "author": "Brian Martinez",
+   "commit_sha": "716546bf850adacd3d76157f39d7a22f1b2f2b81",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0125"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.8",
+   "deployed_at": "2026-10-11T18:53:00+00:00",
+   "author": "Wayne Alexander",
+   "commit_sha": "cef56d3f1f4870bd97cc57f3e7ae1da7f88f58ee",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0126"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.15",
+   "deployed_at": "2026-10-11T18:53:00+00:00",
+   "author": "John Carroll",
+   "commit_sha": "92c2dd85ad08e9153aa7d422b00cfcfe8dbc56ec",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0127"
+  },
+  {
+   "service": "search",
+   "version": "3.13.15",
+   "deployed_at": "2026-10-12T08:51:00+00:00",
+   "author": "Priscilla Gibson",
+   "commit_sha": "a77243c5e1e7a269385b123082fe911d9c4890a7",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0128"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.12",
+   "deployed_at": "2026-10-12T09:06:00+00:00",
+   "author": "Sherri Reid",
+   "commit_sha": "7816f284a5c48061d930a2bfb0b124f3acc7f8c4",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0129"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.11",
+   "deployed_at": "2026-10-12T09:57:00+00:00",
+   "author": "Deborah Boyd",
+   "commit_sha": "d99523e1cf4d90f6e71650dc40335c16f310b0cb",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0130"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.11",
+   "deployed_at": "2026-10-12T10:22:00+00:00",
+   "author": "Tyler Blackwell",
+   "commit_sha": "70d1c17d3939c3a8b1f09f9d3cac84bb76b8ac39",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0131"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.12",
+   "deployed_at": "2026-10-12T10:41:00+00:00",
+   "author": "Jennifer Clark",
+   "commit_sha": "de186836dfed4bd5761f98f640375a2ee3c932b0",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0132"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.12",
+   "deployed_at": "2026-10-12T10:52:00+00:00",
+   "author": "Linda Gallegos",
+   "commit_sha": "cea9d1737ff4fc3dfc942b54b499d331f5cf16b8",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0133"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.10",
+   "deployed_at": "2026-10-12T12:13:00+00:00",
+   "author": "Christopher Martinez",
+   "commit_sha": "c2d067b2881ab6644069c79794503909bc09d4a3",
+   "summary": "Add metrics for notification",
+   "status": "succeeded",
+   "id": "dep-0134"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.16",
+   "deployed_at": "2026-10-12T12:22:00+00:00",
+   "author": "Jessica Saunders",
+   "commit_sha": "aeb35772814189a1b1e3a5bffbe82d3e4b177ebb",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0135"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.11",
+   "deployed_at": "2026-10-12T12:51:00+00:00",
+   "author": "Nicole Wright",
+   "commit_sha": "d238281bc2a7ef9174b194d78e86f25757c33be6",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0136"
+  },
+  {
+   "service": "search",
+   "version": "3.13.13",
+   "deployed_at": "2026-10-12T13:21:00+00:00",
+   "author": "Elizabeth Austin",
+   "commit_sha": "0a3b7a25bcca5fc17033c25f4fd6b2f73245aad0",
+   "summary": "Roll out retry behind a flag",
+   "status": "succeeded",
+   "id": "dep-0137"
+  },
+  {
+   "service": "search",
+   "version": "3.13.14",
+   "deployed_at": "2026-10-12T13:40:00+00:00",
+   "author": "Jennifer Johnson",
+   "commit_sha": "397f87670aab0c91ebccee3692f6e71b368205c2",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0138"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.12",
+   "deployed_at": "2026-10-12T13:41:00+00:00",
+   "author": "Tracy Riley",
+   "commit_sha": "7b917e2607e2fbe2fbe0ab82a61c1eb8a817b396",
+   "summary": "Increase pool cache TTL",
+   "status": "succeeded",
+   "id": "dep-0139"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.14",
+   "deployed_at": "2026-10-12T15:15:00+00:00",
+   "author": "Heather Martinez",
+   "commit_sha": "4888f1cf97aa4fad27c70b37ac630e24353adb3e",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0140"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.13",
+   "deployed_at": "2026-10-12T17:26:00+00:00",
+   "author": "James Martin",
+   "commit_sha": "c63baf9c18a60cb8bd6ad89461dade487b09ec7e",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0141"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.13",
+   "deployed_at": "2026-10-12T18:25:00+00:00",
+   "author": "Jared Johnson",
+   "commit_sha": "517cfc7d0d3a9cc438b9885a97dc75676bc4b431",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0142"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.11",
+   "deployed_at": "2026-10-12T18:33:00+00:00",
+   "author": "Jodi Martinez",
+   "commit_sha": "4885e1a62e1a302d7cbd3f0d096e26f8ec2ff859",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0143"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.12",
+   "deployed_at": "2026-10-12T18:47:00+00:00",
+   "author": "Brittany Lopez",
+   "commit_sha": "fa0751af8f5c43d19966904dfea186af0dcc26e1",
+   "summary": "Fix flaky retry handling",
+   "status": "succeeded",
+   "id": "dep-0144"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.18",
+   "deployed_at": "2026-10-13T08:01:00+00:00",
+   "author": "Laura Aguilar",
+   "commit_sha": "aaa5d68e80446d407bba1fa26493f04714055f8e",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0145"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.13",
+   "deployed_at": "2026-10-13T08:02:00+00:00",
+   "author": "Richard Leon",
+   "commit_sha": "363bb433fdab5e758c5e4ecfe5c47cd5b2d9cd8e",
+   "summary": "Increase inventory cache TTL",
+   "status": "succeeded",
+   "id": "dep-0146"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.10",
+   "deployed_at": "2026-10-13T08:29:00+00:00",
+   "author": "William Roy",
+   "commit_sha": "cb68afaad8561b06b084b275b8b6b042dc9f5e61",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0147"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.16",
+   "deployed_at": "2026-10-13T10:31:00+00:00",
+   "author": "Jeremy Hernandez",
+   "commit_sha": "d057cd4704b96253d8907cc047f42dab6964cee2",
+   "summary": "Roll out notification behind a flag",
+   "status": "succeeded",
+   "id": "dep-0148"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.11",
+   "deployed_at": "2026-10-13T10:42:00+00:00",
+   "author": "Mary Odom",
+   "commit_sha": "5fcd0bc00627f022801cddec5ff2069c57dda2c3",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0149"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.10",
+   "deployed_at": "2026-10-13T12:02:00+00:00",
+   "author": "Miss Elizabeth Smith",
+   "commit_sha": "0c8ad6eae32af654f90d8b5eef6301805c22ca44",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0150"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.10",
+   "deployed_at": "2026-10-13T12:04:00+00:00",
+   "author": "Zachary Williams",
+   "commit_sha": "35edf24ede20a9b1ebaa9baec5a6817649c25f51",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0151"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.15",
+   "deployed_at": "2026-10-13T12:53:00+00:00",
+   "author": "Brian Hancock",
+   "commit_sha": "2458073256b0b4c4a10737341664d98aaf887dbd",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0152"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.14",
+   "deployed_at": "2026-10-13T13:10:00+00:00",
+   "author": "William Powell",
+   "commit_sha": "97f1de7237ff4edf4f517f8ab91a09c5abc03d7c",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0153"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.13",
+   "deployed_at": "2026-10-13T14:05:00+00:00",
+   "author": "Meredith Lopez",
+   "commit_sha": "ad8c4e3e32ee94fa97581221e182aab2eb1aeb9f",
+   "summary": "Refactor search client",
+   "status": "succeeded",
+   "id": "dep-0154"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.19",
+   "deployed_at": "2026-10-13T14:14:00+00:00",
+   "author": "Jacob Murphy",
+   "commit_sha": "a37b9d3a63ce0f7a0701bda477281bdb0cfe2045",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0155"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.14",
+   "deployed_at": "2026-10-13T14:28:00+00:00",
+   "author": "Mary Delacruz",
+   "commit_sha": "08cacc0ea28cf0fd2393e3d5a525e2154aaa8f93",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0156"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.14",
+   "deployed_at": "2026-10-13T16:16:00+00:00",
+   "author": "Albert Bradley",
+   "commit_sha": "c05e9cfdd84114f4f44fafbfdd29b768936de28e",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0157"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.13",
+   "deployed_at": "2026-10-13T16:32:00+00:00",
+   "author": "James Ward",
+   "commit_sha": "321e31277073fa1da6129461ce27c1b084d8cb5c",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0158"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.15",
+   "deployed_at": "2026-10-13T16:33:00+00:00",
+   "author": "Rodney Dunn",
+   "commit_sha": "c8ab2741f0332016654303b233f2855c00c61815",
+   "summary": "Add metrics for notification",
+   "status": "succeeded",
+   "id": "dep-0159"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.17",
+   "deployed_at": "2026-10-13T17:03:00+00:00",
+   "author": "Gregory Wilson",
+   "commit_sha": "08430ef61a994e1654d08c789a4da2ccad7c340a",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0160"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.9",
+   "deployed_at": "2026-10-13T17:09:00+00:00",
+   "author": "Michael Hall",
+   "commit_sha": "4bc30b18010b27799de4bbd4849e73a5628888c7",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0161"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.12",
+   "deployed_at": "2026-10-13T17:23:00+00:00",
+   "author": "Nicholas Baldwin",
+   "commit_sha": "bde830ff1dc97ae757cb70e055d488f5f43de4b8",
+   "summary": "Roll out notification behind a flag",
+   "status": "succeeded",
+   "id": "dep-0162"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.15",
+   "deployed_at": "2026-10-13T17:30:00+00:00",
+   "author": "Heather Leonard",
+   "commit_sha": "e6567d2fd4ddcce44661a17f45e77c31cd6b3fa4",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0163"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.11",
+   "deployed_at": "2026-10-13T18:03:00+00:00",
+   "author": "Cindy Steele",
+   "commit_sha": "3c888d044ab8093dac793d0eff2770950ab98b66",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0164"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.13",
+   "deployed_at": "2026-10-14T10:22:00+00:00",
+   "author": "Shirley Mitchell",
+   "commit_sha": "5571128d5a9b114e472021cf1fdbc02d6e8723a6",
+   "summary": "Fix flaky search handling",
+   "status": "succeeded",
+   "id": "dep-0165"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.17",
+   "deployed_at": "2026-10-14T10:36:00+00:00",
+   "author": "Jeffrey Jones",
+   "commit_sha": "6ece8c56c5ef5fdaecf8336d535879c514ed85c3",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0166"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.18",
+   "deployed_at": "2026-10-14T11:09:00+00:00",
+   "author": "Patrick Sullivan",
+   "commit_sha": "442e40e8c9804360c36b31f093e5887a2b63d761",
+   "summary": "Fix flaky search handling",
+   "status": "succeeded",
+   "id": "dep-0167"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.15",
+   "deployed_at": "2026-10-14T11:19:00+00:00",
+   "author": "Kathleen Baldwin",
+   "commit_sha": "0210aec7cf344759fb3e67c662cfd1c96ebe80bb",
+   "summary": "Bump dependencies",
+   "status": "rolled_back",
+   "id": "dep-0168"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.22",
+   "deployed_at": "2026-10-14T11:47:00+00:00",
+   "author": "Cameron West",
+   "commit_sha": "918b643c269522e92cc7d46ca8b6e337900e3c9e",
+   "summary": "Fix flaky notification handling",
+   "status": "succeeded",
+   "id": "dep-0169"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.21",
+   "deployed_at": "2026-10-14T12:27:00+00:00",
+   "author": "Ashlee Bruce",
+   "commit_sha": "9c0415890ecd3dcfd184d89a7cdc940e0590d520",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0170"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.17",
+   "deployed_at": "2026-10-14T12:44:00+00:00",
+   "author": "Jonathan Blackwell",
+   "commit_sha": "c6a5a47d04f0ca6c27bea847fd53770a70b13d03",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0171"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.16",
+   "deployed_at": "2026-10-14T12:45:00+00:00",
+   "author": "Thomas Jenkins",
+   "commit_sha": "8160f51d2ec993be8f0b5c69f801e127c8573c8b",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0172"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.14",
+   "deployed_at": "2026-10-14T13:24:00+00:00",
+   "author": "Matthew Deleon",
+   "commit_sha": "519b214e8bde42db9a1ecc8c28f9cfd9155bcdd6",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0173"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.12",
+   "deployed_at": "2026-10-14T14:22:00+00:00",
+   "author": "Travis Santos",
+   "commit_sha": "76cc8b1dd2ba092ebeeb4cd44a8190872fec731e",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0174"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.16",
+   "deployed_at": "2026-10-14T14:46:00+00:00",
+   "author": "Kevin Vasquez",
+   "commit_sha": "81dcb0a48d17f26ba7d01ec21d3896c6dc6ea92a",
+   "summary": "Tune retry policy",
+   "status": "rolled_back",
+   "id": "dep-0175"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.20",
+   "deployed_at": "2026-10-14T15:21:00+00:00",
+   "author": "Corey Tucker",
+   "commit_sha": "945a3f2f51d2501b8436b90311902f19f412a7db",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0176"
+  },
+  {
+   "service": "search",
+   "version": "3.13.17",
+   "deployed_at": "2026-10-14T16:12:00+00:00",
+   "author": "Brandon Jones",
+   "commit_sha": "85bb5d7111e19f8596ac56d892264cfe3bf33750",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0177"
+  },
+  {
+   "service": "search",
+   "version": "3.13.16",
+   "deployed_at": "2026-10-14T16:35:00+00:00",
+   "author": "Heather Hayes",
+   "commit_sha": "3b7a4f7e72c867365722415a030af61b0ec3e47b",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0178"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.12",
+   "deployed_at": "2026-10-14T17:11:00+00:00",
+   "author": "Michael Holloway",
+   "commit_sha": "edb3318a66e6fef5b161d7a3b11ba1b448622a51",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0179"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.16",
+   "deployed_at": "2026-10-14T17:23:00+00:00",
+   "author": "Matthew Miller",
+   "commit_sha": "20854ad82bfe13d3c6c7df55dc7e8393d6feaf1b",
+   "summary": "Roll out notification behind a flag",
+   "status": "rolled_back",
+   "id": "dep-0180"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.17",
+   "deployed_at": "2026-10-14T17:36:00+00:00",
+   "author": "Nicole Thomas",
+   "commit_sha": "f1d74c5c57b1c9b99338868ca1d78742bf6903f4",
+   "summary": "Fix flaky retry handling",
+   "status": "succeeded",
+   "id": "dep-0181"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.13",
+   "deployed_at": "2026-10-15T09:00:00+00:00",
+   "author": "Kathryn Pearson",
+   "commit_sha": "446c5745fc0397c0e86a8f698e133d40971328e6",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0182"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.19",
+   "deployed_at": "2026-10-15T09:35:00+00:00",
+   "author": "David Summers",
+   "commit_sha": "efdc109f8b3ad9e77d15883499bd531823ecf0c8",
+   "summary": "Increase checkout cache TTL",
+   "status": "succeeded",
+   "id": "dep-0183"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.23",
+   "deployed_at": "2026-10-15T11:19:00+00:00",
+   "author": "Joseph Vaughn",
+   "commit_sha": "667f36f56e602adfc4b53192f5cfc7b53f855a12",
+   "summary": "Increase inventory cache TTL",
+   "status": "succeeded",
+   "id": "dep-0184"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.15",
+   "deployed_at": "2026-10-15T12:05:00+00:00",
+   "author": "Scott Cooper",
+   "commit_sha": "7cea4cb72e77191ca83a351855f17298ef096309",
+   "summary": "Fix flaky notification handling",
+   "status": "succeeded",
+   "id": "dep-0185"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.14",
+   "deployed_at": "2026-10-15T12:26:00+00:00",
+   "author": "Craig Griffin",
+   "commit_sha": "91aa741c5b315f8fc2e863d4ae4473f13b202410",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0186"
+  },
+  {
+   "service": "search",
+   "version": "3.13.19",
+   "deployed_at": "2026-10-15T12:35:00+00:00",
+   "author": "Erika Butler",
+   "commit_sha": "46f5a30dbee8019cdb01996e348b3998f0bd1b8b",
+   "summary": "Roll out ledger behind a flag",
+   "status": "succeeded",
+   "id": "dep-0187"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.20",
+   "deployed_at": "2026-10-15T15:32:00+00:00",
+   "author": "Jennifer Smith",
+   "commit_sha": "82aeb5bd062559f6f91007ad21842dcb50d2ebc1",
+   "summary": "Roll out notification behind a flag",
+   "status": "succeeded",
+   "id": "dep-0188"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.19",
+   "deployed_at": "2026-10-15T16:12:00+00:00",
+   "author": "Daniel Mckinney",
+   "commit_sha": "11dc58f82ac69c98b36611d3aac7785e55c7d7a4",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0189"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.12",
+   "deployed_at": "2026-10-15T16:54:00+00:00",
+   "author": "Rebekah Phillips",
+   "commit_sha": "93958740588f273a60a3f37fb997c81b5d4e6c3a",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0190"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.18",
+   "deployed_at": "2026-10-15T17:22:00+00:00",
+   "author": "Patricia Moon",
+   "commit_sha": "b71756caee21e3370ab157a2ba84c8c7a6903878",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0191"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.11",
+   "deployed_at": "2026-10-15T17:28:00+00:00",
+   "author": "Ronald Rose",
+   "commit_sha": "45488fa3597711cfba1a55a3607b87835a576157",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0192"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.14",
+   "deployed_at": "2026-10-15T17:36:00+00:00",
+   "author": "Carla Dawson",
+   "commit_sha": "7c839f40e33282b192e9c9c821b9380ddbd45ecf",
+   "summary": "Fix flaky notification handling",
+   "status": "succeeded",
+   "id": "dep-0193"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.21",
+   "deployed_at": "2026-10-15T18:20:00+00:00",
+   "author": "Shannon Pearson",
+   "commit_sha": "dfb95d727e5dd1877210383a8d1113532745d5b9",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0194"
+  },
+  {
+   "service": "search",
+   "version": "3.13.18",
+   "deployed_at": "2026-10-15T18:53:00+00:00",
+   "author": "Stacy White",
+   "commit_sha": "b2dc3790367ecdd19f6fc2c4b1a216461d6832ec",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0195"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.13",
+   "deployed_at": "2026-10-15T18:54:00+00:00",
+   "author": "Christopher Young",
+   "commit_sha": "86023c029d307cf5cfe5e2739c80e5ee0d046584",
+   "summary": "Roll out pool behind a flag",
+   "status": "succeeded",
+   "id": "dep-0196"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.24",
+   "deployed_at": "2026-10-16T08:00:00+00:00",
+   "author": "Rachel Harrison",
+   "commit_sha": "1e4ee598c693f63c7f82c4ac9bfb511d03c3d115",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0197"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.15",
+   "deployed_at": "2026-10-16T08:05:00+00:00",
+   "author": "Tami Hartman MD",
+   "commit_sha": "4d26743ad820a9a6e22f4b4d5de102ac794a448f",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0198"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.19",
+   "deployed_at": "2026-10-16T08:46:00+00:00",
+   "author": "Lisa Jensen",
+   "commit_sha": "60fadc495b68f7f1507dc02ad51f150be6355b44",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0199"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.15",
+   "deployed_at": "2026-10-16T09:00:00+00:00",
+   "author": "Bonnie Nelson",
+   "commit_sha": "06c20c619ece861f65d491fdaef8f2b7bd214edf",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0200"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.18",
+   "deployed_at": "2026-10-16T09:34:00+00:00",
+   "author": "Susan Booth",
+   "commit_sha": "cdfbd7f21614e4daaea7e1c3fbb934a7eb322852",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0201"
+  },
+  {
+   "service": "search",
+   "version": "3.13.21",
+   "deployed_at": "2026-10-16T10:32:00+00:00",
+   "author": "Makayla Anderson",
+   "commit_sha": "27bd97a149beca2e090907f3430fa5017efb62c2",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0202"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.16",
+   "deployed_at": "2026-10-16T10:49:00+00:00",
+   "author": "Melinda Miller",
+   "commit_sha": "6db78490e3f4a87ca2ea2f290e9432a00190e783",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0203"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.14",
+   "deployed_at": "2026-10-16T10:50:00+00:00",
+   "author": "Michael Griffith",
+   "commit_sha": "3bcbbf0d07217e9e0e0641469eb4962a841a485e",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0204"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.20",
+   "deployed_at": "2026-10-16T11:52:00+00:00",
+   "author": "Tracy Wheeler MD",
+   "commit_sha": "fbeeb0b40a15b14fe6008bc3c13c2e7a4fe7429f",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0205"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.15",
+   "deployed_at": "2026-10-16T12:17:00+00:00",
+   "author": "Neil Erickson",
+   "commit_sha": "bd17e913ed890c99b7352ac67575e88bc157d8e8",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0206"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.15",
+   "deployed_at": "2026-10-16T12:21:00+00:00",
+   "author": "Anne Vaughn",
+   "commit_sha": "9da11df52d77e74af9ad9b5673200977928ae2d4",
+   "summary": "Tune retry policy",
+   "status": "rolled_back",
+   "id": "dep-0207"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.13",
+   "deployed_at": "2026-10-16T12:32:00+00:00",
+   "author": "Stephen Burke",
+   "commit_sha": "186f7fc408a5f3a3f5437d5e352d8b5ce74a92a2",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0208"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.16",
+   "deployed_at": "2026-10-16T13:37:00+00:00",
+   "author": "Albert Jacobs",
+   "commit_sha": "6fd8a2e3110e04652502a10bfd2cb12a5ef0c5f5",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0209"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.22",
+   "deployed_at": "2026-10-16T13:43:00+00:00",
+   "author": "Brian Tanner",
+   "commit_sha": "7fb28bb235924d7207f06fb13c02cdeae26511ef",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0210"
+  },
+  {
+   "service": "search",
+   "version": "3.13.20",
+   "deployed_at": "2026-10-16T14:06:00+00:00",
+   "author": "Adam Johnston",
+   "commit_sha": "fd80ec5347e7a2e97ddea62512081d6ea426987e",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0211"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.14",
+   "deployed_at": "2026-10-16T16:14:00+00:00",
+   "author": "Shawn Taylor",
+   "commit_sha": "c4e80892924ac8823652c44a3baae4408fbd1433",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0212"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.17",
+   "deployed_at": "2026-10-16T17:56:00+00:00",
+   "author": "Sean Whitehead",
+   "commit_sha": "82ea87ce254c4869532181b371b82ce1a13eed61",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0213"
+  },
+  {
+   "service": "search",
+   "version": "3.13.22",
+   "deployed_at": "2026-10-17T08:36:00+00:00",
+   "author": "Beverly Harrison",
+   "commit_sha": "18ffff6696affc2669e70d55f44a070b84695746",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0214"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.23",
+   "deployed_at": "2026-10-17T10:16:00+00:00",
+   "author": "Luis Larson",
+   "commit_sha": "bf1c7106e0893444f2e8267889db08190e548801",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0215"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.16",
+   "deployed_at": "2026-10-17T11:42:00+00:00",
+   "author": "Maureen Reed",
+   "commit_sha": "bf037f0d97f24b1779bedb0297a7b3b23ea687a8",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0216"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.22",
+   "deployed_at": "2026-10-17T12:23:00+00:00",
+   "author": "Kristina Harmon",
+   "commit_sha": "3d70763642e099539284436e37b18638da4df5f8",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0217"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.14",
+   "deployed_at": "2026-10-17T13:35:00+00:00",
+   "author": "Gregory Watson",
+   "commit_sha": "cea9d13878c648a618d2782b86ff904589886ef2",
+   "summary": "Roll out token behind a flag",
+   "status": "rolled_back",
+   "id": "dep-0218"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.20",
+   "deployed_at": "2026-10-17T13:51:00+00:00",
+   "author": "Daniel Hogan",
+   "commit_sha": "7d82aec4a3ff1511f18f5899eed6b6702a478f3c",
+   "summary": "Fix flaky retry handling",
+   "status": "succeeded",
+   "id": "dep-0219"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.18",
+   "deployed_at": "2026-10-17T14:13:00+00:00",
+   "author": "Jim Riddle",
+   "commit_sha": "a82a0563ef6aad50144c37209392ac95085c742b",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0220"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.16",
+   "deployed_at": "2026-10-17T14:15:00+00:00",
+   "author": "Alison Diaz",
+   "commit_sha": "4c36cd64e3f33320c007c6e0b251e40cc27b17a5",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0221"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.16",
+   "deployed_at": "2026-10-17T14:19:00+00:00",
+   "author": "Tiffany Bridges",
+   "commit_sha": "b94a4ec816702666e2c46a2633700ea988ca4164",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0222"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.17",
+   "deployed_at": "2026-10-17T14:44:00+00:00",
+   "author": "Laura Mccarthy",
+   "commit_sha": "c30393c4a62a9d7f286e142f39f9319a0b197fc2",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0223"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.17",
+   "deployed_at": "2026-10-17T15:43:00+00:00",
+   "author": "Elizabeth Vance",
+   "commit_sha": "4f36aa68ff8a3b410faba86412daa066ad7e524d",
+   "summary": "Increase inventory cache TTL",
+   "status": "succeeded",
+   "id": "dep-0224"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.21",
+   "deployed_at": "2026-10-17T16:06:00+00:00",
+   "author": "Brittany Schneider",
+   "commit_sha": "a63a114c6eca022b787469d9c101ca94df13a8ef",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0225"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.24",
+   "deployed_at": "2026-10-17T16:09:00+00:00",
+   "author": "Jeremy Huffman",
+   "commit_sha": "637ad2068b8cb9d954ab9ec0116ba416d1afb9f0",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0226"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.17",
+   "deployed_at": "2026-10-17T16:47:00+00:00",
+   "author": "Brandon Faulkner",
+   "commit_sha": "392af85a05cb7b43335ac9802b1c0a9a5bebaa64",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0227"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.25",
+   "deployed_at": "2026-10-17T16:47:00+00:00",
+   "author": "Angela Johnson MD",
+   "commit_sha": "46bb72256890a824e41cae00261b778d8df94f26",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0228"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.18",
+   "deployed_at": "2026-10-17T17:33:00+00:00",
+   "author": "Kathryn Thornton",
+   "commit_sha": "e4209835bd9327ee29ec6169f97f169ff2222b0f",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0229"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.17",
+   "deployed_at": "2026-10-18T09:10:00+00:00",
+   "author": "Christina Hernandez",
+   "commit_sha": "d131f0bdb10bf24e7ae94faff5c6d74d1d9ac7fe",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0230"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.26",
+   "deployed_at": "2026-10-18T09:30:00+00:00",
+   "author": "Christopher Wallace",
+   "commit_sha": "bac929a691512e3c9e2c332bcb8e862ff8bcb4d1",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0231"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.25",
+   "deployed_at": "2026-10-18T11:14:00+00:00",
+   "author": "Jennifer Martinez",
+   "commit_sha": "236c5cbb9845f7d6a0ff81ea74370b2c2bb688a7",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0232"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.19",
+   "deployed_at": "2026-10-18T12:01:00+00:00",
+   "author": "Nicole Stephenson",
+   "commit_sha": "e0d6abb7676815e9da4d86e78fa461eefb9fd66e",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0233"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.18",
+   "deployed_at": "2026-10-18T12:31:00+00:00",
+   "author": "Christopher Hernandez",
+   "commit_sha": "739a81deca61fdf5bcdae86d99aafd7d4b65f963",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0234"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.20",
+   "deployed_at": "2026-10-18T13:29:00+00:00",
+   "author": "Kimberly Bryan",
+   "commit_sha": "02c027085b1f8a4e39dba6e2c194d4a73e86bfe6",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0235"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.27",
+   "deployed_at": "2026-10-18T15:31:00+00:00",
+   "author": "Justin Contreras",
+   "commit_sha": "c91b973f0a5dc1f79690349d2e651a8facba9c1d",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0236"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.23",
+   "deployed_at": "2026-10-18T17:13:00+00:00",
+   "author": "Michael Lewis",
+   "commit_sha": "f856a25eedea4784c7b3d16ddcc193fb36aba311",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0237"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.19",
+   "deployed_at": "2026-10-18T18:06:00+00:00",
+   "author": "Marissa Flores",
+   "commit_sha": "16467a7621bb5297cbf19bdd2897fa212a058da3",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0238"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.18",
+   "deployed_at": "2026-10-18T18:23:00+00:00",
+   "author": "Anna Lawson",
+   "commit_sha": "e8dd9d8e5ece6243f3a0bcf47ba3e5ec29255832",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0239"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.17",
+   "deployed_at": "2026-10-19T09:03:00+00:00",
+   "author": "Emily Johnson",
+   "commit_sha": "fadd711a302dab1014674b7f362f8fa3dcdeda86",
+   "summary": "Refactor search client",
+   "status": "succeeded",
+   "id": "dep-0240"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.29",
+   "deployed_at": "2026-10-19T09:17:00+00:00",
+   "author": "Steve Mercer",
+   "commit_sha": "d54d1d3ea91797a24029b9c9f632e1b68ece5b15",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0241"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.24",
+   "deployed_at": "2026-10-19T09:18:00+00:00",
+   "author": "Brenda Thompson",
+   "commit_sha": "2f139ac94dd3f2824c6709295a18831d21fc769c",
+   "summary": "Fix flaky token handling",
+   "status": "succeeded",
+   "id": "dep-0242"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.19",
+   "deployed_at": "2026-10-19T10:25:00+00:00",
+   "author": "Robert Rosales",
+   "commit_sha": "a27c6a23efb415620fcd53445c67f73709756708",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0243"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.28",
+   "deployed_at": "2026-10-19T12:18:00+00:00",
+   "author": "Brittany Rosario",
+   "commit_sha": "74341826a7ea2460e1f40cdc70113a297fc412ba",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0244"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.20",
+   "deployed_at": "2026-10-19T13:36:00+00:00",
+   "author": "Thomas Trevino",
+   "commit_sha": "544cdea2df09cedaceb50b50a24080357daf8101",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0245"
+  },
+  {
+   "service": "search",
+   "version": "3.13.23",
+   "deployed_at": "2026-10-19T14:05:00+00:00",
+   "author": "Jasmine Stewart",
+   "commit_sha": "05bdf40a919e08182e142a73f2a907dd60e4c26c",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0246"
+  },
+  {
+   "service": "search",
+   "version": "3.13.24",
+   "deployed_at": "2026-10-19T15:05:00+00:00",
+   "author": "Earl Smith",
+   "commit_sha": "d6b665193ed6bfaffc454ec3350ad339651d5922",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0247"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.16",
+   "deployed_at": "2026-10-19T15:56:00+00:00",
+   "author": "Charles Mckinney",
+   "commit_sha": "d53cea336fa280d6f43fba51998ad4d8da7ee4de",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0248"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.15",
+   "deployed_at": "2026-10-19T17:44:00+00:00",
+   "author": "Jade Fuller",
+   "commit_sha": "e8d02823180b2a92430e03ae533902ec37295403",
+   "summary": "Fix flaky inventory handling",
+   "status": "succeeded",
+   "id": "dep-0249"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.17",
+   "deployed_at": "2026-10-19T18:14:00+00:00",
+   "author": "Jared Williams",
+   "commit_sha": "b032264fcd03a22c0631d84b1b0e0253e999b316",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0250"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.18",
+   "deployed_at": "2026-10-20T09:00:00+00:00",
+   "author": "Katrina Jones",
+   "commit_sha": "fca732d461e21b008269dc15bd264a55c84273b6",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0251"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.19",
+   "deployed_at": "2026-10-20T09:41:00+00:00",
+   "author": "Dave Fox",
+   "commit_sha": "039432c7db2717e29ce86439c7f45196402aad6b",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0252"
+  },
+  {
+   "service": "search",
+   "version": "3.13.25",
+   "deployed_at": "2026-10-20T09:48:00+00:00",
+   "author": "Jenna Lopez",
+   "commit_sha": "dbeae67a3a0be82c98224602e6807dd36bd8eb26",
+   "summary": "Fix flaky checkout handling",
+   "status": "succeeded",
+   "id": "dep-0253"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.19",
+   "deployed_at": "2026-10-20T11:21:00+00:00",
+   "author": "Maria Hawkins",
+   "commit_sha": "0c210d66eb87e9ad5a0d4a2b240a797e1ba6581a",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0254"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.21",
+   "deployed_at": "2026-10-20T11:32:00+00:00",
+   "author": "Candice Allen",
+   "commit_sha": "1f0f9dca053bbde46d70a56a58cc4196b0d3bb66",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0255"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.25",
+   "deployed_at": "2026-10-20T11:54:00+00:00",
+   "author": "Frank Smith",
+   "commit_sha": "b00125cd0edf25eeb42d8291ba84f3f7824374a0",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0256"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.20",
+   "deployed_at": "2026-10-20T13:13:00+00:00",
+   "author": "Kristin Johnson",
+   "commit_sha": "58adf113abaf34510b26ead49548c0fa8de1a65e",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0257"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.21",
+   "deployed_at": "2026-10-20T13:47:00+00:00",
+   "author": "Holly Poole",
+   "commit_sha": "b07d4543abeac08ad13b95d38f89ceb776886928",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0258"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.22",
+   "deployed_at": "2026-10-20T14:01:00+00:00",
+   "author": "Nathan Harper",
+   "commit_sha": "0cbab9051f221ec2b09b6a566c2e58b001d2c287",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0259"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.23",
+   "deployed_at": "2026-10-20T14:20:00+00:00",
+   "author": "Michael Elliott",
+   "commit_sha": "7dbca67db7e3120e13cb6c9989383bcf33f3784b",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0260"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.26",
+   "deployed_at": "2026-10-20T14:50:00+00:00",
+   "author": "Timothy Miller",
+   "commit_sha": "3c36f78f0f9b811777d2ab113b333d51b0e83a1f",
+   "summary": "Fix flaky search handling",
+   "status": "succeeded",
+   "id": "dep-0261"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.30",
+   "deployed_at": "2026-10-20T16:14:00+00:00",
+   "author": "Robert Wagner",
+   "commit_sha": "e5f0d68cae3a5eec73eba1d23853b728bc930493",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0262"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.26",
+   "deployed_at": "2026-10-20T16:18:00+00:00",
+   "author": "Susan Roberson",
+   "commit_sha": "c2e46d1975c2b4ff66991d5386d49d7bc5944c8a",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0263"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.18",
+   "deployed_at": "2026-10-20T18:26:00+00:00",
+   "author": "Sharon Johnson",
+   "commit_sha": "ed0cf6b0b8dc5f10f4e5e967f51611d0d3c48c9a",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0264"
+  },
+  {
+   "service": "search",
+   "version": "3.13.27",
+   "deployed_at": "2026-10-21T09:21:00+00:00",
+   "author": "Lisa Wallace",
+   "commit_sha": "c1ccfd5d987451dffa0e0d05833fb820afe4fe58",
+   "summary": "Fix flaky token handling",
+   "status": "succeeded",
+   "id": "dep-0265"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.28",
+   "deployed_at": "2026-10-21T11:26:00+00:00",
+   "author": "Alexandria Cisneros",
+   "commit_sha": "515a865ba0b845a092cf09057b68cd79e566a555",
+   "summary": "Fix flaky search handling",
+   "status": "succeeded",
+   "id": "dep-0266"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.23",
+   "deployed_at": "2026-10-21T11:32:00+00:00",
+   "author": "Edward Howard",
+   "commit_sha": "c1298920c02dfd1401e07a55c98d6ad4c4ec987e",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0267"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.20",
+   "deployed_at": "2026-10-21T11:48:00+00:00",
+   "author": "Emily Jacobson",
+   "commit_sha": "c41f0096f462c06f042c7756c7a288a2c53daa5c",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0268"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.31",
+   "deployed_at": "2026-10-21T12:03:00+00:00",
+   "author": "Shannon David",
+   "commit_sha": "907c9a1f5ffab1a77deb6d9b09e1d04dd5424987",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0269"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.22",
+   "deployed_at": "2026-10-21T13:53:00+00:00",
+   "author": "Dustin Dyer",
+   "commit_sha": "9a2427271191a18e7cffd94ed858180a9c242835",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0270"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.21",
+   "deployed_at": "2026-10-21T15:49:00+00:00",
+   "author": "Tina Juarez",
+   "commit_sha": "a24e20a7ba2f665024d61706cd304557a95a10be",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0271"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.24",
+   "deployed_at": "2026-10-21T16:11:00+00:00",
+   "author": "Joseph Wilson",
+   "commit_sha": "b030b7d7ecbbcc6cc61cfff3804faf4933523356",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0272"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.27",
+   "deployed_at": "2026-10-21T17:00:00+00:00",
+   "author": "Johnny Anderson",
+   "commit_sha": "27a0797c1083a63a6c02183f996e7f7c9a52576b",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0273"
+  },
+  {
+   "service": "search",
+   "version": "3.13.26",
+   "deployed_at": "2026-10-21T18:32:00+00:00",
+   "author": "Andrew Harrison",
+   "commit_sha": "34ca51f5810ea75b0691b0a481a68231f1b57339",
+   "summary": "Fix flaky checkout handling",
+   "status": "succeeded",
+   "id": "dep-0274"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.22",
+   "deployed_at": "2026-10-21T18:56:00+00:00",
+   "author": "Misty Greene",
+   "commit_sha": "2b24f44c4f1fbebea3c0cdd0eea614afa67105aa",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0275"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.21",
+   "deployed_at": "2026-10-22T09:39:00+00:00",
+   "author": "Jordan Fitzgerald",
+   "commit_sha": "caae3e482bec05bc5ab12da6ab93f4865ed09720",
+   "summary": "Refactor search client",
+   "status": "succeeded",
+   "id": "dep-0276"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.27",
+   "deployed_at": "2026-10-22T10:39:00+00:00",
+   "author": "Scott Marshall",
+   "commit_sha": "375070919dd0ab89ad4868423841845d16043cd9",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0277"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.32",
+   "deployed_at": "2026-10-22T12:55:00+00:00",
+   "author": "Daniel Hendricks",
+   "commit_sha": "540ad6df2157a564413bde52b27a1b5d0b6e5a64",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0278"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.24",
+   "deployed_at": "2026-10-22T13:32:00+00:00",
+   "author": "Jeremy Haney",
+   "commit_sha": "bb9f18149e1e26f3d5e8def9992726b7d7cc87b5",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0279"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.33",
+   "deployed_at": "2026-10-22T13:54:00+00:00",
+   "author": "Stephanie Walker",
+   "commit_sha": "aac9e32f57b00981dd784df922eb142e8d89b9f2",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0280"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.28",
+   "deployed_at": "2026-10-22T14:55:00+00:00",
+   "author": "Antonio Perez",
+   "commit_sha": "741b7aba6e3d870ae375a0fc65254e325f3c59b3",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0281"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.19",
+   "deployed_at": "2026-10-22T14:57:00+00:00",
+   "author": "Katie Haynes",
+   "commit_sha": "a4ed6a25b89b7ca33fa70bc8061d02da472ad782",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0282"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.20",
+   "deployed_at": "2026-10-22T15:26:00+00:00",
+   "author": "David Smith",
+   "commit_sha": "ecca5366aeaf1900fb82d68893b0adf5ae0f5d6d",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0283"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.29",
+   "deployed_at": "2026-10-22T16:26:00+00:00",
+   "author": "Ryan Hamilton",
+   "commit_sha": "0ef93379af4685c7d58440a208b5b9c554fca0c2",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0284"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.23",
+   "deployed_at": "2026-10-22T18:58:00+00:00",
+   "author": "Adrian Perkins",
+   "commit_sha": "e419ba61c014f664d174fed362feeffaa237c687",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0285"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.21",
+   "deployed_at": "2026-10-23T09:02:00+00:00",
+   "author": "Derek Henderson",
+   "commit_sha": "c401fdfe3b37751212c73514f6d032f4a1e6d66c",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0286"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.18",
+   "deployed_at": "2026-10-23T09:03:00+00:00",
+   "author": "Isaac Richardson",
+   "commit_sha": "fbb1ebd1ffa32ef1c4fa5289f528a5857e3798f7",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0287"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.22",
+   "deployed_at": "2026-10-23T09:34:00+00:00",
+   "author": "Jesse Edwards",
+   "commit_sha": "0305f08e2b66ba162587764f48f0d46ed9885de7",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0288"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.29",
+   "deployed_at": "2026-10-23T09:43:00+00:00",
+   "author": "Christopher Perry",
+   "commit_sha": "d0440070dcbcb8e2f6c97234c715e7c1fac2e5ab",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0289"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.31",
+   "deployed_at": "2026-10-23T10:37:00+00:00",
+   "author": "Emily Jones",
+   "commit_sha": "3fa8fee58db1fdbea3787b202688a8dd1d678880",
+   "summary": "Roll out ledger behind a flag",
+   "status": "succeeded",
+   "id": "dep-0290"
+  },
+  {
+   "service": "search",
+   "version": "3.13.28",
+   "deployed_at": "2026-10-23T11:19:00+00:00",
+   "author": "Brittany Gonzalez DDS",
+   "commit_sha": "852ee4106fb3492e2801ba10a3506cefb504b9e3",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0291"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.20",
+   "deployed_at": "2026-10-23T11:43:00+00:00",
+   "author": "Maria Smith",
+   "commit_sha": "719dbd949bbef50db9b1e13eb2e5ce893eaca65b",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0292"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.25",
+   "deployed_at": "2026-10-23T12:37:00+00:00",
+   "author": "Hannah Moore",
+   "commit_sha": "4b08c4825eedae25ec7c54fbd7ac5fc7c106f275",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0293"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.20",
+   "deployed_at": "2026-10-23T12:40:00+00:00",
+   "author": "Rachel Figueroa",
+   "commit_sha": "cc6af32082c947b81b96e9a8ea62caa55abfbb36",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0294"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.26",
+   "deployed_at": "2026-10-23T12:46:00+00:00",
+   "author": "Tammy Ross",
+   "commit_sha": "a55355cfce27e4abf12a2b11b927180c964820a9",
+   "summary": "Increase checkout cache TTL",
+   "status": "succeeded",
+   "id": "dep-0295"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.24",
+   "deployed_at": "2026-10-23T13:50:00+00:00",
+   "author": "Veronica Estes",
+   "commit_sha": "405f83b922827fde2b452375278e66ae75fae44c",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0296"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.25",
+   "deployed_at": "2026-10-23T13:58:00+00:00",
+   "author": "David Wheeler",
+   "commit_sha": "934a18b31fa03d93db27bf515af17cf9379f27ee",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0297"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.19",
+   "deployed_at": "2026-10-23T13:59:00+00:00",
+   "author": "Elizabeth Holland",
+   "commit_sha": "0f391a237fd7887700392ef38c3f65b3936d715b",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0298"
+  },
+  {
+   "service": "search",
+   "version": "3.13.30",
+   "deployed_at": "2026-10-23T14:11:00+00:00",
+   "author": "Kylie Holt",
+   "commit_sha": "3b8d549c1c8f35953faad784a6fa4ddc800eb893",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0299"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.23",
+   "deployed_at": "2026-10-23T15:23:00+00:00",
+   "author": "Patricia Scott",
+   "commit_sha": "84597a6b0709671c2b3d06f5e50197946cb2b687",
+   "summary": "Fix flaky pool handling",
+   "status": "succeeded",
+   "id": "dep-0300"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.34",
+   "deployed_at": "2026-10-23T15:43:00+00:00",
+   "author": "Caitlin Thomas",
+   "commit_sha": "bc36b310cecdaaf265dbf8576bbb3813c34b8446",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0301"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.21",
+   "deployed_at": "2026-10-23T15:55:00+00:00",
+   "author": "Susan Paul",
+   "commit_sha": "eb1560e61d031270950a2c573544d07884a931e5",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0302"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.22",
+   "deployed_at": "2026-10-23T15:56:00+00:00",
+   "author": "Phillip Walker",
+   "commit_sha": "12dd3bddbdf47d7368b05cb800f988c15ae6ca21",
+   "summary": "Increase checkout cache TTL",
+   "status": "rolled_back",
+   "id": "dep-0303"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.30",
+   "deployed_at": "2026-10-23T17:01:00+00:00",
+   "author": "John Gutierrez",
+   "commit_sha": "2588ea69734dbbe9e5a77a946bbd95ab14a8446c",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0304"
+  },
+  {
+   "service": "search",
+   "version": "3.13.29",
+   "deployed_at": "2026-10-23T17:28:00+00:00",
+   "author": "Eric Swanson",
+   "commit_sha": "e05deceac1d308640ec5b28cffbe51c3183ab0ac",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0305"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.25",
+   "deployed_at": "2026-10-23T17:46:00+00:00",
+   "author": "Melissa Moreno",
+   "commit_sha": "2117007b756a4d71d6fbbe2ee9d199784c5b4f5c",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0306"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.21",
+   "deployed_at": "2026-10-23T18:56:00+00:00",
+   "author": "Courtney Ramirez",
+   "commit_sha": "cf784200a1d36bc4e5cd59bb5b6151ee99f3bb68",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0307"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.32",
+   "deployed_at": "2026-10-24T08:03:00+00:00",
+   "author": "Karen Kelly",
+   "commit_sha": "326073bfad138f4105d6e33bbae14bba760b7828",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0308"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.33",
+   "deployed_at": "2026-10-24T08:15:00+00:00",
+   "author": "Sarah Ortiz",
+   "commit_sha": "1a557295777ad04751f27475b5e778970ba2e8c9",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0309"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.30",
+   "deployed_at": "2026-10-24T08:21:00+00:00",
+   "author": "Deborah Russell",
+   "commit_sha": "9800f52c9db54d63d5e3e59a465381692f03a41b",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0310"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.22",
+   "deployed_at": "2026-10-24T08:32:00+00:00",
+   "author": "Scott West",
+   "commit_sha": "5d672f59cf17db228193f09208a93f5df6099425",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0311"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.23",
+   "deployed_at": "2026-10-24T10:38:00+00:00",
+   "author": "James Martin",
+   "commit_sha": "b24f098336bbf6af2b0a7d8a2656efa858ae474f",
+   "summary": "Bump dependencies",
+   "status": "rolled_back",
+   "id": "dep-0312"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.21",
+   "deployed_at": "2026-10-24T11:56:00+00:00",
+   "author": "Debbie Skinner",
+   "commit_sha": "9bab4451a55a39fe92ca0424e7b2146131e53bdd",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0313"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.26",
+   "deployed_at": "2026-10-24T12:25:00+00:00",
+   "author": "James Reynolds",
+   "commit_sha": "fd60e184cbc252908f088f212041a63674d92f34",
+   "summary": "Increase pool cache TTL",
+   "status": "succeeded",
+   "id": "dep-0314"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.24",
+   "deployed_at": "2026-10-24T12:47:00+00:00",
+   "author": "Meghan Patterson",
+   "commit_sha": "dbba9318c57ea15878000156d95ad42e171f01cd",
+   "summary": "Refactor refund client",
+   "status": "rolled_back",
+   "id": "dep-0315"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.22",
+   "deployed_at": "2026-10-24T13:09:00+00:00",
+   "author": "Ruben Snow",
+   "commit_sha": "d765110a065fc11d4b6fbcca5f2108b2033a8ea5",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0316"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.35",
+   "deployed_at": "2026-10-24T13:24:00+00:00",
+   "author": "Timothy Hughes",
+   "commit_sha": "4e4fcbe129325e271b8b16cbee30006f1fe15947",
+   "summary": "Add metrics for notification",
+   "status": "succeeded",
+   "id": "dep-0317"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.28",
+   "deployed_at": "2026-10-24T16:38:00+00:00",
+   "author": "Mary Griffin",
+   "commit_sha": "6af77f87f787e97980a58f77ec08c870eb2988ce",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0318"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.27",
+   "deployed_at": "2026-10-24T17:51:00+00:00",
+   "author": "Bailey Hughes",
+   "commit_sha": "8794c47d47a66fe1622ea185e124a34ab4ca12b2",
+   "summary": "Add metrics for retry",
+   "status": "succeeded",
+   "id": "dep-0319"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.23",
+   "deployed_at": "2026-10-25T08:35:00+00:00",
+   "author": "Jessica Diaz",
+   "commit_sha": "1d142da3054898c3ce5cb233dfd2e71a594f06a0",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0320"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.27",
+   "deployed_at": "2026-10-25T09:31:00+00:00",
+   "author": "Ariel Walker",
+   "commit_sha": "fccf3799f2f9712bfa9f3b00f7c7de1157696d25",
+   "summary": "Roll out pool behind a flag",
+   "status": "succeeded",
+   "id": "dep-0321"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.26",
+   "deployed_at": "2026-10-25T10:40:00+00:00",
+   "author": "Melissa Anderson",
+   "commit_sha": "758f7fa8f8d52043587ee20c808a7febafb382a1",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0322"
+  },
+  {
+   "service": "redis-cache",
+   "version": "6.38.7",
+   "deployed_at": "2026-10-25T10:48:00+00:00",
+   "author": "Mrs. Cindy Brown",
+   "commit_sha": "9126c35f64d530f45f6e095958457495b7d3eec8",
+   "summary": "Release 6.38.7",
+   "status": "succeeded",
+   "id": "dep-0323"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.31",
+   "deployed_at": "2026-10-25T12:35:00+00:00",
+   "author": "Ashley Haynes",
+   "commit_sha": "2fbf2ca9108683e5735c702aed03a096a31616e7",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0324"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.36",
+   "deployed_at": "2026-10-25T15:00:00+00:00",
+   "author": "Dylan Jones",
+   "commit_sha": "2852a50062189e3a0786ed679a30aad0eecd97b0",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0325"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.23",
+   "deployed_at": "2026-10-25T16:30:00+00:00",
+   "author": "Kathryn Valdez",
+   "commit_sha": "9d8c1ad249f6b45e823c2a0652d2f2bdcb85290d",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0326"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.24",
+   "deployed_at": "2026-10-25T16:49:00+00:00",
+   "author": "Lisa Bates",
+   "commit_sha": "85e46338eff09bcfa2fae201d1730e7c69c3b5ff",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0327"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.34",
+   "deployed_at": "2026-10-25T17:20:00+00:00",
+   "author": "Stanley Lara",
+   "commit_sha": "dfe918853a350e99349e75577d7864349ec2bc81",
+   "summary": "Roll out pool behind a flag",
+   "status": "succeeded",
+   "id": "dep-0328"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.28",
+   "deployed_at": "2026-10-25T17:47:00+00:00",
+   "author": "Christopher Curry",
+   "commit_sha": "838b7d34ba1dd69f5916295dda33a865ebf1b8bd",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0329"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.29",
+   "deployed_at": "2026-10-25T18:29:00+00:00",
+   "author": "Anthony Peters",
+   "commit_sha": "37e4ceb67c4401443622d5d0a3e85498943d72e5",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0330"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.35",
+   "deployed_at": "2026-10-26T08:08:00+00:00",
+   "author": "Jennifer Young",
+   "commit_sha": "38c5d96e9bc4bf5abde2974bc78490b7be724b51",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0331"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.28",
+   "deployed_at": "2026-10-26T08:52:00+00:00",
+   "author": "Thomas Walker",
+   "commit_sha": "97cd72ea5b54278c232a93a2dcc0e68380e37c9d",
+   "summary": "Fix flaky inventory handling",
+   "status": "succeeded",
+   "id": "dep-0332"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.23",
+   "deployed_at": "2026-10-26T08:53:00+00:00",
+   "author": "Joshua Davila",
+   "commit_sha": "a41c677819d7fb40ae36bed41b1bb6c7e5fa249e",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0333"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.25",
+   "deployed_at": "2026-10-26T12:36:00+00:00",
+   "author": "Kyle Bryant",
+   "commit_sha": "81f36438bf94e72a95f0af3d44932b0cc737bce5",
+   "summary": "Fix flaky notification handling",
+   "status": "succeeded",
+   "id": "dep-0334"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.31",
+   "deployed_at": "2026-10-26T12:45:00+00:00",
+   "author": "Theresa Lawson",
+   "commit_sha": "17470c95974d2acd9eb3bfa780fca87b6fc08e01",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0335"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.22",
+   "deployed_at": "2026-10-26T13:55:00+00:00",
+   "author": "Vicki Walker",
+   "commit_sha": "4fb6b0fdf6f75ca15d4e8c0229c01dbdac6b835d",
+   "summary": "Roll out ledger behind a flag",
+   "status": "succeeded",
+   "id": "dep-0336"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.24",
+   "deployed_at": "2026-10-26T14:42:00+00:00",
+   "author": "Vanessa Harris",
+   "commit_sha": "4ecdd16b0ee2f2c7c4715eedc698f013a76bab6b",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0337"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.27",
+   "deployed_at": "2026-10-26T14:45:00+00:00",
+   "author": "Brenda Bautista",
+   "commit_sha": "67b464f6f267e5d083c772aebcdc9b6c2c0dd0b4",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0338"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.30",
+   "deployed_at": "2026-10-26T15:46:00+00:00",
+   "author": "Vanessa Gonzalez",
+   "commit_sha": "8d5d54ce35ebd6b2e0d878188dd4ccaaf0882583",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0339"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.27",
+   "deployed_at": "2026-10-26T16:22:00+00:00",
+   "author": "Amber Rogers",
+   "commit_sha": "5b3147e10134377443ec911e27678b1bcff976ec",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0340"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.29",
+   "deployed_at": "2026-10-26T16:48:00+00:00",
+   "author": "Katherine Kelley",
+   "commit_sha": "0881a829ccb9a52574c027f3cf5e8afce0cae21a",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0341"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.29",
+   "deployed_at": "2026-10-26T17:30:00+00:00",
+   "author": "Justin Harris",
+   "commit_sha": "468ed192e5e68fbd8a29fd99e476047ecbbf13ab",
+   "summary": "Refactor inventory client",
+   "status": "succeeded",
+   "id": "dep-0342"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.24",
+   "deployed_at": "2026-10-26T17:32:00+00:00",
+   "author": "Kenneth Doyle",
+   "commit_sha": "35c18e67c25626052a1bf3b0985681215f934355",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0343"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.26",
+   "deployed_at": "2026-10-26T17:42:00+00:00",
+   "author": "Charles Swanson",
+   "commit_sha": "ace6dd7d87440a7772bf99eccc12cf7fc36ac8eb",
+   "summary": "Fix flaky token handling",
+   "status": "rolled_back",
+   "id": "dep-0344"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.25",
+   "deployed_at": "2026-10-26T18:51:00+00:00",
+   "author": "Jessica Thomas",
+   "commit_sha": "247ef603f61a97b6a98fb8d51a265e5c19f9862f",
+   "summary": "Refactor ledger client",
+   "status": "succeeded",
+   "id": "dep-0345"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.25",
+   "deployed_at": "2026-10-26T18:54:00+00:00",
+   "author": "Natalie Green",
+   "commit_sha": "4d4780b9d94206097e4fca99d512140e7649d076",
+   "summary": "Refactor token client",
+   "status": "succeeded",
+   "id": "dep-0346"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.38",
+   "deployed_at": "2026-10-27T08:56:00+00:00",
+   "author": "Emily Petty",
+   "commit_sha": "6bfbd5e4a012e3215931b81cba1f0a83c43dcc15",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0347"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.28",
+   "deployed_at": "2026-10-27T09:05:00+00:00",
+   "author": "Kevin Mendoza",
+   "commit_sha": "069fd03d7ae20c3b3891871a6ef6426c0c84d3e5",
+   "summary": "Increase inventory cache TTL",
+   "status": "succeeded",
+   "id": "dep-0348"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.24",
+   "deployed_at": "2026-10-27T09:52:00+00:00",
+   "author": "Todd Jefferson",
+   "commit_sha": "86cd01710c04cb84b55a4b47302ea51cc5ca87f8",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0349"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.30",
+   "deployed_at": "2026-10-27T10:37:00+00:00",
+   "author": "Edward Griffith",
+   "commit_sha": "7a437c7c58db5dbf2e592367c5cda928a4588352",
+   "summary": "Roll out notification behind a flag",
+   "status": "succeeded",
+   "id": "dep-0350"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.39",
+   "deployed_at": "2026-10-27T11:33:00+00:00",
+   "author": "Lauren Garcia",
+   "commit_sha": "cd39527aab2e5a9bf971936afc6b46b4d4b8e080",
+   "summary": "Refactor pool client",
+   "status": "succeeded",
+   "id": "dep-0351"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.26",
+   "deployed_at": "2026-10-27T12:36:00+00:00",
+   "author": "Lisa Warren",
+   "commit_sha": "846eac5a0f0499b6afe30ed0949fe5dab1153007",
+   "summary": "Add metrics for pool",
+   "status": "succeeded",
+   "id": "dep-0352"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.25",
+   "deployed_at": "2026-10-27T13:23:00+00:00",
+   "author": "Elizabeth Smith",
+   "commit_sha": "7e0dbfca0cb2ef7fd3319bc9053bc6875bd05c38",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0353"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.29",
+   "deployed_at": "2026-10-27T14:44:00+00:00",
+   "author": "Linda Bridges",
+   "commit_sha": "ad26936c046eeb50c9733a0a08b31e13bae7f625",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0354"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.27",
+   "deployed_at": "2026-10-27T14:57:00+00:00",
+   "author": "Sandra Carter",
+   "commit_sha": "12c0e64ba78b4f2676a8589c43107382a02d6029",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0355"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.26",
+   "deployed_at": "2026-10-27T16:11:00+00:00",
+   "author": "James Payne",
+   "commit_sha": "717f6d5305c0173ed0d358b19fb800e4bb789830",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0356"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.30",
+   "deployed_at": "2026-10-27T16:45:00+00:00",
+   "author": "Samantha Hansen",
+   "commit_sha": "f781f632bef60db0c1f1981f2f1603207b4f4ff1",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0357"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.31",
+   "deployed_at": "2026-10-27T16:45:00+00:00",
+   "author": "Lauren Dillon",
+   "commit_sha": "988928fcc0ced9b9327faff6a32f39039d3e9fde",
+   "summary": "Roll out notification behind a flag",
+   "status": "succeeded",
+   "id": "dep-0358"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.31",
+   "deployed_at": "2026-10-27T16:52:00+00:00",
+   "author": "Stephen Fitzgerald",
+   "commit_sha": "cde90d710b6ea58a551626ba72b5b840ed2ebe0d",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0359"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.37",
+   "deployed_at": "2026-10-27T16:58:00+00:00",
+   "author": "Jonathan Cook",
+   "commit_sha": "14b4da493eb4c3651d51d2c6efa73119e8db543c",
+   "summary": "Fix flaky checkout handling",
+   "status": "succeeded",
+   "id": "dep-0360"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.32",
+   "deployed_at": "2026-10-27T17:38:00+00:00",
+   "author": "Paul Davis MD",
+   "commit_sha": "cfbb5adeba88cdd139cf7566e461798de9f4075f",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0361"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.32",
+   "deployed_at": "2026-10-27T17:44:00+00:00",
+   "author": "Jacqueline Webb",
+   "commit_sha": "5069d5c0816f4693e8eee1ec2a423dfcceb63405",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0362"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.26",
+   "deployed_at": "2026-10-28T08:56:00+00:00",
+   "author": "Gloria Jackson",
+   "commit_sha": "a0f24fe0b4d559ffc331b04e3b29df910f4f2c99",
+   "summary": "Increase refund cache TTL",
+   "status": "succeeded",
+   "id": "dep-0363"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.35",
+   "deployed_at": "2026-10-28T10:08:00+00:00",
+   "author": "Regina Wade",
+   "commit_sha": "f21f2caf971f97d0f53c9d407fc0e4fb700aaf5a",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0364"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.33",
+   "deployed_at": "2026-10-28T11:07:00+00:00",
+   "author": "Tara Anderson MD",
+   "commit_sha": "0cee753f5c81bcb7a4df0f6597ff5f88f5d597f5",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0365"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.25",
+   "deployed_at": "2026-10-28T11:18:00+00:00",
+   "author": "Lori Krueger",
+   "commit_sha": "402607f1ea70476e4329f77766662f42b008393a",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0366"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.34",
+   "deployed_at": "2026-10-28T11:20:00+00:00",
+   "author": "Christopher Gill",
+   "commit_sha": "0e1974adf6f34dc1db667ac1a00e64bcd65b2382",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0367"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.32",
+   "deployed_at": "2026-10-28T12:13:00+00:00",
+   "author": "Justin Boyle",
+   "commit_sha": "6ab7100331c14a903e4fe1f2ad5a15d3eeec9408",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0368"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.27",
+   "deployed_at": "2026-10-28T13:33:00+00:00",
+   "author": "Carrie Thomas",
+   "commit_sha": "87bffb642cf88df74c9209182b364347fe8e7092",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0369"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.35",
+   "deployed_at": "2026-10-28T13:56:00+00:00",
+   "author": "George Cruz",
+   "commit_sha": "31a5b8a1c8e6b7a9f16d0578436313a630710319",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0370"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.27",
+   "deployed_at": "2026-10-28T14:28:00+00:00",
+   "author": "David Ortiz",
+   "commit_sha": "423149e32bbc465d8a33d6ca9e5cdabba0618d3e",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0371"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.34",
+   "deployed_at": "2026-10-28T14:45:00+00:00",
+   "author": "Michael Best",
+   "commit_sha": "d40689fc3e7044ce1fde4e3f8c2aa149fbb5ad7a",
+   "summary": "Bump dependencies",
+   "status": "rolled_back",
+   "id": "dep-0372"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.33",
+   "deployed_at": "2026-10-28T16:20:00+00:00",
+   "author": "Lisa Wilson",
+   "commit_sha": "8c422528c029f5c7ab9d6d7f594176516753c9ef",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0373"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.33",
+   "deployed_at": "2026-10-28T16:54:00+00:00",
+   "author": "Stephen Jimenez",
+   "commit_sha": "ef0c47fd81bbe8c2ef21e5bf25ac5b8b7a5f1751",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0374"
+  },
+  {
+   "service": "search",
+   "version": "3.13.31",
+   "deployed_at": "2026-10-28T17:10:00+00:00",
+   "author": "Jose Huerta",
+   "commit_sha": "0b7135befd962a46d3e16964d8b166f4a99ec3d6",
+   "summary": "Add metrics for checkout",
+   "status": "succeeded",
+   "id": "dep-0375"
+  },
+  {
+   "service": "search",
+   "version": "3.13.32",
+   "deployed_at": "2026-10-28T17:40:00+00:00",
+   "author": "John Salazar",
+   "commit_sha": "972248a8637487196ae6355a797aad2babcfe604",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0376"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.34",
+   "deployed_at": "2026-10-28T17:48:00+00:00",
+   "author": "Mrs. Kimberly Gonzalez DDS",
+   "commit_sha": "d06696668cb475f2a0e0fbc47d0953a6c593a165",
+   "summary": "Roll out checkout behind a flag",
+   "status": "succeeded",
+   "id": "dep-0377"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.29",
+   "deployed_at": "2026-10-28T18:51:00+00:00",
+   "author": "Christina Collins",
+   "commit_sha": "3361ce2611d2387837a90b4552af9403215324c1",
+   "summary": "Fix flaky retry handling",
+   "status": "succeeded",
+   "id": "dep-0378"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.28",
+   "deployed_at": "2026-10-28T18:58:00+00:00",
+   "author": "Joseph Davis",
+   "commit_sha": "7f2644cbc2396855d35ea8556d523a58af0921d3",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0379"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.36",
+   "deployed_at": "2026-10-29T08:02:00+00:00",
+   "author": "Jennifer Zuniga",
+   "commit_sha": "a6873209724b8967a123c6f776ecac1d2f7f2316",
+   "summary": "Increase token cache TTL",
+   "status": "succeeded",
+   "id": "dep-0380"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.35",
+   "deployed_at": "2026-10-29T08:47:00+00:00",
+   "author": "Stephen Richards",
+   "commit_sha": "195fe03628334abe45d174fdf4a35521ec48b92e",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0381"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.37",
+   "deployed_at": "2026-10-29T09:26:00+00:00",
+   "author": "Stephanie Livingston",
+   "commit_sha": "6d94b85af82af88b092046fa575014a7179d02a7",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0382"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.28",
+   "deployed_at": "2026-10-29T09:58:00+00:00",
+   "author": "Ann Mcguire",
+   "commit_sha": "4f56a3f21c70b0b4ba1f391bd18c26f610cf748c",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0383"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.30",
+   "deployed_at": "2026-10-29T10:46:00+00:00",
+   "author": "Joseph Norman",
+   "commit_sha": "3fa2c68aff77e0bf0177b31d77b6b21964b91c5c",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0384"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.32",
+   "deployed_at": "2026-10-29T12:12:00+00:00",
+   "author": "Jason Cortez",
+   "commit_sha": "4992467a2d1dc7108689b5bfc9ac31f2dac5bc34",
+   "summary": "Roll out search behind a flag",
+   "status": "succeeded",
+   "id": "dep-0385"
+  },
+  {
+   "service": "search",
+   "version": "3.13.33",
+   "deployed_at": "2026-10-29T12:47:00+00:00",
+   "author": "Ann Wilson",
+   "commit_sha": "44f5c59eaf915656386be6ccbcc40c0b9e076973",
+   "summary": "Tune retry policy",
+   "status": "rolled_back",
+   "id": "dep-0386"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.36",
+   "deployed_at": "2026-10-29T13:00:00+00:00",
+   "author": "Kristina Price",
+   "commit_sha": "4a21b6ee662baadf9be2d171dfd1f78ea29da0cf",
+   "summary": "Roll out retry behind a flag",
+   "status": "rolled_back",
+   "id": "dep-0387"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.33",
+   "deployed_at": "2026-10-29T13:44:00+00:00",
+   "author": "John Freeman",
+   "commit_sha": "dde7b46db439794212ab34d86a82e2909486305a",
+   "summary": "Increase ledger cache TTL",
+   "status": "succeeded",
+   "id": "dep-0388"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.37",
+   "deployed_at": "2026-10-29T15:58:00+00:00",
+   "author": "Dennis Rogers",
+   "commit_sha": "e4fd27efb0e323693ac90de41322e3b619ce9ff6",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0389"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.40",
+   "deployed_at": "2026-10-29T16:55:00+00:00",
+   "author": "Lisa Santos",
+   "commit_sha": "66183a65ef6eba56eddcc1c53ba2fad22f187922",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0390"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.37",
+   "deployed_at": "2026-10-30T08:44:00+00:00",
+   "author": "Robert Fuller DVM",
+   "commit_sha": "c94614e63a6e94b70cbe8575a96c9658eb4988a3",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0391"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.40",
+   "deployed_at": "2026-10-30T09:09:00+00:00",
+   "author": "Michael Alvarez",
+   "commit_sha": "3f76445ffb517abfd1e6444d691def456a10b932",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0392"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.38",
+   "deployed_at": "2026-10-30T09:33:00+00:00",
+   "author": "Victoria Burns",
+   "commit_sha": "716ec737aa484f7f03cb8e255c3caca7eb68fdf6",
+   "summary": "Fix flaky token handling",
+   "status": "succeeded",
+   "id": "dep-0393"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.30",
+   "deployed_at": "2026-10-30T09:41:00+00:00",
+   "author": "Stephen Gonzalez",
+   "commit_sha": "ed248d6906cd25ed12df1b742512417f809da1d1",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0394"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.26",
+   "deployed_at": "2026-10-30T09:58:00+00:00",
+   "author": "Elizabeth Singleton",
+   "commit_sha": "ff6c84bbbaccc558b916392dde974177aca8d86e",
+   "summary": "Roll out inventory behind a flag",
+   "status": "succeeded",
+   "id": "dep-0395"
+  },
+  {
+   "service": "auth",
+   "version": "8.14.27",
+   "deployed_at": "2026-10-30T10:16:00+00:00",
+   "author": "Jacob Benjamin",
+   "commit_sha": "8406d635029442bb696b98a32b819a1e99b844c4",
+   "summary": "Refactor refund client",
+   "status": "succeeded",
+   "id": "dep-0396"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.42",
+   "deployed_at": "2026-10-30T10:25:00+00:00",
+   "author": "Amanda Fuller",
+   "commit_sha": "66b99582aa62e1eba49978502fd993eba118fbbe",
+   "summary": "Increase search cache TTL",
+   "status": "rolled_back",
+   "id": "dep-0397"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.37",
+   "deployed_at": "2026-10-30T10:45:00+00:00",
+   "author": "Vincent Medina",
+   "commit_sha": "9ed55c779113e51fbc508e19acd457547bd388b6",
+   "summary": "Add metrics for refund",
+   "status": "succeeded",
+   "id": "dep-0398"
+  },
+  {
+   "service": "search",
+   "version": "3.13.34",
+   "deployed_at": "2026-10-30T13:22:00+00:00",
+   "author": "Michael Clark",
+   "commit_sha": "8d375e45984d388b6da6b52647711a3c873a8506",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0399"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.31",
+   "deployed_at": "2026-10-30T14:06:00+00:00",
+   "author": "Andrew Higgins",
+   "commit_sha": "2ce44747a9483f353e82f01b406f62ed95e4b386",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0400"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.31",
+   "deployed_at": "2026-10-30T14:14:00+00:00",
+   "author": "Nicholas Perry",
+   "commit_sha": "762551c21ffcdd6ab7bc64aa81c83f2c3a6074c6",
+   "summary": "Add metrics for search",
+   "status": "succeeded",
+   "id": "dep-0401"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.39",
+   "deployed_at": "2026-10-30T14:57:00+00:00",
+   "author": "Ryan Rice",
+   "commit_sha": "015f404125579659e17332517a311b3cccf7499d",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0402"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.41",
+   "deployed_at": "2026-10-30T15:22:00+00:00",
+   "author": "Neil Barajas",
+   "commit_sha": "19e29c3a9361d5ec6e5913ee80406fef3dbee757",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0403"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.29",
+   "deployed_at": "2026-10-30T15:28:00+00:00",
+   "author": "Claudia Fields",
+   "commit_sha": "7e32672284be68f4067fad2cbf80dd9177d0b62e",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0404"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.36",
+   "deployed_at": "2026-10-30T15:44:00+00:00",
+   "author": "John Moore",
+   "commit_sha": "c656169b84f46c51fcadb6fc4c38abd4d58c7180",
+   "summary": "Refactor retry client",
+   "status": "succeeded",
+   "id": "dep-0405"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.28",
+   "deployed_at": "2026-10-30T15:50:00+00:00",
+   "author": "Jason Chapman",
+   "commit_sha": "3d2c467e7fc8f6ec50b9527345499c5ffd6b4476",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0406"
+  },
+  {
+   "service": "kafka-broker",
+   "version": "2.24.32",
+   "deployed_at": "2026-10-30T16:34:00+00:00",
+   "author": "Donald Fleming",
+   "commit_sha": "27c3d533f5e53901c0eab556c2bf344db076eab0",
+   "summary": "Add metrics for token",
+   "status": "succeeded",
+   "id": "dep-0407"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.36",
+   "deployed_at": "2026-10-30T18:27:00+00:00",
+   "author": "Kelsey Gross",
+   "commit_sha": "e341bff2646a92c77e54126fc132726d85da296c",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0408"
+  },
+  {
+   "service": "orders",
+   "version": "5.29.30",
+   "deployed_at": "2026-10-31T08:19:00+00:00",
+   "author": "Stacy Green",
+   "commit_sha": "be415dc5dbc156c1154c9c408c5b70090c92c283",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0409"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.38",
+   "deployed_at": "2026-10-31T08:56:00+00:00",
+   "author": "Karen Mcdonald",
+   "commit_sha": "111c179d672eebfdf3ce9b6aee27f110ab527bd2",
+   "summary": "Add metrics for inventory",
+   "status": "succeeded",
+   "id": "dep-0410"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.43",
+   "deployed_at": "2026-10-31T09:01:00+00:00",
+   "author": "Kimberly Hurley",
+   "commit_sha": "1c5d4d73c6e2208d586fc8285edb491ce64f0c1e",
+   "summary": "Roll out token behind a flag",
+   "status": "succeeded",
+   "id": "dep-0411"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.38",
+   "deployed_at": "2026-10-31T09:29:00+00:00",
+   "author": "Shannon Young",
+   "commit_sha": "e539ae200d7e6593c8277c8c12acd3c84a85e932",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0412"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.30",
+   "deployed_at": "2026-10-31T09:45:00+00:00",
+   "author": "Joseph Ward",
+   "commit_sha": "a5d12320f6be46ba759f10e25cc601d244eea951",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0413"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.39",
+   "deployed_at": "2026-10-31T12:17:00+00:00",
+   "author": "Dean Olson",
+   "commit_sha": "8f70c25f5110ce5238fc4ebd23c740dd584eb1ee",
+   "summary": "Refactor notification client",
+   "status": "succeeded",
+   "id": "dep-0414"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.34",
+   "deployed_at": "2026-10-31T12:48:00+00:00",
+   "author": "Mr. James James",
+   "commit_sha": "17bfcb3201bcbbef9b56e54299bb62f9b7ccf355",
+   "summary": "Roll out refund behind a flag",
+   "status": "succeeded",
+   "id": "dep-0415"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.40",
+   "deployed_at": "2026-10-31T13:17:00+00:00",
+   "author": "Joseph Yates",
+   "commit_sha": "c209cfb281cae6404c8d590a262964d65cb58e74",
+   "summary": "Increase retry cache TTL",
+   "status": "succeeded",
+   "id": "dep-0416"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.34",
+   "deployed_at": "2026-10-31T13:19:00+00:00",
+   "author": "Alexandra Hess",
+   "commit_sha": "9147f93480c73d6f0be5469df8e806d2a3c5d344",
+   "summary": "Bump dependencies",
+   "status": "succeeded",
+   "id": "dep-0417"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.39",
+   "deployed_at": "2026-10-31T14:02:00+00:00",
+   "author": "Kimberly Harris",
+   "commit_sha": "168aa968ea84c49da8ad271f1c7fe5f12b82e0c2",
+   "summary": "Refactor checkout client",
+   "status": "succeeded",
+   "id": "dep-0418"
+  },
+  {
+   "service": "inventory",
+   "version": "6.13.38",
+   "deployed_at": "2026-10-31T14:17:00+00:00",
+   "author": "Lance Jones",
+   "commit_sha": "13a76ba8a455ea6e7c3783394bac6c4d1d4c3d34",
+   "summary": "Fix flaky refund handling",
+   "status": "rolled_back",
+   "id": "dep-0419"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.33",
+   "deployed_at": "2026-10-31T15:15:00+00:00",
+   "author": "Nancy Johnston",
+   "commit_sha": "7e3e6939351b76f85d0387c90bca69eaac44b2e6",
+   "summary": "Increase notification cache TTL",
+   "status": "rolled_back",
+   "id": "dep-0420"
+  },
+  {
+   "service": "card-auth",
+   "version": "4.1.32",
+   "deployed_at": "2026-10-31T15:20:00+00:00",
+   "author": "Ernest Rowland",
+   "commit_sha": "9fb86a039d3ce7b3d87e82f173787413f6b1a7c9",
+   "summary": "Fix flaky token handling",
+   "status": "succeeded",
+   "id": "dep-0421"
+  },
+  {
+   "service": "api-gateway",
+   "version": "4.23.29",
+   "deployed_at": "2026-10-31T15:41:00+00:00",
+   "author": "Brandon Miller",
+   "commit_sha": "94ccc16f94687de3992a02d8530d089373ca2369",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0422"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.44",
+   "deployed_at": "2026-10-31T16:13:00+00:00",
+   "author": "Alan Bowen",
+   "commit_sha": "fc5f8d70a8676b84aa27f85dafe7001889e8182b",
+   "summary": "Fix flaky refund handling",
+   "status": "succeeded",
+   "id": "dep-0423"
+  },
+  {
+   "service": "search",
+   "version": "3.13.35",
+   "deployed_at": "2026-10-31T16:47:00+00:00",
+   "author": "Jason Moore",
+   "commit_sha": "ce627bff760d6cb38576c3fa4e62120d8974456a",
+   "summary": "Increase search cache TTL",
+   "status": "succeeded",
+   "id": "dep-0424"
+  },
+  {
+   "service": "postgres-primary",
+   "version": "4.31.45",
+   "deployed_at": "2026-10-31T17:06:00+00:00",
+   "author": "Chad Roth",
+   "commit_sha": "f22eb33e9143599982784d5308b7b7d075421584",
+   "summary": "Tune retry policy",
+   "status": "succeeded",
+   "id": "dep-0425"
+  },
+  {
+   "service": "redis-cache",
+   "version": "3.37.40",
+   "deployed_at": "2026-10-31T17:20:00+00:00",
+   "author": "Marcus Garrison",
+   "commit_sha": "43733487c0b253785bbf684c3548fdc0bce6ad77",
+   "summary": "Add metrics for ledger",
+   "status": "succeeded",
+   "id": "dep-0426"
+  },
+  {
+   "service": "notifications",
+   "version": "8.9.35",
+   "deployed_at": "2026-10-31T18:01:00+00:00",
+   "author": "Dustin West",
+   "commit_sha": "adb961f5e948a360e51497551e92a0f8ddc73396",
+   "summary": "Fix flaky ledger handling",
+   "status": "succeeded",
+   "id": "dep-0427"
+  },
+  {
+   "service": "payments",
+   "version": "2.34.41",
+   "deployed_at": "2026-10-31T18:03:00+00:00",
+   "author": "Ryan Porter",
+   "commit_sha": "fc54b1901b0c815709a48fedcec10239bb8d649e",
+   "summary": "Add metrics for notification",
+   "status": "succeeded",
+   "id": "dep-0428"
+  },
+  {
+   "service": "ledger",
+   "version": "1.37.39",
+   "deployed_at": "2026-10-31T18:14:00+00:00",
+   "author": "Sheryl Weaver",
+   "commit_sha": "d8e84076279f381184d6f437a5e5fb0b0d293cdd",
+   "summary": "Increase notification cache TTL",
+   "status": "succeeded",
+   "id": "dep-0429"
+  }
+ ]
+}

@@ -62,23 +62,31 @@ def reciprocal_rank_fusion(rankings: Sequence[Sequence[uuid.UUID]], k: int = RRF
     return sorted(scores.items(), key=lambda pair: -pair[1])
 
 
-async def _fts(session: AsyncSession, query: str, limit: int) -> list[tuple[uuid.UUID, float]]:
+def _only(statement, source_type: str | None):  # noqa: ANN001, ANN202 - a Select
+    return statement.join(Document).where(Document.source_type == source_type) if source_type else statement
+
+
+async def _fts(session: AsyncSession, query: str, limit: int, source_type: str | None) -> list[tuple[uuid.UUID, float]]:
     # websearch_to_tsquery accepts what people type ("quoted phrases", -exclusions) and never raises a syntax error.
     tsquery = func.websearch_to_tsquery("english", query)
     score = func.ts_rank_cd(Chunk.tsv, tsquery).label("score")
     rows = await session.execute(
-        select(Chunk.id, score).where(Chunk.tsv.op("@@")(tsquery)).order_by(score.desc(), Chunk.id).limit(limit)
+        _only(select(Chunk.id, score), source_type).where(Chunk.tsv.op("@@")(tsquery))
+        .order_by(score.desc(), Chunk.id).limit(limit)
     )
     return [(i, float(s)) for i, s in rows.all()]
 
 
-async def _vector(session: AsyncSession, vector: list[float], limit: int) -> list[tuple[uuid.UUID, float]]:
+async def _vector(session: AsyncSession, vector: list[float], limit: int,
+                  source_type: str | None) -> list[tuple[uuid.UUID, float]]:
     distance = Chunk.embedding.cosine_distance(vector).label("distance")
-    rows = await session.execute(select(Chunk.id, distance).order_by(distance).limit(limit))
+    rows = await session.execute(_only(select(Chunk.id, distance), source_type).order_by(distance).limit(limit))
     return [(i, float(d)) for i, d in rows.all()]
 
 
-async def hybrid_search(session: AsyncSession, query: str, k: int | None = None) -> SearchResult:
+async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
+                        source_type: str | None = None) -> SearchResult:
+    """source_type ("runbook" or "postmortem") limits both searches to that kind of document."""
     k = k or settings.retrieval_top_k
     timings: dict[str, float] = {}
     started = time.perf_counter()
@@ -100,8 +108,8 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None)
 
     # A second session on the same engine, so the two searches really run concurrently (one connection each).
     async with AsyncSession(bind=session.bind) as other:
-        fts, vec = await asyncio.gather(timed("fts", _fts(session, query, CANDIDATES)),
-                                        timed("vector", _vector(other, vector, CANDIDATES)))
+        fts, vec = await asyncio.gather(timed("fts", _fts(session, query, CANDIDATES, source_type)),
+                                        timed("vector", _vector(other, vector, CANDIDATES, source_type)))
     mark = lap("searches", mark)
 
     fused = reciprocal_rank_fusion([[i for i, _ in fts], [i for i, _ in vec]])[: max(k, settings.rerank_candidates)]

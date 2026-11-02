@@ -129,6 +129,8 @@ class TriageRun(Base):
     verdict: Mapped[str | None] = mapped_column(String(32))
     error_code: Mapped[str | None] = mapped_column(String(64))
     problems: Mapped[list[str]] = mapped_column(JSONB, server_default="[]")
+    degraded_sources: Mapped[list[dict[str, str]]] = mapped_column(JSONB, server_default="[]")  # [{source, reason}]
+    tenant: Mapped[str] = mapped_column(String(64), server_default="default")
     model: Mapped[str | None] = mapped_column(String(128))
     prompt_version: Mapped[str | None] = mapped_column(String(64))
     prompt_tokens: Mapped[int | None] = mapped_column(Integer)
@@ -184,21 +186,6 @@ class DeadLetter(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     replayed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     replay_count: Mapped[int] = mapped_column(Integer, server_default="0")
-
-
-class Deploy(Base):
-    """One deploy of one service. Seeded for now (scripts/seed.py); a deploy source arrives in slice 5."""
-
-    __tablename__ = "deploys"
-
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
-    service: Mapped[str] = mapped_column(String(128))
-    version: Mapped[str] = mapped_column(String(64))
-    deployed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    author: Mapped[str] = mapped_column(String(128))
-    commit_sha: Mapped[str] = mapped_column(String(40))
-    summary: Mapped[str]
-    status: Mapped[str] = mapped_column(String(16))
 
 
 class ImportState(Base):

@@ -14,3 +14,5 @@ stream's `error` event uses the same codes.
 | <a id="format_invalid"></a>`format_invalid` | stream | The brief broke the section or citation contract; `problems` lists how. |
 | <a id="triage_abandoned"></a>`triage_abandoned` | stream | The triage stopped renewing its heartbeat (its process died or its client left) and was given up. |
 | <a id="broker_unavailable"></a>`broker_unavailable` | 503 | Kafka didn't accept the messages (e.g. a DLQ replay). Nothing was marked replayed; retry the request. |
+| <a id="triage_capacity"></a>`triage_capacity` | 503 | The tenant (`X-Pagerwise-Tenant`, default `default`) already has its limit of triages queued or running. Retry after the `Retry-After` header's seconds. |
+| <a id="triage_failed"></a>`triage_failed` | stream | The triage worker hit an unexpected error; `detail` names it. The run is failed and can be started again. |

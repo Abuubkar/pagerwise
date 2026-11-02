@@ -21,6 +21,8 @@ class ProblemCode(enum.StrEnum):
     FORMAT_INVALID = "format_invalid"
     TRIAGE_ABANDONED = "triage_abandoned"
     BROKER_UNAVAILABLE = "broker_unavailable"
+    TRIAGE_CAPACITY = "triage_capacity"
+    TRIAGE_FAILED = "triage_failed"
 
 
 class Problem(BaseModel):
@@ -39,8 +41,10 @@ class Problem(BaseModel):
 class ApiProblem(Exception):
     """Raised anywhere in request handling; rendered as application/problem+json."""
 
-    def __init__(self, status: int, code: ProblemCode, title: str, detail: str | None = None, **extra):
+    def __init__(self, status: int, code: ProblemCode, title: str, detail: str | None = None,
+                 retry_after: int | None = None, **extra):
         super().__init__(f"{status} {code}: {detail or title}")
+        self.retry_after = retry_after  # seconds, sent as the Retry-After header
         self.problem = Problem(type=f"{PROBLEMS_URL}#{code}", title=title, status=status, detail=detail, code=code,
                                **extra)
 
@@ -84,12 +88,21 @@ class TriageAccepted(BaseModel):
     stream_url: str
 
 
+SourceType = Literal["runbook", "postmortem", "deploy"]
+EvidenceSource = Literal["runbooks", "postmortems", "deploys"]
+
+
 class Citation(BaseModel):
     tag: str = Field(description="The tag as written in the text, e.g. C3.")
-    source_type: Literal["runbook"]
-    source_id: str = Field(description="The source document, e.g. data/runbooks/ledger-read-only-write-errors.md.")
-    chunk_id: uuid.UUID
+    source_type: SourceType
+    source_id: str = Field(description="The source: a document path (runbook, postmortem) or a deploy id.")
+    chunk_id: uuid.UUID | None = Field(description="The cited chunk of the document; null for a deploy.")
     chunk_excerpt: str
+
+
+class DegradedSource(BaseModel):
+    source: EvidenceSource
+    reason: str = Field(description="Why it was left out, e.g. 'timed out after 500 ms' or 'HTTP 503'.")
 
 
 class BriefSection(BaseModel):
@@ -120,6 +133,8 @@ class TriageBrief(BaseModel):
     model: str
     prompt_version: str
     usage: TriageUsage
+    degraded_sources: list[DegradedSource] = Field(
+        description="Evidence sources that failed or timed out; the brief makes no claims about them.")
 
 
 # Payloads of the triage stream's events, one model per SSE `event:` name.
@@ -133,6 +148,10 @@ class CitationEvent(Citation):
 
 class SectionCompleteEvent(BaseModel):
     section: SectionName
+
+
+class DegradedSourceEvent(DegradedSource):
+    """Sent before the first token, once per source that failed or timed out."""
 
 
 class ErrorEvent(BaseModel):

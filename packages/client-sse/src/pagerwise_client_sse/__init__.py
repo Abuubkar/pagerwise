@@ -12,6 +12,7 @@ from pagerwise_client import Client
 from pagerwise_client.api.default import stream_triage as _stream_triage
 from pagerwise_client.models import (
     CitationEvent,
+    DegradedSourceEvent,
     ErrorEvent,
     Problem,
     SectionCompleteEvent,
@@ -19,9 +20,10 @@ from pagerwise_client.models import (
     TriageBrief,
 )
 
-TriageEvent = TokenEvent | CitationEvent | SectionCompleteEvent | TriageBrief | ErrorEvent
+TriageEvent = DegradedSourceEvent | TokenEvent | CitationEvent | SectionCompleteEvent | TriageBrief | ErrorEvent
 
 EVENT_MODELS: dict[str, type[TriageEvent]] = {
+    "degraded_source": DegradedSourceEvent,
     "token": TokenEvent,
     "citation": CitationEvent,
     "section_complete": SectionCompleteEvent,
@@ -31,7 +33,7 @@ EVENT_MODELS: dict[str, type[TriageEvent]] = {
 
 
 class TriageStreamRefused(Exception):
-    """The stream didn't open (404, 409): the server's problem document is on `.problem`."""
+    """The stream didn't open (404): the server's problem document is on `.problem`."""
 
     def __init__(self, problem: Problem):
         super().__init__(f"{problem.status} {problem.code}: {problem.detail or problem.title}")

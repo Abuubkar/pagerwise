@@ -9,6 +9,11 @@ from .brief_section import BriefSection
 from .brief_sections import BriefSections
 from .citation import Citation
 from .citation_event import CitationEvent
+from .citation_source_type import CitationSourceType
+from .degraded_source import DegradedSource
+from .degraded_source_event import DegradedSourceEvent
+from .degraded_source_event_source import DegradedSourceEventSource
+from .degraded_source_source import DegradedSourceSource
 from .dlq_replay_accepted import DlqReplayAccepted
 from .dlq_replay_request import DlqReplayRequest
 from .error_event import ErrorEvent
@@ -41,6 +46,11 @@ __all__ = (
     "BriefSections",
     "Citation",
     "CitationEvent",
+    "CitationSourceType",
+    "DegradedSource",
+    "DegradedSourceEvent",
+    "DegradedSourceEventSource",
+    "DegradedSourceSource",
     "DlqReplayAccepted",
     "DlqReplayRequest",
     "ErrorEvent",

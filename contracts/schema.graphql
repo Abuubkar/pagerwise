@@ -1,3 +1,15 @@
+union AcknowledgeResult = Incident | VersionConflict
+
+type AlertGroup {
+  service: String!
+  alertname: String
+  instance: String
+  fingerprint: String!
+  count: Int!
+  firstAt: DateTime!
+  lastAt: DateTime!
+}
+
 """Date with time (isoformat)"""
 scalar DateTime
 
@@ -10,6 +22,16 @@ type Incident {
   summary: String!
   openedAt: DateTime!
   version: Int!
+  alertCount: Int!
+  lastAlertAt: DateTime
+
+  """
+  Alert groups by fingerprint, busiest first: the incident's timeline material.
+  """
+  alerts(first: Int! = 20): [AlertGroup!]!
+
+  """The latest triage of this incident, if any."""
+  triage: Triage
 }
 
 type IncidentConnection {
@@ -35,6 +57,18 @@ input IncidentFilter {
   severity: String = null
 }
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).
+"""
+scalar JSON @specifiedBy(url: "https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
+
+type Mutation {
+  """
+  Acknowledge the incident as of the version you saw. If a new kind of alert joined or severity rose since, you get VersionConflict and nothing changes.
+  """
+  acknowledgeIncident(id: UUID!, expectedVersion: Int!): AcknowledgeResult!
+}
+
 """Information to aid in pagination."""
 type PageInfo {
   """When paginating forwards, are there more items?"""
@@ -57,4 +91,34 @@ type Query {
   incidents(filter: IncidentFilter = null, first: Int! = 25, after: String = null): IncidentConnection!
 }
 
+type Subscription {
+  """Incidents as they open or change, optionally for one service."""
+  incidentUpdated(service: String = null): Incident!
+
+  """A triage's events from its first one, live, ending with done or error."""
+  triageProgress(triageId: UUID!): TriageProgress!
+}
+
+type Triage {
+  id: UUID!
+  status: String!
+  verdict: String
+  incidentVersion: Int!
+  degradedSources: [String!]!
+  createdAt: DateTime!
+  finishedAt: DateTime
+}
+
+type TriageProgress {
+  triageId: UUID!
+  event: String!
+  data: JSON!
+}
+
 scalar UUID
+
+type VersionConflict {
+  incidentId: UUID!
+  expectedVersion: Int!
+  currentVersion: Int!
+}

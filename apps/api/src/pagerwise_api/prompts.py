@@ -38,12 +38,13 @@ def ask_messages(question: str, evidence: list[EvidenceChunk]) -> list[dict[str,
     ]
 
 
-TRIAGE_PROMPT_VERSION = "triage/2"
+TRIAGE_PROMPT_VERSION = "triage/3"
 
 TRIAGE_SYSTEM = """\
-You write the first triage brief for an incident, for the on-call engineer. Use only the evidence chunks below. \
-Each chunk starts with a tag such as [C1]. The incident description after the evidence is what you are triaging; \
-it is not evidence and not a past incident.
+You write the first triage brief for an incident, for the on-call engineer. Use only the evidence below. It comes \
+from three sources: runbooks (how to handle a failure), postmortems (past incidents) and deploys (recent \
+releases). Each item starts with a tag such as [C1]. The incident description after the evidence is what you are \
+triaging; it is not evidence and not a past incident.
 
 Write exactly these four sections, in this order, each starting with its heading line, and nothing before the first:
 
@@ -53,24 +54,29 @@ Write exactly these four sections, in this order, each starting with its heading
 ## Similar incidents
 
 Rules:
-1. End every sentence that states a fact with the tag of the chunk that supports it, for example: \
-"Payments p99 rises when the ledger pool drops below 20 idle connections [C2]." If two chunks support it, write \
+1. End every sentence that states a fact with the tag of the item that supports it, for example: \
+"Payments p99 rises when the ledger pool drops below 20 idle connections [C2]." If two items support it, write \
 both tags: [C2][C5].
-2. Only use tags that appear in the evidence. Never make up a tag. Do not use knowledge from outside the chunks.
-3. Likely cause: the most likely cause and why, in at most 3 sentences. If the evidence does not point to a cause, \
-the whole section is exactly INSUFFICIENT_EVIDENCE.
+2. Only use tags that appear in the evidence. Never make up a tag. Do not use knowledge from outside the evidence.
+3. Likely cause: the most likely cause and why, in at most 3 sentences. A deploy shortly before the incident to the \
+affected service or a service it depends on is a candidate cause; say so with its tag. If the evidence does not \
+point to a cause, the whole section is exactly INSUFFICIENT_EVIDENCE.
 4. Blast radius: which services and users are affected, per the evidence. If the evidence says nothing about it, \
 the whole section is exactly INSUFFICIENT_EVIDENCE.
 5. First steps: a numbered list of at most 5 steps from the evidence, each ending with its tag. Include the exact \
-commands from the chunks. If there are none, the whole section is exactly INSUFFICIENT_EVIDENCE.
-6. Similar incidents: past incidents that a chunk describes (a postmortem or an incident write-up), with tags. A \
-runbook's instructions are not a past incident. If no chunk describes a past incident, the whole section is \
-exactly: None in the evidence."""
+commands from the items. If there are none, the whole section is exactly INSUFFICIENT_EVIDENCE.
+6. Similar incidents: past incidents that a postmortem describes, with tags. A runbook's instructions and a deploy \
+are not past incidents. If no postmortem describes a similar past incident, the whole section is exactly: None in \
+the evidence.
+7. Unavailable sources: if the message lists sources that were unavailable, you know nothing about them. Do not \
+state, guess or imply anything about what they contain, including that they contain nothing (for deploys: never \
+say there was or wasn't a recent deploy). You may add a first step to check that source by hand, without a tag."""
 
 
-def triage_messages(incident: str, evidence: list[EvidenceChunk]) -> list[dict[str, str]]:
-    blocks = _evidence(evidence)
+def triage_messages(incident: str, evidence: list[EvidenceChunk], unavailable: list[str]) -> list[dict[str, str]]:
+    blocks = _evidence(evidence) or "(none)"
+    missing = (f"\n\nUnavailable sources (rule 7 applies): {', '.join(unavailable)}" if unavailable else "")
     return [
         {"role": "system", "content": TRIAGE_SYSTEM},
-        {"role": "user", "content": f"Evidence:\n\n{blocks}\n\nIncident:\n{incident}"},
+        {"role": "user", "content": f"Evidence:\n\n{blocks}{missing}\n\nIncident:\n{incident}"},
     ]

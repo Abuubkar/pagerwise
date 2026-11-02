@@ -9,12 +9,17 @@ from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.problem import Problem
 from ...models.triage_accepted import TriageAccepted
-from ...types import Response
+from ...types import Response, Unset
 
 
 def _get_kwargs(
     incident_id: UUID,
+    *,
+    x_pagerwise_tenant: str | Unset = "default",
 ) -> dict[str, Any]:
+    headers: dict[str, Any] = {}
+    if not isinstance(x_pagerwise_tenant, Unset):
+        headers["X-Pagerwise-Tenant"] = x_pagerwise_tenant
 
     _kwargs: dict[str, Any] = {
         "method": "post",
@@ -23,6 +28,7 @@ def _get_kwargs(
         ),
     }
 
+    _kwargs["headers"] = headers
     return _kwargs
 
 
@@ -43,6 +49,11 @@ def _parse_response(
         response_409 = Problem.from_dict(response.json())
 
         return response_409
+
+    if response.status_code == 503:
+        response_503 = Problem.from_dict(response.json())
+
+        return response_503
 
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
@@ -65,16 +76,21 @@ def sync_detailed(
     incident_id: UUID,
     *,
     client: AuthenticatedClient | Client,
+    x_pagerwise_tenant: str | Unset = "default",
 ) -> Response[Problem | TriageAccepted]:
     """Queue a triage of the incident's current version
 
-     Returns 202 with the run's id; the brief is produced on `stream_url`. While a triage of this
-    incident
-    version is queued or running, another request gets 409 `triage_in_progress` with that run's
-    `triage_id`.
+     Returns 202 with the run's id; the triage worker generates the brief and `stream_url` streams it.
+    While a
+    triage of this incident version is queued or running, another request gets 409 `triage_in_progress`
+    with
+    that run's `triage_id`. A tenant that already has its limit of triages queued or running gets 503
+    `triage_capacity` with a `Retry-After` header. Triages also start by themselves when alerts open an
+    incident.
 
     Args:
         incident_id (UUID):
+        x_pagerwise_tenant (str | Unset):  Default: 'default'.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -86,6 +102,7 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         incident_id=incident_id,
+        x_pagerwise_tenant=x_pagerwise_tenant,
     )
 
     response = client.get_httpx_client().request(
@@ -99,16 +116,21 @@ def sync(
     incident_id: UUID,
     *,
     client: AuthenticatedClient | Client,
+    x_pagerwise_tenant: str | Unset = "default",
 ) -> Problem | TriageAccepted | None:
     """Queue a triage of the incident's current version
 
-     Returns 202 with the run's id; the brief is produced on `stream_url`. While a triage of this
-    incident
-    version is queued or running, another request gets 409 `triage_in_progress` with that run's
-    `triage_id`.
+     Returns 202 with the run's id; the triage worker generates the brief and `stream_url` streams it.
+    While a
+    triage of this incident version is queued or running, another request gets 409 `triage_in_progress`
+    with
+    that run's `triage_id`. A tenant that already has its limit of triages queued or running gets 503
+    `triage_capacity` with a `Retry-After` header. Triages also start by themselves when alerts open an
+    incident.
 
     Args:
         incident_id (UUID):
+        x_pagerwise_tenant (str | Unset):  Default: 'default'.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -121,6 +143,7 @@ def sync(
     return sync_detailed(
         incident_id=incident_id,
         client=client,
+        x_pagerwise_tenant=x_pagerwise_tenant,
     ).parsed
 
 
@@ -128,16 +151,21 @@ async def asyncio_detailed(
     incident_id: UUID,
     *,
     client: AuthenticatedClient | Client,
+    x_pagerwise_tenant: str | Unset = "default",
 ) -> Response[Problem | TriageAccepted]:
     """Queue a triage of the incident's current version
 
-     Returns 202 with the run's id; the brief is produced on `stream_url`. While a triage of this
-    incident
-    version is queued or running, another request gets 409 `triage_in_progress` with that run's
-    `triage_id`.
+     Returns 202 with the run's id; the triage worker generates the brief and `stream_url` streams it.
+    While a
+    triage of this incident version is queued or running, another request gets 409 `triage_in_progress`
+    with
+    that run's `triage_id`. A tenant that already has its limit of triages queued or running gets 503
+    `triage_capacity` with a `Retry-After` header. Triages also start by themselves when alerts open an
+    incident.
 
     Args:
         incident_id (UUID):
+        x_pagerwise_tenant (str | Unset):  Default: 'default'.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,6 +177,7 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         incident_id=incident_id,
+        x_pagerwise_tenant=x_pagerwise_tenant,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -160,16 +189,21 @@ async def asyncio(
     incident_id: UUID,
     *,
     client: AuthenticatedClient | Client,
+    x_pagerwise_tenant: str | Unset = "default",
 ) -> Problem | TriageAccepted | None:
     """Queue a triage of the incident's current version
 
-     Returns 202 with the run's id; the brief is produced on `stream_url`. While a triage of this
-    incident
-    version is queued or running, another request gets 409 `triage_in_progress` with that run's
-    `triage_id`.
+     Returns 202 with the run's id; the triage worker generates the brief and `stream_url` streams it.
+    While a
+    triage of this incident version is queued or running, another request gets 409 `triage_in_progress`
+    with
+    that run's `triage_id`. A tenant that already has its limit of triages queued or running gets 503
+    `triage_capacity` with a `Retry-After` header. Triages also start by themselves when alerts open an
+    incident.
 
     Args:
         incident_id (UUID):
+        x_pagerwise_tenant (str | Unset):  Default: 'default'.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -183,5 +217,6 @@ async def asyncio(
         await asyncio_detailed(
             incident_id=incident_id,
             client=client,
+            x_pagerwise_tenant=x_pagerwise_tenant,
         )
     ).parsed
