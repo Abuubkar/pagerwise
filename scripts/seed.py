@@ -3,7 +3,8 @@
   corpus   120 runbooks (12 services x 10 failure modes) and 60 postmortems, rendered from data/templates/ into
            data/corpus/, plus evals/planted_facts.json: one specific, checkable fact per runbook section that has
            one, and each postmortem's root cause, with a question an on-call engineer would ask.
-  deploys  30 days of deploys into the deploys table, including the deploys the recent postmortems blame.
+  deploys  30 days of deploys into data/corpus/deploys.json (served by docs_mock), including the deploys the
+           recent postmortems blame.
   graph    data/service_graph.yaml into the services and service_edges tables (clustering reads them).
   alerts   500k historical alert_events over the 30 days before the anchor, via COPY: a daily cycle (busiest at
            14:00 UTC, quieter at weekends) plus 3 storms. No incident_id: history predates clustering.
@@ -35,13 +36,14 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 import asyncpg
 from sqlalchemy import delete
 
-from pagerwise_api.db import Deploy, Service as ServiceRow, ServiceEdge, SessionLocal, engine
+from pagerwise_api.db import Service as ServiceRow, ServiceEdge, SessionLocal, engine
 from pagerwise_api.settings import settings
 from pagerwise_simulator import Service, fingerprint, load_graph, summary
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "data" / "corpus"
 FACTS = ROOT / "evals" / "planted_facts.json"
+DEPLOYS = CORPUS / "deploys.json"
 
 
 @dataclass(frozen=True)
@@ -230,7 +232,8 @@ def corpus(seed: int, anchor: datetime) -> None:
     graph = load_graph()
     env = Environment(loader=FileSystemLoader(ROOT / "data" / "templates"), undefined=StrictUndefined,
                       trim_blocks=True, lstrip_blocks=True, keep_trailing_newline=True)
-    shutil.rmtree(CORPUS, ignore_errors=True)
+    for folder in ("runbooks", "postmortems"):  # deploys.json lives here too; only regenerate the documents
+        shutil.rmtree(CORPUS / folder, ignore_errors=True)
     (CORPUS / "runbooks").mkdir(parents=True)
     (CORPUS / "postmortems").mkdir(parents=True)
     facts: list[dict] = []
@@ -347,8 +350,9 @@ def corpus(seed: int, anchor: datetime) -> None:
           f"{len(facts)} planted facts to {FACTS.relative_to(ROOT)}")
 
 
-async def deploys(seed: int, anchor: datetime) -> None:
-    """30 days of deploys before the anchor, replacing whatever is in the table, plus the blamed postmortem deploys."""
+def deploys(seed: int, anchor: datetime) -> None:
+    """30 days of deploys before the anchor, plus the deploys the recent postmortems blame, written to
+    data/corpus/deploys.json. docs_mock serves them at GET /v1/deploys; triage fetches them from there."""
     rng = random.Random(seed + 1)
     fake = Faker()
     fake.seed_instance(seed + 1)
@@ -364,24 +368,25 @@ async def deploys(seed: int, anchor: datetime) -> None:
             for _ in range(rng.choice([0, 0, 1, 1, 2, 3])):
                 patch += 1
                 at = day.replace(hour=rng.randint(8, 18), minute=rng.randint(0, 59))
-                rows.append(Deploy(service=service.name, version=f"{major}.{minor}.{patch}", deployed_at=at,
-                                   author=fake.name(), commit_sha=hashlib.sha1(f"{service.name}{patch}{seed}".encode())
-                                   .hexdigest(), summary=rng.choice(changes).format(thing=rng.choice(things)),
-                                   status="rolled_back" if rng.random() < 0.05 else "succeeded"))
+                rows.append({"service": service.name, "version": f"{major}.{minor}.{patch}", "deployed_at": at,
+                             "author": fake.name(),
+                             "commit_sha": hashlib.sha1(f"{service.name}{patch}{seed}".encode()).hexdigest(),
+                             "summary": rng.choice(changes).format(thing=rng.choice(things)),
+                             "status": "rolled_back" if rng.random() < 0.05 else "succeeded"})
             day += timedelta(days=1)
     blamed = [f["deploy"] for f in json.loads(FACTS.read_text())["facts"] if f.get("deploy")]
     for d in blamed:
         hour, minute = map(int, d["deployed_at"].split(":"))
-        at = datetime.fromisoformat(d["date"]).replace(hour=hour, minute=minute, tzinfo=UTC)
-        rows.append(Deploy(service=d["service"], version=d["version"], deployed_at=at, author=fake.name(),
-                           commit_sha=hashlib.sha1(f"{d['service']}{d['version']}".encode()).hexdigest(),
-                           summary=f"Release {d['version']}", status="succeeded"))
-    async with SessionLocal() as session:
-        await session.execute(delete(Deploy))
-        session.add_all(rows)
-        await session.commit()
-    await engine.dispose()
-    print(f"seeded {len(rows)} deploys over 30 days ({len(blamed)} blamed by postmortems)")
+        rows.append({"service": d["service"], "version": d["version"],
+                     "deployed_at": datetime.fromisoformat(d["date"]).replace(hour=hour, minute=minute, tzinfo=UTC),
+                     "author": fake.name(), "commit_sha": hashlib.sha1(f"{d['service']}{d['version']}".encode()).hexdigest(),
+                     "summary": f"Release {d['version']}", "status": "succeeded"})
+    rows.sort(key=lambda r: (r["deployed_at"], r["service"]))
+    for i, row in enumerate(rows, start=1):
+        row["id"] = f"dep-{i:04}"
+        row["deployed_at"] = row["deployed_at"].isoformat()
+    DEPLOYS.write_text(json.dumps({"seed": seed, "anchor": anchor.date().isoformat(), "deploys": rows}, indent=1) + "\n")
+    print(f"wrote {len(rows)} deploys over 30 days ({len(blamed)} blamed by postmortems) to {DEPLOYS.relative_to(ROOT)}")
 
 
 async def graph_tables() -> None:
@@ -472,7 +477,7 @@ def main() -> None:
     if args.what == "corpus":
         corpus(args.seed, anchor)
     elif args.what == "deploys":
-        asyncio.run(deploys(args.seed, anchor))
+        deploys(args.seed, anchor)
     elif args.what == "graph":
         asyncio.run(graph_tables())
     else:

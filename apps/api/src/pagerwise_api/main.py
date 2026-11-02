@@ -1,20 +1,21 @@
 import uuid
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, AsyncIterator
 from typing import Annotated, Any
 
-from fastapi import Depends, FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Header, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.sse import EventSourceResponse, ServerSentEvent
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from pagerwise_api import llm, prompts, retrieval, schemas, service
+from pagerwise_api import bus, llm, prompts, retrieval, schemas, service, triage
 from pagerwise_api.db import TriageRun, get_session
 from pagerwise_api.graphql import graphql_router
 from pagerwise_api.schemas import ApiProblem, Problem, ProblemCode
 
-app = FastAPI(title="Pagerwise", version="0.4.0")
+app = FastAPI(title="Pagerwise", version="0.5.0")
 app.include_router(graphql_router, prefix="/graphql", include_in_schema=False)
 
 PROBLEM_JSON = "application/problem+json"
@@ -22,14 +23,26 @@ EVENT_STREAM = "text/event-stream"
 Session = Annotated[AsyncSession, Depends(get_session)]
 
 
-def problem_response(problem: Problem) -> JSONResponse:
+async def get_redis() -> AsyncIterator[Redis]:
+    redis = bus.connect()
+    try:
+        yield redis
+    finally:
+        await redis.aclose()
+
+
+RedisClient = Annotated[Redis, Depends(get_redis)]
+
+
+def problem_response(problem: Problem, retry_after: int | None = None) -> JSONResponse:
+    headers = {"Retry-After": str(retry_after)} if retry_after is not None else None
     return JSONResponse(problem.model_dump(mode="json", exclude_none=True), status_code=problem.status,
-                        media_type=PROBLEM_JSON)
+                        media_type=PROBLEM_JSON, headers=headers)
 
 
 @app.exception_handler(ApiProblem)
 async def api_problem_handler(_: Request, exc: ApiProblem) -> JSONResponse:
-    return problem_response(exc.problem)
+    return problem_response(exc.problem, exc.retry_after)
 
 
 @app.exception_handler(RequestValidationError)
@@ -117,9 +130,13 @@ async def get_incident(incident_id: uuid.UUID, session: Session) -> schemas.Inci
     return schemas.Incident.model_validate(row)
 
 
-@app.post("/v1/incidents/{incident_id}/triage", operation_id="startTriage", status_code=202, responses=_problems(404, 409))
-async def start_triage(incident_id: uuid.UUID, session: Session) -> schemas.TriageAccepted:
-    run = await service.start_triage(session, incident_id)
+@app.post("/v1/incidents/{incident_id}/triage", operation_id="startTriage", status_code=202,
+          responses=_problems(404, 409, 503))
+async def start_triage(
+    incident_id: uuid.UUID, session: Session, redis: RedisClient,
+    tenant: Annotated[str, Header(alias="X-Pagerwise-Tenant", min_length=1, max_length=64)] = "default",
+) -> schemas.TriageAccepted:
+    run = await service.start_triage(session, redis, incident_id, tenant)
     return schemas.TriageAccepted(triage_id=run.id, incident_id=run.incident_id, incident_version=run.incident_version,
                                   stream_url=f"/v1/incidents/{incident_id}/triage/stream")
 
@@ -130,30 +147,30 @@ async def replay_dead_letters(body: schemas.DlqReplayRequest, session: Session) 
     return schemas.DlqReplayAccepted(replayed=len(offsets), dlq_offsets=offsets)
 
 
-async def _open_triage_stream(incident_id: uuid.UUID, session: Session) -> tuple[TriageRun, bool]:
+async def _latest_triage(incident_id: uuid.UUID, session: Session) -> TriageRun:
     """A dependency, not the first line of the endpoint: a streaming endpoint has already sent 200 and its headers
-    by the time its body runs, so a 404 or 409 raised there would be lost. Dependencies run before the response."""
-    return await service.open_triage_stream(session, incident_id)
+    by the time its body runs, so a 404 raised there would be lost. Dependencies run before the response."""
+    return await service.latest_triage(session, incident_id)
 
 
 @app.get(
     "/v1/incidents/{incident_id}/triage/stream",
     operation_id="streamTriage",
     response_class=EventSourceResponse,
-    responses=_problems(404, 409),
+    responses=_problems(404),
     description=(
-        "The incident's latest triage as server-sent events. The first connection generates it; later ones replay "
-        "the stored result. Events, each with a JSON `data` payload: `token` (TokenEvent), `citation` "
-        "(CitationEvent, once a complete [Cn] tag has arrived), `section_complete` (SectionCompleteEvent), then "
-        "either `done` (TriageBrief) or `error` (ErrorEvent)."
+        "The incident's latest triage as server-sent events, from its first event, live while the triage worker "
+        "generates it, or replayed once it's finished; any number of clients can watch at once. Events, each with "
+        "a JSON `data` payload: `degraded_source` (DegradedSourceEvent, one per evidence source left out), `token` "
+        "(TokenEvent), `citation` (CitationEvent, once a complete [Cn] tag has arrived), `section_complete` "
+        "(SectionCompleteEvent), then either `done` (TriageBrief) or `error` (ErrorEvent)."
     ),
 )
 async def stream_triage(
-    session: Session, opened: Annotated[tuple[TriageRun, bool], Depends(_open_triage_stream)]
+    session: Session, redis: RedisClient, run: Annotated[TriageRun, Depends(_latest_triage)]
 ) -> AsyncIterable[ServerSentEvent]:
-    run, claimed = opened
-    async for name, payload in service.triage_events(session, run, claimed):
-        yield ServerSentEvent(event=name, data=payload)
+    async for name, data in triage.events(session, redis, run.id):
+        yield ServerSentEvent(event=name, raw_data=data)
 
 
 _default_openapi = app.openapi
@@ -182,7 +199,7 @@ def openapi_with_problem_json() -> dict[str, Any]:
         for unused in ("HTTPValidationError", "ValidationError"):
             components.pop(unused, None)
         for model in (schemas.TokenEvent, schemas.CitationEvent, schemas.SectionCompleteEvent, schemas.TriageBrief,
-                      schemas.ErrorEvent):
+                      schemas.ErrorEvent, schemas.DegradedSourceEvent):
             definition = model.model_json_schema(ref_template="#/components/schemas/{model}")
             for name, nested in definition.pop("$defs", {}).items():
                 components.setdefault(name, nested)

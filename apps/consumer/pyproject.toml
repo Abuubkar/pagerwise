@@ -6,7 +6,6 @@ requires-python = ">=3.13"
 dependencies = [
     "pagerwise-api",
     "pagerwise-kafka",
-    "redis>=8.1.0",
 ]
 
 [build-system]

@@ -1,6 +1,6 @@
 OASDIFF := docker run --rm -v $(CURDIR):/specs:ro tufin/oasdiff:v1.35.0
 
-.PHONY: codegen contract-check test test-int smoke topics storm
+.PHONY: codegen contract-check test test-int smoke topics storm web-test
 
 # Regenerate everything derived from the contracts. Generated code is never edited by hand.
 codegen:
@@ -12,6 +12,7 @@ codegen:
 		--use-union-operator --use-annotated --strict-nullable --formatters builtin --disable-timestamp \
 		--custom-file-header '# Generated from contracts/kafka/alert.v1.json by `make codegen`. Do not edit.' \
 		--output packages/kafka/src/pagerwise_kafka/alert_v1.py
+	cd apps/web && pnpm codegen
 
 # Fails if the running code would break a client generated from contracts/openapi.yaml.
 contract-check:
@@ -24,6 +25,9 @@ test:
 
 test-int:
 	uv run pytest -m integration
+
+web-test:
+	cd apps/web && pnpm test && pnpm typecheck
 
 smoke:
 	uv run python scripts/smoke.py

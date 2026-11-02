@@ -1,20 +1,17 @@
 """Business logic. REST routes and GraphQL resolvers stay thin and call these functions."""
 
 import asyncio
-import time
 import uuid
-from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
 from aiokafka.errors import KafkaError
-from pydantic import BaseModel
-from sqlalchemy import Select, func, or_, select, tuple_, update
+from sqlalchemy import Select, func, select, tuple_, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import pagerwise_kafka as k
-from pagerwise_api import citations, cursor, llm, prompts, schemas
+from pagerwise_api import bus, cursor, llm, prompts, schemas
 from pagerwise_api.citations import Verdict, parse_answer
 from pagerwise_api.db import Answer, DeadLetter, Incident, TriageRun
 from pagerwise_api.embedding import count_tokens
@@ -143,27 +140,30 @@ async def list_incidents(
 # --- Triage ----------------------------------------------------------------------------------------------------
 
 
-def _stale_heartbeat():  # noqa: ANN202 - a SQL expression
+def stale_heartbeat():  # noqa: ANN202 - a SQL expression
+    """A running triage whose heartbeat is this old was abandoned (its worker died)."""
     return TriageRun.heartbeat_at < func.now() - timedelta(seconds=settings.triage_abandoned_after_s)
 
 
-async def start_triage(session: AsyncSession, incident_id: uuid.UUID) -> TriageRun:
-    """Queue a triage of the incident's current version. A second request while one is queued or running gets
-    409 with the existing run's id; the partial unique index decides, so concurrent requests can't both win."""
+async def start_triage(session: AsyncSession, redis, incident_id: uuid.UUID,  # noqa: ANN001 - Redis
+                       tenant: str = "default") -> TriageRun:
+    """Queue a triage of the incident's current version for the triage worker. A second request while one is queued
+    or running gets 409 with the existing run's id (the partial unique index decides, so concurrent requests can't
+    both win); a tenant already at its limit of queued + running triages gets 503 with Retry-After."""
     incident = await session.get(Incident, incident_id)
     if incident is None:
         raise ApiProblem(404, ProblemCode.NOT_FOUND, "Incident not found", f"no incident with id {incident_id}")
-    # A run whose stream died without finishing would block every new triage of this version forever.
+    # A run whose worker died without finishing would block every new triage of this version forever.
     await session.execute(
         update(TriageRun)
-        .where(TriageRun.incident_id == incident_id, TriageRun.status == "running", _stale_heartbeat())
+        .where(TriageRun.incident_id == incident_id, TriageRun.status == "running", stale_heartbeat())
         .values(status="failed", error_code=ProblemCode.TRIAGE_ABANDONED, finished_at=func.now())
     )
     version = incident.version  # read now: a rollback below expires the loaded row
-    run = TriageRun(incident_id=incident_id, incident_version=version)
+    run = TriageRun(incident_id=incident_id, incident_version=version, tenant=tenant)
     session.add(run)
     try:
-        await session.commit()
+        await session.flush()
     except IntegrityError as exc:
         await session.rollback()
         if "uq_triage_runs_active" not in str(exc.orig):
@@ -180,165 +180,49 @@ async def start_triage(session: AsyncSession, incident_id: uuid.UUID) -> TriageR
             f"incident {incident_id} version {version} already has a queued or running triage",
             triage_id=existing,
         ) from None
+    run_id = run.id
+    if not await bus.acquire_triage_slot(redis, tenant, run_id):
+        await session.rollback()  # the run was never committed
+        raise ApiProblem(503, ProblemCode.TRIAGE_CAPACITY, "Triage capacity reached",
+                         f"tenant {tenant} already has {settings.triage_tenant_limit} triages queued or running",
+                         retry_after=settings.triage_retry_after_s)
+    try:
+        await session.commit()
+    except Exception:
+        await bus.release_triage_slot(redis, tenant, run_id)
+        raise
+    await bus.wake_worker(redis)
     await session.refresh(run)
     return run
 
 
-async def open_triage_stream(session: AsyncSession, incident_id: uuid.UUID) -> tuple[TriageRun, bool]:
-    """The incident's latest triage, and whether this caller should generate it (True: claimed) or replay it.
-    Raises before any byte is streamed, so failures are ordinary problem responses (ADR 0004)."""
+async def latest_triage(session: AsyncSession, incident_id: uuid.UUID) -> TriageRun:
     run = await session.scalar(
         select(TriageRun).where(TriageRun.incident_id == incident_id).order_by(TriageRun.created_at.desc()).limit(1)
     )
     if run is None:
         raise ApiProblem(404, ProblemCode.NOT_FOUND, "No triage", f"incident {incident_id} has no triage; POST one first")
-    claimed = await session.scalar(
-        update(TriageRun)
-        .where(TriageRun.id == run.id, or_(TriageRun.status == "queued",
-                                           (TriageRun.status == "running") & _stale_heartbeat()))
-        .values(status="running", started_at=func.now(), heartbeat_at=func.now())
-        .returning(TriageRun.id)
+    return run
+
+
+async def acknowledge_incident(session: AsyncSession, incident_id: uuid.UUID,
+                               expected_version: int) -> Incident | int:
+    """Marks the incident acknowledged if it's still the version the caller saw. Returns the incident, or the
+    current version on a conflict (a new kind of alert joined, or severity rose, since the caller looked).
+    Acknowledging doesn't change the version: the version tracks what a triage would see, not the status."""
+    row = await session.scalar(
+        update(Incident).where(Incident.id == incident_id, Incident.version == expected_version,
+                               Incident.status != "resolved")
+        .values(status="acknowledged").returning(Incident)
     )
+    if row is None:
+        current = await session.scalar(select(Incident.version).where(Incident.id == incident_id))
+        await session.rollback()
+        if current is None:
+            raise ApiProblem(404, ProblemCode.NOT_FOUND, "Incident not found", f"no incident with id {incident_id}")
+        return current
     await session.commit()
-    if claimed:
-        await session.refresh(run)
-        return run, True
-    if run.status == "running":
-        raise ApiProblem(409, ProblemCode.TRIAGE_IN_PROGRESS, "Triage is streaming elsewhere",
-                         "another connection is generating this triage; open the stream again once it's done",
-                         triage_id=run.id)
-    return run, False
-
-
-def _incident_text(incident: Incident) -> str:
-    return (f"Title: {incident.title}\nService: {incident.service}\nSeverity: {incident.severity}\n"
-            f"Opened: {incident.opened_at.isoformat()}\nSummary: {incident.summary or '(none)'}")
-
-
-def _citation(item: dict, section: str | None) -> schemas.CitationEvent:
-    text = item["text"]
-    return schemas.CitationEvent(
-        tag=item["tag"], source_type="runbook", source_id=item["source_id"], chunk_id=item["chunk_id"],
-        chunk_excerpt=text if len(text) <= EXCERPT_CHARS else text[:EXCERPT_CHARS].rstrip() + "…",
-        section=section,  # type: ignore[arg-type]  # one of SECTIONS' values, or None
-    )
-
-
-TriageEvent = tuple[str, BaseModel]  # (SSE event name, payload)
-
-
-async def triage_events(session: AsyncSession, run: TriageRun, claimed: bool) -> AsyncIterator[TriageEvent]:
-    if not claimed:
-        async for event in _replay(run):
-            yield event
-        return
-
-    incident = await session.get(Incident, run.incident_id)
-    assert incident is not None  # triage_runs.incident_id is a foreign key
-    # Queried with the incident itself. Slice 5 builds a better query (neighbours, alerts, deploys).
-    retrieved = (await hybrid_search(session, f"{incident.title}\n{incident.summary}")).hits
-    evidence = _evidence(retrieved)
-    run.evidence = [
-        {"tag": e.tag, "source_type": r.source_type, "source_id": r.document_path, "chunk_id": str(r.chunk_id),
-         "heading_path": r.heading_path, "text": r.text}
-        for e, r in zip(evidence, retrieved, strict=True)
-    ]
-    run.model, run.prompt_version = settings.llm_model, prompts.TRIAGE_PROMPT_VERSION
-    await session.commit()
-    by_tag = {item["tag"]: item for item in run.evidence}
-
-    messages = prompts.triage_messages(_incident_text(incident), evidence)
-    scanner = citations.TagScanner(set(by_tag))
-    started = last_beat = time.monotonic()
-    result: llm.ChatResult | None = None
-    try:
-        async for piece in llm.chat_stream(messages, estimated_prompt_tokens=_estimate_tokens(messages)):
-            if isinstance(piece, llm.ChatResult):
-                result = piece
-                continue
-            if run.ttft_ms is None:
-                run.ttft_ms = int((time.monotonic() - started) * 1000)
-            for event in scanner.feed(piece):
-                yield _scan_event(event, by_tag)
-            if time.monotonic() - last_beat >= settings.triage_heartbeat_s:
-                run.heartbeat_at = datetime.now(UTC)
-                await session.commit()
-                last_beat = time.monotonic()
-    except llm.PromptTooLong as exc:
-        yield await _fail(session, run, ProblemCode.PROMPT_TOO_LONG, str(exc))
-        return
-    except ConnectionError:  # the ollama client's own error when Ollama isn't running
-        yield await _fail(session, run, ProblemCode.MODEL_UNAVAILABLE, "model server unreachable")
-        return
-    for event in scanner.finish():
-        yield _scan_event(event, by_tag)
-
-    assert result is not None  # Ollama's last chunk (done=True) carries the counts
-    run.raw_text = result.content
-    run.prompt_tokens, run.output_tokens = result.prompt_tokens, result.output_tokens
-    run.total_ms = int((time.monotonic() - started) * 1000)
-    parsed = citations.parse_brief(result.content, set(by_tag))
-    if parsed.verdict is None:
-        yield await _fail(session, run, ProblemCode.FORMAT_INVALID, "the brief broke the section contract",
-                          parsed.problems)
-        return
-    brief = _brief(run, parsed, by_tag)
-    # Python timestamps, not func.now(): a SQL expression on an ORM attribute expires it, and reading it back
-    # under asyncio would need a lazy load.
-    run.status, run.verdict, run.finished_at = "completed", brief.verdict, datetime.now(UTC)
-    run.brief = brief.model_dump(mode="json")
-    await session.commit()
-    yield "done", brief
-
-
-def _scan_event(event: citations.ScanEvent, by_tag: dict[str, dict]) -> TriageEvent:
-    match event:
-        case citations.TokenEvent(text):
-            return "token", schemas.TokenEvent(text=text)
-        case citations.CitationEvent(tag, section):
-            return "citation", _citation(by_tag[tag], section)
-        case citations.SectionCompleteEvent(section):
-            return "section_complete", schemas.SectionCompleteEvent(section=section)  # type: ignore[arg-type]
-    raise AssertionError(event)
-
-
-def _brief(run: TriageRun, parsed: citations.ParsedBrief, by_tag: dict[str, dict]) -> schemas.TriageBrief:
-    def section(key: str) -> schemas.BriefSection:
-        s = parsed.sections[key]
-        cited = [schemas.Citation(**_citation(by_tag[t], key).model_dump(exclude={"section"})) for t in s.tags]
-        return schemas.BriefSection(text=s.text, citations=cited)
-
-    assert parsed.verdict is not None and run.model and run.prompt_version
-    return schemas.TriageBrief(
-        triage_id=run.id, incident_id=run.incident_id, incident_version=run.incident_version, verdict=parsed.verdict,
-        sections=schemas.BriefSections(**{key: section(key) for key in citations.SECTIONS.values()}),
-        model=run.model, prompt_version=run.prompt_version,
-        usage=schemas.TriageUsage(prompt_tokens=run.prompt_tokens or 0, output_tokens=run.output_tokens or 0,
-                                  ttft_ms=run.ttft_ms or 0, total_ms=run.total_ms or 0),
-    )
-
-
-async def _fail(session: AsyncSession, run: TriageRun, code: ProblemCode, detail: str,
-                problems: list[str] | None = None) -> TriageEvent:
-    run.status, run.error_code, run.problems, run.finished_at = "failed", code, problems or [], datetime.now(UTC)
-    await session.commit()
-    return "error", schemas.ErrorEvent(code=code, detail=detail, problems=problems or [])
-
-
-async def _replay(run: TriageRun) -> AsyncIterator[TriageEvent]:
-    """A finished run streams again from what was stored, in the same event shapes as the live stream."""
-    if run.status == "failed":
-        yield "error", schemas.ErrorEvent(code=ProblemCode(run.error_code), detail="this triage failed",
-                                          problems=run.problems)
-        return
-    assert run.brief is not None
-    brief = schemas.TriageBrief.model_validate(run.brief)
-    yield "token", schemas.TokenEvent(text=run.raw_text)
-    for key in citations.SECTIONS.values():
-        for c in getattr(brief.sections, key).citations:
-            yield "citation", schemas.CitationEvent(**c.model_dump(), section=key)
-        yield "section_complete", schemas.SectionCompleteEvent(section=key)  # type: ignore[arg-type]
-    yield "done", brief
+    return row
 
 
 async def replay_dead_letters(session: AsyncSession, body: schemas.DlqReplayRequest) -> list[int]:

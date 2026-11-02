@@ -11,6 +11,7 @@ from ..models.triage_brief_verdict import TriageBriefVerdict
 
 if TYPE_CHECKING:
     from ..models.brief_sections import BriefSections
+    from ..models.degraded_source import DegradedSource
     from ..models.triage_usage import TriageUsage
 
 
@@ -30,6 +31,8 @@ class TriageBrief:
         model (str):
         prompt_version (str):
         usage (TriageUsage):
+        degraded_sources (list[DegradedSource]): Evidence sources that failed or timed out; the brief makes no claims
+            about them.
     """
 
     triage_id: UUID
@@ -40,6 +43,7 @@ class TriageBrief:
     model: str
     prompt_version: str
     usage: TriageUsage
+    degraded_sources: list[DegradedSource]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -59,6 +63,11 @@ class TriageBrief:
 
         usage = self.usage.to_dict()
 
+        degraded_sources = []
+        for degraded_sources_item_data in self.degraded_sources:
+            degraded_sources_item = degraded_sources_item_data.to_dict()
+            degraded_sources.append(degraded_sources_item)
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -71,6 +80,7 @@ class TriageBrief:
                 "model": model,
                 "prompt_version": prompt_version,
                 "usage": usage,
+                "degraded_sources": degraded_sources,
             }
         )
 
@@ -79,6 +89,7 @@ class TriageBrief:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.brief_sections import BriefSections  # noqa: PLC0415
+        from ..models.degraded_source import DegradedSource  # noqa: PLC0415
         from ..models.triage_usage import TriageUsage  # noqa: PLC0415
 
         d = dict(src_dict)
@@ -98,6 +109,13 @@ class TriageBrief:
 
         usage = TriageUsage.from_dict(d.pop("usage"))
 
+        degraded_sources = []
+        _degraded_sources = d.pop("degraded_sources")
+        for degraded_sources_item_data in _degraded_sources:
+            degraded_sources_item = DegradedSource.from_dict(degraded_sources_item_data)
+
+            degraded_sources.append(degraded_sources_item)
+
         triage_brief = cls(
             triage_id=triage_id,
             incident_id=incident_id,
@@ -107,6 +125,7 @@ class TriageBrief:
             model=model,
             prompt_version=prompt_version,
             usage=usage,
+            degraded_sources=degraded_sources,
         )
 
         triage_brief.additional_properties = d

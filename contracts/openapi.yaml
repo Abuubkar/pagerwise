@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Pagerwise
-  version: 0.4.0
+  version: 0.5.0
   description: |
     Incident-response copilot. This file is the contract: the code is checked against it with
     `make contract-check`, and the Python client is generated from it with `make codegen`.
@@ -122,11 +122,19 @@ paths:
     post:
       summary: Queue a triage of the incident's current version
       description: |
-        Returns 202 with the run's id; the brief is produced on `stream_url`. While a triage of this incident
-        version is queued or running, another request gets 409 `triage_in_progress` with that run's `triage_id`.
+        Returns 202 with the run's id; the triage worker generates the brief and `stream_url` streams it. While a
+        triage of this incident version is queued or running, another request gets 409 `triage_in_progress` with
+        that run's `triage_id`. A tenant that already has its limit of triages queued or running gets 503
+        `triage_capacity` with a `Retry-After` header. Triages also start by themselves when alerts open an
+        incident.
       operationId: startTriage
       parameters:
         - {$ref: '#/components/parameters/IncidentId'}
+        - name: X-Pagerwise-Tenant
+          in: header
+          required: false
+          description: Whose concurrency budget the triage counts against.
+          schema: {type: string, minLength: 1, maxLength: 64, default: default}
       responses:
         '202':
           description: Triage queued.
@@ -135,24 +143,34 @@ paths:
               schema: {$ref: '#/components/schemas/TriageAccepted'}
         '404': {$ref: '#/components/responses/Problem'}
         '409': {$ref: '#/components/responses/Problem'}
+        '503':
+          description: The tenant's triage limit is reached.
+          headers:
+            Retry-After:
+              description: Seconds to wait before asking again.
+              schema: {type: integer}
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
 
   /v1/incidents/{incident_id}/triage/stream:
     get:
       summary: Stream the incident's latest triage
       description: |
-        Server-sent events. The first connection generates the brief; later connections replay the stored
-        result in the same event shapes. Each event's `data` is JSON:
+        Server-sent events, from the triage's first event: live while the triage worker generates it, replayed
+        from the stored result once it's finished. Any number of clients can watch the same triage. Each event's
+        `data` is JSON:
 
         | event | data | when |
         |---|---|---|
+        | `degraded_source` | DegradedSourceEvent | before the first token, once per evidence source left out |
         | `token` | TokenEvent | a piece of the brief's markdown, as the model writes it |
         | `citation` | CitationEvent | a complete [Cn] tag has arrived (a tag can be split across tokens) |
         | `section_complete` | SectionCompleteEvent | a section's text is finished |
         | `done` | TriageBrief | the brief passed the section and citation contract; last event |
         | `error` | ErrorEvent | generation failed or the brief broke the contract; last event |
 
-        Concatenating the `token` texts gives exactly what the model wrote. A 409 `triage_in_progress` means
-        another connection is generating this run.
+        Concatenating the `token` texts gives exactly what the model wrote.
       operationId: streamTriage
       parameters:
         - {$ref: '#/components/parameters/IncidentId'}
@@ -163,7 +181,6 @@ paths:
             text/event-stream:
               schema: {type: string}
         '404': {$ref: '#/components/responses/Problem'}
-        '409': {$ref: '#/components/responses/Problem'}
 
   /v1/admin/dlq/replay:
     post:
@@ -208,7 +225,7 @@ components:
     ProblemCode:
       type: string
       enum: [invalid_request, invalid_cursor, not_found, triage_in_progress, model_unavailable, prompt_too_long,
-             format_invalid, triage_abandoned, broker_unavailable]
+             format_invalid, triage_abandoned, broker_unavailable, triage_capacity, triage_failed]
     Problem:
       type: object
       description: RFC 9457 problem details, plus our stable `code`.
@@ -285,10 +302,18 @@ components:
       required: [tag, source_type, source_id, chunk_id, chunk_excerpt]
       properties:
         tag: {type: string, description: 'The tag as written in the text, e.g. C3.'}
-        source_type: {type: string, const: runbook}
-        source_id: {type: string, description: 'The source document, e.g. data/runbooks/ledger-read-only-write-errors.md.'}
-        chunk_id: {type: string, format: uuid}
+        source_type: {type: string, enum: [runbook, postmortem, deploy]}
+        source_id: {type: string, description: 'The source: a document path (runbook, postmortem) or a deploy id.'}
+        chunk_id:
+          anyOf: [{type: string, format: uuid}, {type: 'null'}]
+          description: The cited chunk of the document; null for a deploy.
         chunk_excerpt: {type: string}
+    DegradedSource:
+      type: object
+      required: [source, reason]
+      properties:
+        source: {type: string, enum: [runbooks, postmortems, deploys]}
+        reason: {type: string, description: "Why it was left out, e.g. 'timed out after 500 ms' or 'HTTP 503'."}
     BriefSection:
       type: object
       required: [text, citations]
@@ -316,7 +341,8 @@ components:
     TriageBrief:
       type: object
       description: Data of the stream's `done` event.
-      required: [triage_id, incident_id, incident_version, verdict, sections, model, prompt_version, usage]
+      required: [triage_id, incident_id, incident_version, verdict, sections, model, prompt_version, usage,
+                 degraded_sources]
       properties:
         triage_id: {type: string, format: uuid}
         incident_id: {type: string, format: uuid}
@@ -328,6 +354,18 @@ components:
         model: {type: string}
         prompt_version: {type: string}
         usage: {$ref: '#/components/schemas/TriageUsage'}
+        degraded_sources:
+          type: array
+          items: {$ref: '#/components/schemas/DegradedSource'}
+          description: Evidence sources that failed or timed out; the brief makes no claims about them.
+
+    DegradedSourceEvent:
+      type: object
+      description: Data of the stream's `degraded_source` event, sent before the first token.
+      required: [source, reason]
+      properties:
+        source: {type: string, enum: [runbooks, postmortems, deploys]}
+        reason: {type: string, description: "Why it was left out, e.g. 'timed out after 500 ms' or 'HTTP 503'."}
 
     TokenEvent:
       type: object

@@ -33,7 +33,25 @@ class Settings(BaseSettings):
     # abandoned (its process died or its client left), so it stops blocking a new triage of that incident.
     triage_heartbeat_s: int = 15
     triage_abandoned_after_s: int = 120
+    # Evidence sources, fetched concurrently, each with its own timeout. The plan said 300/300/500 ms; hybrid search
+    # with reranking takes ~0.5 s on its own (ADR 0006), and two run at once on the CPU, so the document sources
+    # get 2 s. A source over its timeout is left out of the brief and named in degraded_sources.
+    triage_timeout_runbooks_s: float = 2.0
+    triage_timeout_postmortems_s: float = 2.0
+    triage_timeout_deploys_s: float = 0.5
+    triage_runbooks_k: int = 4
+    triage_postmortems_k: int = 3
+    triage_deploys_max: int = 5
+    triage_deploy_window_h: int = 2  # deploys this long before the incident opened are evidence
+    deploy_source_url: str = "http://localhost:8002"  # docs_mock's /v1/deploys stands in for a deploy tool
+    # Per-tenant limit on queued + running triages; one more gets 503 with Retry-After.
+    triage_tenant_limit: int = 2
+    triage_slot_ttl_s: int = 900  # a slot a crashed worker never released frees itself after this
+    triage_retry_after_s: int = 30
+    triage_poll_s: float = 5.0  # the worker also checks for queued runs this often, in case a wake-up was lost
 
+    # Browser origins allowed to open GraphQL subscriptions (WebSocket handshakes aren't covered by CORS).
+    web_origins: list[str] = ["http://localhost:3001"]
     redis_url: str = "redis://localhost:6379/0"
     incident_updates_channel: str = "incidents"  # JSON per changed incident; slice 5's GraphQL subscription reads it
 

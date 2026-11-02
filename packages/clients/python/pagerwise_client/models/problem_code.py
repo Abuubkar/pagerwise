@@ -10,6 +10,8 @@ class ProblemCode(StrEnum):
     NOT_FOUND = "not_found"
     PROMPT_TOO_LONG = "prompt_too_long"
     TRIAGE_ABANDONED = "triage_abandoned"
+    TRIAGE_CAPACITY = "triage_capacity"
+    TRIAGE_FAILED = "triage_failed"
     TRIAGE_IN_PROGRESS = "triage_in_progress"
 
     def __str__(self) -> str:

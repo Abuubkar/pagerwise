@@ -6,13 +6,17 @@
 - Next-page cursors belong to one version of the listing. Any change to the corpus makes them stale, and a stale
   cursor gets 404, as a real API's expired cursor would: the client has to restart, ideally with `since`.
 
-Test hooks, not part of the imitation: POST /_faults injects 5xx responses (randomly, or on given pages) or expires
-every cursor; POST /_touch edits a document; GET /_stats counts responses by status.
+It also stands in for a deploy tool: GET /v1/deploys?service=..&since=..&until=.. returns the seeded deploys
+(data/corpus/deploys.json), newest first.
+
+Test hooks, not part of the imitation: POST /_faults injects 5xx responses (randomly, or on given pages), takes an
+endpoint down or slows it, or expires every cursor; POST /_touch edits a document; GET /_stats counts responses.
 
 uv run python -m pagerwise_docs_mock [--port 8002] [--fail-rate 0.1]
 """
 
 import argparse
+import asyncio
 import hashlib
 import json
 import random
@@ -26,6 +30,7 @@ from fastapi import FastAPI, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 
 ROOT = Path(__file__).resolve().parents[4]
+DEFAULT_DEPLOYS = ROOT / "data" / "corpus" / "deploys.json"
 DEFAULT_COLLECTIONS = {
     "runbooks": [ROOT / "data" / "runbooks", ROOT / "data" / "corpus" / "runbooks"],
     "postmortems": [ROOT / "data" / "corpus" / "postmortems"],
@@ -46,6 +51,8 @@ class Faults(BaseModel):
     fail_pages: dict[int, int] = {}  # page number -> how many more requests for it fail
     fail_status: int = 503
     expire_cursors: bool = False  # make every cursor issued so far stale, once
+    down: list[str] = []  # endpoints answering 503 to everything: "runbooks", "postmortems", "deploys"
+    delay_ms: dict[str, int] = {}  # endpoint -> added latency, to trip a client's timeout
     seed: int = 0
 
 
@@ -54,9 +61,21 @@ class Touch(BaseModel):
     append: str = "\nEdited for a test.\n"
 
 
+class Deploy(BaseModel):
+    id: str
+    service: str
+    version: str
+    deployed_at: datetime
+    author: str
+    commit_sha: str
+    summary: str
+    status: str
+
+
 @dataclass
 class State:
     collections: dict[str, list[Document]]
+    deploys: list[Deploy] = field(default_factory=list)
     faults: Faults = field(default_factory=Faults)
     rng: random.Random = field(default_factory=random.Random)
     generation: int = 1  # version of every listing; cursors from older generations are stale
@@ -80,9 +99,12 @@ def load_documents(folders: list[Path]) -> list[Document]:
     return docs
 
 
-def create_app(collections: dict[str, list[Path]] | None = None, faults: Faults | None = None) -> FastAPI:
+def create_app(collections: dict[str, list[Path]] | None = None, faults: Faults | None = None,
+               deploys: Path | None = DEFAULT_DEPLOYS) -> FastAPI:
     app = FastAPI(title="docs mock")
     state = State({name: load_documents(folders) for name, folders in (collections or DEFAULT_COLLECTIONS).items()})
+    if deploys is not None and deploys.exists():
+        state.deploys = [Deploy.model_validate(d) for d in json.loads(deploys.read_text())["deploys"]]
     state.faults = faults or Faults()
     state.rng.seed(state.faults.seed)
     app.state.docs = state
@@ -90,8 +112,30 @@ def create_app(collections: dict[str, list[Path]] | None = None, faults: Faults 
     def count(key: str) -> None:
         state.stats[key] = state.stats.get(key, 0) + 1
 
+    async def injected(endpoint: str) -> None:
+        if delay := state.faults.delay_ms.get(endpoint):
+            await asyncio.sleep(delay / 1000)
+        if endpoint in state.faults.down:
+            count(str(state.faults.fail_status))
+            raise HTTPException(state.faults.fail_status, f"{endpoint} is down (injected)")
+
+    @app.get("/v1/deploys")
+    async def deploys_endpoint(
+        service: Annotated[list[str] | None, Query()] = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    ) -> list[Deploy]:
+        """Newest first. Registered before /v1/{collection} so it isn't taken for a document collection."""
+        await injected("deploys")
+        found = [d for d in state.deploys
+                 if (not service or d.service in service) and (since is None or d.deployed_at >= since)
+                 and (until is None or d.deployed_at <= until)]
+        count("200")
+        return sorted(found, key=lambda d: d.deployed_at, reverse=True)[:limit]
+
     @app.get("/v1/{collection}")
-    def listing(
+    async def listing(
         collection: str, request: Request,
         cursor: str | None = None,
         since: datetime | None = None,
@@ -99,6 +143,7 @@ def create_app(collections: dict[str, list[Path]] | None = None, faults: Faults 
     ) -> Response:
         if collection not in state.collections:
             raise HTTPException(404, f"no collection {collection}")
+        await injected(collection)
         offset = 0
         if cursor is not None:
             generation, _, raw_offset = cursor.partition(".")
