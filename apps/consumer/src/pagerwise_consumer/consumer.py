@@ -11,7 +11,10 @@ are committed in Postgres, and a record seen twice inserts nothing the second ti
 Records in one partition are processed in order, by one worker; partitions run in parallel. A record that fails
 transiently is republished to the next retry topic and committed; a malformed one, or one out of retries, goes to
 alerts.dlq and dead_letters. If Postgres or Kafka itself is down, the batch is retried in place: the partition
-stalls, the queues fill, and backpressure stops fetching."""
+stalls, the queues fill, and backpressure stops fetching.
+
+Each record gets a process span in its alert's trace, linked to its batch's span (pagerwise_kafka.tracing); the
+consumer's metrics (lag, pauses, outcomes, ingest freshness) are below. docs/adr/0012."""
 
 import asyncio
 import hashlib
@@ -22,14 +25,18 @@ import signal
 import socket
 import time
 import uuid
+import weakref
 from collections import deque
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 
 from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener, ConsumerRecord, TopicPartition
 from aiokafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
 from aiokafka.errors import KafkaError
+from opentelemetry import metrics, propagate, trace
+from opentelemetry.metrics import CallbackOptions, Observation
+from opentelemetry.trace import Span, Status, StatusCode
 from redis.exceptions import RedisError
 from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert
@@ -37,6 +44,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 import pagerwise_kafka as k
+import pagerwise_telemetry as telemetry
 from pagerwise_api import bus
 from pagerwise_api.db import DeadLetter, ServiceEdge, TriageRun
 from pagerwise_api.embedding import embed_passages
@@ -46,6 +54,18 @@ from pagerwise_consumer.flow import Backpressure
 from pagerwise_consumer.offsets import OffsetTracker
 
 log = logging.getLogger("pagerwise.consumer")
+tracer = trace.get_tracer("pagerwise.consumer")
+meter = metrics.get_meter("pagerwise.consumer")
+
+EVENTS = meter.create_counter(
+    "pagerwise.consumer.events", unit="{event}",
+    description="Records processed, by topic and outcome: stored, duplicate, retried, dead_lettered")
+DEAD_LETTERS = meter.create_counter("pagerwise.consumer.dead_letters", unit="{event}",
+                                    description="Records sent to alerts.dlq, by error class")
+FRESHNESS = meter.create_histogram(
+    "pagerwise.ingest.freshness", unit="s",
+    description="An alert's first publish to its row's commit, retries included (the freshness SLO, docs/slo.md)",
+    explicit_bucket_boundaries_advisory=[0.1, 0.25, 0.5, 1, 2, 5, 10, 30, 60, 120, 300, 600])
 
 BATCH_MAX = 500  # records per insert; 500 rows x 10 columns stays well under asyncpg's 32k parameter limit
 Fault = Callable[[uuid.UUID, int], bool]  # (event_id, attempt) -> fail this attempt transiently?
@@ -102,6 +122,7 @@ class AlertConsumer:
             k.RETRY_5M: settings.retry_delay_5m_s,
         }
         self.drain_s = drain_s
+        self.group = group
         self.client_id = client_id or f"consumer-{socket.gethostname()}-{os.getpid()}"
         self.consumer = AIOKafkaConsumer(
             bootstrap_servers=bootstrap,
@@ -132,6 +153,7 @@ class AlertConsumer:
         self.committed: dict[TopicPartition, int] = {}
         self.stopping = asyncio.Event()
         self.failure: BaseException | None = None
+        _live.add(self)
 
     def stop(self) -> None:
         self.stopping.set()
@@ -316,36 +338,55 @@ class AlertConsumer:
                 await wakeup.wait()
                 continue
             batch = [queue.popleft() for _ in range(min(len(queue), BATCH_MAX))]
-            await self._process(batch)
+            await self._process(tp, batch)
             for record in batch:
                 tracker.done(record.offset)
 
-    async def _process(self, records: list[ConsumerRecord]) -> None:
-        rows, failures = [], []
-        for record in records:
+    async def _process(self, tp: TopicPartition, records: list[ConsumerRecord]) -> None:
+        batch = k.batch_span(tp.topic, tp.partition, self.group, len(records))
+        spans = [k.process_span(r.topic, r.partition, r.offset, r.key, r.headers, self.group, batch) for r in records]
+        rows, stored, failures = [], [], []
+        for record, span in zip(records, spans, strict=True):
             attempt = k.attempt_of(record.headers)
             try:
                 alert = k.decode_alert(record.value)
                 if self.faults(alert.event_id, attempt):
                     raise k.TransientError("injected fault")
             except (k.TransientError, k.PermanentError) as e:
-                failures.append((record, e))
+                failures.append((record, span, e))
                 continue
             rows.append({**alert.model_dump(), "severity": alert.severity.value, "attempt": attempt})
+            stored.append((record, span))
 
-        delay = 0.5
-        while True:
-            try:
-                inserted = await self._insert(rows)
-                await asyncio.gather(*(self._route(record, error) for record, error in failures))
-                break
-            except (OSError, SQLAlchemyError, KafkaError) as e:
-                # Postgres or Kafka is failing, not this message. Retrying in place keeps the partition's order and
-                # offsets; a retried route may publish twice, which the event_id and dead_letters keys absorb.
-                self.stats.infra_retries += 1
-                log.warning("batch failed (%s: %s); retrying in %.1fs", type(e).__name__, e, delay)
-                await asyncio.sleep(delay)
-                delay = min(delay * 2, 30)
+        try:
+            with trace.use_span(batch, end_on_exit=True):
+                batch.set_attribute("pagerwise.kafka.max_x_attempt", max(k.attempt_of(r.headers) for r in records))
+                delay = 0.5
+                while True:
+                    try:
+                        inserted = await self._insert(rows)
+                        await asyncio.gather(*(self._route(record, span, error) for record, span, error in failures))
+                        break
+                    except (OSError, SQLAlchemyError, KafkaError) as e:
+                        # Postgres or Kafka is failing, not this message. Retrying in place keeps the partition's
+                        # order and offsets; a retried route may publish twice, which the event_id and dead_letters
+                        # keys absorb.
+                        self.stats.infra_retries += 1
+                        batch.add_event("retry in place", {"error.type": type(e).__name__})
+                        log.warning("batch failed (%s: %s); retrying in %.1fs", type(e).__name__, e, delay)
+                        await asyncio.sleep(delay)
+                        delay = min(delay * 2, 30)
+                batch.set_attributes({"pagerwise.inserted": inserted, "pagerwise.failed": len(failures)})
+            committed_at = time.time()
+            for record, span in stored:
+                span.set_attribute(k.tracing.OUTCOME, "stored")
+                FRESHNESS.record(committed_at - k.published_ms(record.timestamp, record.headers) / 1000,
+                                 {"messaging.destination.name": record.topic}, context=trace.set_span_in_context(span))
+        finally:
+            for span in spans:
+                span.end()
+        EVENTS.add(inserted, {"messaging.destination.name": tp.topic, "outcome": "stored"})
+        EVENTS.add(len(rows) - inserted, {"messaging.destination.name": tp.topic, "outcome": "duplicate"})
         self.stats.records += len(records)
         self.stats.inserted += inserted
         self.stats.duplicates += len(rows) - inserted
@@ -356,10 +397,18 @@ class AlertConsumer:
         if not rows:
             return 0
         async with self.sessions() as session, session.begin():
-            result = await clustering.store_alerts(session, rows, self.edges, self._embed)
-            opened = [t for t in result.touched.values() if t.opened]
+            with tracer.start_as_current_span("incident upsert") as span:
+                result = await clustering.store_alerts(session, rows, self.edges, self._embed)
+                opened = [t for t in result.touched.values() if t.opened]
+                span.set_attributes({"pagerwise.alerts": len(rows), "pagerwise.inserted": result.inserted,
+                                     "pagerwise.incidents_touched": len(result.touched),
+                                     "pagerwise.incidents_opened": len(opened)})
+                carrier: dict[str, str] = {}
+                propagate.inject(carrier)  # this span's context: the triage trace links back to it
+            trace.get_current_span().set_attribute("pagerwise.incidents_opened", len(opened))
             # In the same transaction: an incident is never committed without its triage queued.
-            runs = [TriageRun(incident_id=t.incident_id, incident_version=1, tenant="default") for t in opened]
+            runs = [TriageRun(incident_id=t.incident_id, incident_version=1, tenant="default",
+                              traceparent=carrier.get("traceparent")) for t in opened]
             session.add_all(runs)
             await session.flush()
             queued = [(run.id, run.tenant) for run in runs]
@@ -393,12 +442,23 @@ class AlertConsumer:
             if self.stats.publish_failures == len(messages):  # log the first failure, not every batch
                 log.warning("Redis unavailable (%s); continuing without incident updates", e)
 
-    async def _route(self, record: ConsumerRecord, error: Exception) -> None:
-        target, headers = k.route_failure(record.topic, record.partition, record.offset, record.headers, error)
-        sent = await self.producer.send_and_wait(target, record.value, key=record.key, headers=headers)
+    async def _route(self, record: ConsumerRecord, span: Span, error: Exception) -> None:
+        """Republishes a failed record to its next topic. The send span is a child of the record's process span, so
+        the hop stays in the alert's trace."""
+        error_class = type(error).__name__
+        span.set_status(Status(StatusCode.ERROR, f"{error_class}: {str(error)[:200]}"))
+        span.set_attribute("error.type", error_class)
+        target, headers = k.route_failure(record.topic, record.partition, record.offset, record.headers, error,
+                                          timestamp_ms=record.timestamp)
+        with trace.use_span(span):
+            sent = await self.producer.send_and_wait(target, record.value, key=record.key, headers=headers)
+        outcome = "dead_lettered" if target == k.DLQ else "retried"
+        span.set_attribute(k.tracing.OUTCOME, outcome)
+        EVENTS.add(1, {"messaging.destination.name": record.topic, "outcome": outcome})
         if target != k.DLQ:
             self.stats.retried += 1
             return
+        DEAD_LETTERS.add(1, {"error.type": error_class})
         origin = k.origin_of(record.topic, record.partition, record.offset, record.headers)
         named = {name: value.decode(errors="replace") for name, value in headers}
         row = {
@@ -421,6 +481,42 @@ class AlertConsumer:
             await session.execute(statement)
             await session.commit()
         self.stats.dead_lettered += 1
+
+
+_live: weakref.WeakSet[AlertConsumer] = weakref.WeakSet()  # what the gauges below read
+
+
+def _observe_lag(options: CallbackOptions) -> Iterable[Observation]:
+    """End offset minus committed offset, per assigned partition (runs on the metric reader's thread)."""
+    for consumer in list(_live):
+        try:
+            assigned = consumer.consumer.assignment()
+        except Exception:  # noqa: BLE001, S112 - mid-rebalance or stopped: nothing to report this time
+            continue
+        for tp in assigned:
+            highwater, committed = consumer.consumer.highwater(tp), consumer.committed.get(tp)
+            if highwater is not None and committed is not None:
+                yield Observation(highwater - committed, {"messaging.destination.name": tp.topic,
+                                                          "messaging.destination.partition.id": str(tp.partition)})
+
+
+def _observe_paused(options: CallbackOptions) -> Iterable[Observation]:
+    """Paused partitions by reason: backpressure (queue or db_pool, which pause every partition) or retry_delay (a
+    retry partition waiting for its head message to be due)."""
+    for consumer in list(_live):
+        try:
+            assigned = len(consumer.consumer.assignment())
+        except Exception:  # noqa: BLE001, S112 - as above
+            continue
+        for cause in ("queue", "db_pool"):
+            yield Observation(assigned if consumer.backpressure.cause == cause else 0, {"reason": cause})
+        yield Observation(len(consumer.delayed), {"reason": "retry_delay"})
+
+
+meter.create_observable_gauge("pagerwise.consumer.lag", callbacks=[_observe_lag], unit="{message}",
+                              description="End offset minus committed offset, per partition")
+meter.create_observable_gauge("pagerwise.consumer.paused", callbacks=[_observe_paused], unit="{partition}",
+                              description="Paused partitions, by reason")
 
 
 class _Rebalance(ConsumerRebalanceListener):
@@ -447,6 +543,7 @@ def _summarize(tps: set[TopicPartition]) -> str:
 
 async def _main() -> None:
     engine = create_async_engine(settings.database_url, pool_size=settings.consumer_db_pool_size, max_overflow=0)
+    telemetry.instrument_engine([engine])
     consumer = AlertConsumer(engine, faults=hashed_faults(settings.consumer_fault_transient_rate))
     loop = asyncio.get_running_loop()
     for sig in (signal.SIGTERM, signal.SIGINT):
@@ -459,6 +556,6 @@ async def _main() -> None:
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-    logging.getLogger("aiokafka").setLevel(logging.WARNING)
+    telemetry.setup("pagerwise-consumer")
+    k.instrument()
     asyncio.run(_main())

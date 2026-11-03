@@ -26,6 +26,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 import pagerwise_kafka as k
+import pagerwise_telemetry as telemetry
 from pagerwise_api.settings import settings
 from pagerwise_simulator import produce
 
@@ -102,6 +103,8 @@ async def group_members() -> int:
 
 
 async def main() -> None:
+    telemetry.setup("pagerwise-simulator")  # this process publishes the storm: its sends start each alert's trace
+    k.instrument()
     LOGS.mkdir(parents=True, exist_ok=True)
     await k.create_topics(settings.kafka_bootstrap)
     engine = create_async_engine(settings.database_url)
@@ -165,8 +168,8 @@ async def main() -> None:
     finals = []
     for i, replica in enumerate(replicas[1:], start=1):
         replica.wait(timeout=60)
-        last = (LOGS / f"consumer-{i}.log").read_text().strip().splitlines()[-1]
-        finals.append(json.loads(last))
+        lines = (LOGS / f"consumer-{i}.log").read_text().splitlines()
+        finals.append(json.loads(next(line for line in reversed(lines) if line.startswith('{"client_id"'))))
 
     async with engine.connect() as conn:
         rows = (await conn.execute(

@@ -115,6 +115,10 @@ components:
       headers:
         type: object
         properties:
+          traceparent:
+            type: string
+            description: W3C trace context of the span that published the message, set by the producer (docs/adr/0012).
+          tracestate: {type: string, description: W3C trace state, when the publishing span has any.}
           x-replayed-from:
             type: string
             description: Set on a message republished by a DLQ replay; the DLQ offset it came from.
@@ -147,7 +151,9 @@ components:
   schemas:
     FailureHeaders:
       type: object
-      description: Set by the consumer on every failure; other headers on the original message are kept.
+      description: >-
+        Set by the consumer on every failure. Other headers on the original message are kept, except traceparent and
+        tracestate, which the republishing producer sets to its own span (a child of the failed attempt).
       required: [x-attempt, x-first-failed-at, x-original-topic, x-original-partition, x-original-offset, x-error-class]
       properties:
         x-attempt:
@@ -164,3 +170,11 @@ components:
         x-error-class:
           type: string
           description: The latest failure's class, e.g. TransientError or PermanentError.
+        x-original-timestamp:
+          type: string
+          description: >-
+            Unix milliseconds of the first publish (the alerts.v1 record's timestamp); kept across hops. Optional:
+            messages republished before it existed lack it. Ingest freshness is measured from it.
+        traceparent:
+          type: string
+          description: W3C trace context of the republishing span, so every hop of one alert is one trace.

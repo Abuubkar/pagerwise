@@ -14,11 +14,12 @@ from pagerwise_kafka import (
 
 
 def test_transient_failures_walk_the_delay_topics_then_the_dlq():
-    headers: list = [("traceparent", b"00-abc")]
+    headers: list = [("traceparent", b"00-abc"), ("x-tenant", b"acme")]
     hops = []
     topic, partition, offset = "alerts.v1", 7, 1234
     for now in (1_000, 2_000, 3_000):
-        target, headers = route_failure(topic, partition, offset, headers, TransientError("timeout"), now_ms=now)
+        target, headers = route_failure(topic, partition, offset, headers, TransientError("timeout"), now_ms=now,
+                                        timestamp_ms=now - 500)
         hops.append((target, header(headers, "x-attempt")))
         topic, partition, offset = target, 0, 99  # republished: new coordinates on the retry topic
 
@@ -28,7 +29,9 @@ def test_transient_failures_walk_the_delay_topics_then_the_dlq():
     assert header(headers, "x-original-partition") == "7"
     assert header(headers, "x-original-offset") == "1234"
     assert header(headers, "x-first-failed-at") == "1000"
-    assert header(headers, "traceparent") == "00-abc"  # headers that aren't ours pass through
+    assert header(headers, "x-original-timestamp") == "500"  # first publish, not the republishes
+    assert header(headers, "x-tenant") == "acme"  # headers that aren't ours pass through
+    assert header(headers, "traceparent") is None  # except trace context: the republishing producer sets its own
     assert [k for k, _ in headers].count("x-attempt") == 1  # replaced, not appended
 
 

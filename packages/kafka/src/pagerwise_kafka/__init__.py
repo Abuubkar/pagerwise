@@ -2,7 +2,10 @@
 failed message goes next. contracts/kafka/asyncapi.yaml describes the same things for people.
 
 Retry routing is non-blocking: a message that fails transiently is republished to a delay topic and its original
-offset is committed, so one bad message never holds up its partition. x-attempt counts failures so far."""
+offset is committed, so one bad message never holds up its partition. x-attempt counts failures so far.
+
+Every message carries a W3C traceparent, set by the producer's span (`instrument`, docs/adr/0012); a republished
+message gets the republishing span's, never the one it arrived with."""
 
 import time
 from dataclasses import dataclass
@@ -13,8 +16,9 @@ from aiokafka.errors import TopicAlreadyExistsError
 from pydantic import ValidationError
 
 from pagerwise_kafka.alert_v1 import AlertV1, Severity
+from pagerwise_kafka.tracing import batch_span, creation_context, instrument, process_span
 
-__all__ = ["AlertV1", "Severity", "ValidationError"]
+__all__ = ["AlertV1", "Severity", "ValidationError", "batch_span", "creation_context", "instrument", "process_span"]
 
 ALERTS = "alerts.v1"
 RETRY_30S = "alerts.retry.30s"
@@ -32,7 +36,10 @@ H_ORIGINAL_TOPIC = "x-original-topic"
 H_ORIGINAL_PARTITION = "x-original-partition"
 H_ORIGINAL_OFFSET = "x-original-offset"
 H_ERROR_CLASS = "x-error-class"
+H_ORIGINAL_TIMESTAMP = "x-original-timestamp"  # unix ms the message was first published (ingest freshness)
 H_REPLAYED_FROM = "x-replayed-from"  # DLQ offset, on a message republished by a replay
+
+TRACE_HEADERS = ("traceparent", "tracestate", "baggage")  # replaced by the producer on every publish
 
 Headers = list[tuple[str, bytes]]
 
@@ -86,11 +93,18 @@ def origin_of(topic: str, partition: int, offset: int, headers: Headers | tuple)
                   int(header(headers, H_ORIGINAL_OFFSET) or 0))
 
 
+def published_ms(timestamp_ms: int, headers: Headers | tuple) -> int:
+    """When the message was first published: its own timestamp on alerts.v1, carried in a header across retries."""
+    return int(header(headers, H_ORIGINAL_TIMESTAMP) or timestamp_ms)
+
+
 def route_failure(
-    topic: str, partition: int, offset: int, headers: Headers | tuple, error: Exception, now_ms: int | None = None
+    topic: str, partition: int, offset: int, headers: Headers | tuple, error: Exception, now_ms: int | None = None,
+    timestamp_ms: int | None = None,
 ) -> tuple[str, Headers]:
     """Where a failed message goes next, and its headers there. Transient failures walk the delay topics; the
-    MAX_FAILURES-th failure, or any permanent one, goes to the DLQ. Headers other than ours are kept."""
+    MAX_FAILURES-th failure, or any permanent one, goes to the DLQ. `timestamp_ms` is the failed record's Kafka
+    timestamp. Headers other than ours are kept, except trace context: the producer sets its own."""
     failures = attempt_of(headers) + 1
     if isinstance(error, TransientError) and failures < MAX_FAILURES:
         target = RETRY_30S if failures == 1 else RETRY_5M
@@ -106,7 +120,10 @@ def route_failure(
         H_ORIGINAL_OFFSET: str(origin.offset),
         H_ERROR_CLASS: type(error).__name__,
     }
-    kept = [(k, v) for k, v in headers or () if k not in ours]
+    original = header(headers, H_ORIGINAL_TIMESTAMP) or (str(timestamp_ms) if timestamp_ms is not None else None)
+    if original is not None:
+        ours[H_ORIGINAL_TIMESTAMP] = original
+    kept = [(k, v) for k, v in headers or () if k not in ours and k not in TRACE_HEADERS]
     return target, kept + [(k, v.encode()) for k, v in ours.items()]
 
 
