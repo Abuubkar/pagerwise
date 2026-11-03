@@ -2,7 +2,10 @@
 
 Evals can record every call and replay it later without Ollama (`recording`): each response is stored under the
 hash of its whole request (model, options, messages, output format), with the wall-clock time to its first piece
-and to its end, so offline runs reproduce the live run's metrics, latency included."""
+and to its end, so offline runs reproduce the live run's metrics, latency included.
+
+Every call is a `chat <model>` span with the GenAI semantic-convention attributes (docs/adr/0012); prompt and output
+text are never put on it."""
 
 import difflib
 import hashlib
@@ -10,13 +13,22 @@ import json
 import time
 from collections.abc import AsyncIterator, Iterator
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from ollama import AsyncClient, ChatResponse
+from opentelemetry import metrics, trace
+from opentelemetry.trace import Span, SpanKind, Status, StatusCode
 
 from pagerwise_api.settings import settings
+
+tracer = trace.get_tracer("pagerwise.llm")
+TOKENS = metrics.get_meter("pagerwise.llm").create_counter(
+    "pagerwise.llm.tokens", unit="{token}", description="Model tokens, by type (input, output) and model")
+_streaming: ContextVar[Span | None] = ContextVar("pagerwise_chat_span", default=None)
 
 
 class PromptTooLong(Exception):
@@ -165,38 +177,101 @@ async def chat(messages: list[dict[str, str]], estimated_prompt_tokens: int, mod
     """One whole response. `model` overrides settings.llm_model (the eval's judge); `format` is a JSON schema the
     output must follow (structured output)."""
     request = _request(messages, estimated_prompt_tokens, model, format)
-    if _replaying(request):
-        return _replayed(request)[1]
-    started = time.monotonic()
-    response = await _client().chat(**request)
-    result = _result(response, response.message.content or "", request["model"])
-    if _recorder is not None:
+    with tracer.start_as_current_span(f"chat {request['model']}", kind=SpanKind.CLIENT,
+                                      attributes=_span_attributes(request)) as span:
+        if _replaying(request):
+            span.set_attribute("pagerwise.replayed", True)
+            _, result, ttft_ms, _ = _replayed(request)
+            _finish(span, result, ttft_ms)
+            return result
+        started = time.monotonic()
+        response = await _client().chat(**request)
+        result = _result(response, response.message.content or "", request["model"])
         elapsed = int((time.monotonic() - started) * 1000)
-        _record(request, [result.content], result, elapsed, elapsed)
-    return result
+        if _recorder is not None:
+            _record(request, [result.content], result, elapsed, elapsed)
+        _finish(span, result, elapsed)
+        return result
 
 
 async def chat_stream(messages: list[dict[str, str]], estimated_prompt_tokens: int) -> AsyncIterator[str | ChatResult]:
     """Yields text pieces as they arrive, then one ChatResult with the whole text and Ollama's counts (which only
     come on the final chunk)."""
     request = _request(messages, estimated_prompt_tokens)
-    if _replaying(request):
-        pieces, result, _, _ = _replayed(request)
-        for piece in pieces:
-            yield piece
-        yield result
-        return
-    parts: list[str] = []
-    started, first = time.monotonic(), None
-    async for chunk in await _client().chat(**request, stream=True):
-        piece = chunk.message.content or ""
-        if piece:
-            first = first or time.monotonic()
-            parts.append(piece)
-            yield piece
-        if chunk.done:
-            result = _result(chunk, "".join(parts), request["model"])
-            if _recorder is not None:
-                now = time.monotonic()
-                _record(request, parts, result, int(((first or now) - started) * 1000), int((now - started) * 1000))
+    # Started, not made current: a generator that attaches a context across its yields would leak it into the
+    # caller. annotate_chat finds it through _streaming instead.
+    span = tracer.start_span(f"chat {request['model']}", kind=SpanKind.CLIENT, attributes=_span_attributes(request))
+    token = _streaming.set(span)
+    try:
+        if _replaying(request):
+            span.set_attribute("pagerwise.replayed", True)
+            pieces, result, ttft_ms, _ = _replayed(request)
+            for piece in pieces:
+                yield piece
+            _finish(span, result, ttft_ms)
             yield result
+            return
+        parts: list[str] = []
+        started, first = time.monotonic(), None
+        with trace.use_span(span):  # the HTTP request to Ollama becomes a child of the chat span
+            stream = aiter(await _client().chat(**request, stream=True))
+            head = await anext(stream, None)  # the request is sent on the first iteration, not by chat()
+        pending = [head] if head is not None else []
+        while (chunk := pending.pop() if pending else await anext(stream, None)) is not None:
+            piece = chunk.message.content or ""
+            if piece:
+                first = first or time.monotonic()
+                parts.append(piece)
+                yield piece
+            if chunk.done:
+                result = _result(chunk, "".join(parts), request["model"])
+                now = time.monotonic()
+                ttft_ms = int(((first or now) - started) * 1000)
+                if _recorder is not None:
+                    _record(request, parts, result, ttft_ms, int((now - started) * 1000))
+                _finish(span, result, ttft_ms)
+                yield result
+    except Exception as e:
+        span.record_exception(e)
+        span.set_status(Status(StatusCode.ERROR, type(e).__name__))
+        raise
+    finally:
+        span.end()
+        try:
+            _streaming.reset(token)
+        except ValueError:  # closed from another context (garbage collection): nothing of ours is left in it
+            pass
+
+
+def annotate_chat(**attributes: str | float | bool) -> None:
+    """Adds pagerwise.* attributes (citation_count, verdict) to the span of the chat_stream being read. Call it when
+    the stream's ChatResult arrives, before the stream is finished."""
+    span = _streaming.get()
+    if span is not None:
+        span.set_attributes({f"pagerwise.{key}": value for key, value in attributes.items()})
+
+
+def _span_attributes(request: dict[str, Any]) -> dict[str, Any]:
+    host = urlsplit(settings.ollama_host)
+    return {
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "ollama",
+        "gen_ai.request.model": request["model"],
+        "gen_ai.request.temperature": request["options"]["temperature"],
+        "gen_ai.request.max_tokens": request["options"]["num_predict"],
+        "server.address": host.hostname or "",
+        "server.port": host.port or 11434,
+        "pagerwise.num_ctx": request["options"]["num_ctx"],
+    }
+
+
+def _finish(span: Span, result: ChatResult, ttft_ms: int) -> None:
+    span.set_attributes({
+        "gen_ai.response.model": result.model,
+        "gen_ai.usage.input_tokens": result.prompt_tokens,
+        "gen_ai.usage.output_tokens": result.output_tokens,
+        "pagerwise.ttft_ms": ttft_ms,
+        "pagerwise.tokens_per_second": round(result.output_tokens / (result.eval_ms / 1000), 1) if result.eval_ms else 0.0,
+    })
+    TOKENS.add(result.prompt_tokens, {"gen_ai.token.type": "input", "gen_ai.request.model": result.model})
+    TOKENS.add(result.output_tokens, {"gen_ai.token.type": "output", "gen_ai.request.model": result.model})

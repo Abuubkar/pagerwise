@@ -5,7 +5,10 @@ Redis stream; readers (SSE, GraphQL) use `events`, which reads that stream, or t
 
 Evidence comes from runbooks and postmortems (hybrid search, each limited to its kind) and recent deploys (HTTP,
 the deploy source), fetched at the same time with a timeout each. A source that fails or is too slow is left out
-and named in degraded_sources; the triage runs anyway, and the prompt forbids saying anything about it."""
+and named in degraded_sources; the triage runs anyway, and the prompt forbids saying anything about it.
+
+Each source is an `evidence <source>` span (degraded=true when it was left out); the model call is llm's chat span,
+annotated with the brief's citation count and verdict. Triage metrics are below; docs/adr/0012."""
 
 import asyncio
 import logging
@@ -16,6 +19,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
 import httpx
+from opentelemetry import metrics, trace
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +32,15 @@ from pagerwise_api.schemas import ProblemCode
 from pagerwise_api.settings import settings
 
 log = logging.getLogger("pagerwise.triage")
+tracer = trace.get_tracer("pagerwise.triage")
+meter = metrics.get_meter("pagerwise.triage")
+TTFT = meter.create_histogram(
+    "pagerwise.triage.ttft", unit="s", description="Model call start to the first brief token",
+    explicit_bucket_boundaries_advisory=[0.5, 1, 2, 5, 10, 15, 20, 30, 45, 60, 120])
+DEGRADED = meter.create_counter("pagerwise.triage.degraded_sources", unit="{source}",
+                                description="Evidence sources left out of a triage, by source")
+VERDICTS = meter.create_counter("pagerwise.triage.verdicts", unit="{triage}",
+                                description="Completed briefs, by verdict (CAUSE_IDENTIFIED, INSUFFICIENT_EVIDENCE)")
 
 EXCERPT_CHARS = 280
 TriageEvent = tuple[str, BaseModel]  # (SSE event name, payload)
@@ -84,11 +97,13 @@ async def _documents(session: AsyncSession, query: str, source_type: str, k: int
 
 
 async def _deploys(client: httpx.AsyncClient, services: list[str], at: datetime) -> list[EvidenceItem]:
-    response = await client.get("/v1/deploys", params={
-        "service": services, "since": (at - timedelta(hours=settings.triage_deploy_window_h)).isoformat(),
-        "until": at.isoformat(), "limit": settings.triage_deploys_max,  # a later deploy can't be the cause
-    })
-    response.raise_for_status()
+    with tracer.start_as_current_span("deploys_http", attributes={"pagerwise.services": len(services)}) as span:
+        response = await client.get("/v1/deploys", params={
+            "service": services, "since": (at - timedelta(hours=settings.triage_deploy_window_h)).isoformat(),
+            "until": at.isoformat(), "limit": settings.triage_deploys_max,  # a later deploy can't be the cause
+        })
+        response.raise_for_status()
+        span.set_attribute("pagerwise.result_count", len(response.json()))
     return [
         EvidenceItem("deploy", d["id"], None, f"deploy {d['service']} {d['version']}",
                      f"Deploy {d['id']}: {d['service']} version {d['version']} deployed at {d['deployed_at']} by "
@@ -112,16 +127,22 @@ async def gather_evidence(session: AsyncSession, client: httpx.AsyncClient, inci
 
     async def fetch(source: str, work, timeout_s: float) -> None:
         started = time.perf_counter()
-        try:
-            async with asyncio.timeout(timeout_s):
-                results[source] = await work
-        except TimeoutError:
-            gathered.degraded.append({"source": source, "reason": f"timed out after {timeout_s * 1000:.0f} ms"})
-        except httpx.HTTPStatusError as e:
-            gathered.degraded.append({"source": source, "reason": f"HTTP {e.response.status_code}"})
-        except Exception as e:  # noqa: BLE001 - any failure of one source degrades it; the others carry on
-            log.warning("evidence source %s failed: %r", source, e)
-            gathered.degraded.append({"source": source, "reason": type(e).__name__})
+        with tracer.start_as_current_span(f"evidence {source}", attributes={"pagerwise.timeout_s": timeout_s}) as span:
+            try:
+                async with asyncio.timeout(timeout_s):
+                    results[source] = await work
+            except TimeoutError:
+                gathered.degraded.append({"source": source, "reason": f"timed out after {timeout_s * 1000:.0f} ms"})
+            except httpx.HTTPStatusError as e:
+                gathered.degraded.append({"source": source, "reason": f"HTTP {e.response.status_code}"})
+            except Exception as e:  # noqa: BLE001 - any failure of one source degrades it; the others carry on
+                log.warning("evidence source %s failed: %r", source, e)
+                gathered.degraded.append({"source": source, "reason": type(e).__name__})
+            degraded = source not in results
+            span.set_attributes({"pagerwise.degraded": degraded, "pagerwise.result_count": len(results.get(source, []))})
+            if degraded:
+                span.set_attribute("pagerwise.degraded_reason", gathered.degraded[-1]["reason"])
+                DEGRADED.add(1, {"source": source})
         gathered.timings_ms[source] = int((time.perf_counter() - started) * 1000)
 
     # Each task catches its own failure, so one source failing never cancels the others.
@@ -191,9 +212,15 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
         async for piece in llm.chat_stream(messages, estimated_prompt_tokens=_estimate_tokens(messages)):
             if isinstance(piece, llm.ChatResult):
                 result = piece
+                # The model span is still open: give it the brief's outcome. Same gate and parse as below, on the
+                # whole text at once.
+                outcome = citations.parse_brief(citations.gate_brief(result.content, gate.cause_tags)[0], set(by_tag))
+                llm.annotate_chat(citation_count=sum(len(s.tags) for s in outcome.sections.values()),
+                                  verdict=outcome.verdict or "format_invalid")
                 continue
             if run.ttft_ms is None:
                 run.ttft_ms = int((time.monotonic() - started) * 1000)
+                TTFT.record(run.ttft_ms / 1000)
             for event in scanner.feed(gate.feed(piece)):
                 yield _scan_event(event, by_tag)
             if time.monotonic() - last_beat >= settings.triage_heartbeat_s:
@@ -227,6 +254,7 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
     run.status, run.verdict, run.finished_at = "completed", brief.verdict, datetime.now(UTC)
     run.brief = brief.model_dump(mode="json")
     await session.commit()
+    VERDICTS.add(1, {"verdict": brief.verdict})
     yield "done", brief
 
 
