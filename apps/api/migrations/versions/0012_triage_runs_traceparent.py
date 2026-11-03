@@ -21,9 +21,11 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     op.execute("SET lock_timeout = '2s'")
-    op.add_column("triage_runs", sa.Column("traceparent", sa.String(64), nullable=True))
+    op.execute("SET statement_timeout = '5s'")
+    op.add_column("triage_runs", sa.Column("traceparent", sa.Text(), nullable=True))  # text: no length to outgrow
 
 
 def downgrade() -> None:
     op.execute("SET lock_timeout = '2s'")
+    op.execute("SET statement_timeout = '5s'")
     op.drop_column("triage_runs", "traceparent")
