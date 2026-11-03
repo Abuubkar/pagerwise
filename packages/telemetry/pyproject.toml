@@ -1,0 +1,19 @@
+[project]
+name = "pagerwise-telemetry"
+version = "0.1.0"
+description = "One telemetry setup for every Pagerwise app: OTLP traces, metrics and logs, structlog JSON, an attribute denylist"
+requires-python = ">=3.13"
+dependencies = [
+    "opentelemetry-exporter-otlp-proto-grpc>=1.45.2",
+    "opentelemetry-instrumentation-aiokafka>=0.66b2",
+    "opentelemetry-instrumentation-fastapi>=0.66b2",
+    "opentelemetry-instrumentation-httpx>=0.66b2",
+    "opentelemetry-instrumentation-redis>=0.66b2",
+    "opentelemetry-instrumentation-sqlalchemy>=0.66b2",
+    "opentelemetry-sdk>=1.45.2",
+    "structlog>=26.1.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"

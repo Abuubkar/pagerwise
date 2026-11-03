@@ -30,7 +30,7 @@ dev = [
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/consumer", "apps/docs_mock", "apps/indexer", "apps/simulator", "packages/kafka", "packages/clients/python", "packages/client-sse"]
+members = ["apps/api", "apps/consumer", "apps/docs_mock", "apps/indexer", "apps/simulator", "packages/kafka", "packages/clients/python", "packages/client-sse", "packages/telemetry"]
 
 [tool.uv.sources]
 pagerwise-api = { workspace = true }
@@ -41,9 +41,10 @@ pagerwise-kafka = { workspace = true }
 pagerwise-simulator = { workspace = true }
 pagerwise-client = { workspace = true }
 pagerwise-client-sse = { workspace = true }
+pagerwise-telemetry = { workspace = true }
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests", "apps/consumer/tests", "apps/indexer/tests", "packages/kafka/tests", "evals/tests"]
+testpaths = ["apps/api/tests", "apps/consumer/tests", "apps/indexer/tests", "packages/kafka/tests", "packages/telemetry/tests", "evals/tests"]
 markers = ["integration: needs Docker (testcontainers); run with make test-int"]
 # importlib: test files in different packages may share a name.
 addopts = "--strict-markers --import-mode=importlib"
@@ -58,7 +59,7 @@ src = ["apps/*/src", "packages/*/src", "evals", "scripts"]
 [tool.mypy]
 python_version = "3.13"
 files = ["apps/api/src", "apps/consumer/src", "apps/docs_mock/src", "apps/indexer/src", "apps/simulator/src",
-         "packages/kafka/src", "packages/client-sse/src"]
+         "packages/kafka/src", "packages/client-sse/src", "packages/telemetry/src"]
 exclude = ["packages/kafka/src/pagerwise_kafka/alert_v1.py"]
 
 [[tool.mypy.overrides]]

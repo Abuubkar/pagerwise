@@ -11,6 +11,7 @@ dependencies = [
     "httpx>=0.28.1",
     "ollama>=0.6.3",
     "pagerwise-kafka",
+    "pagerwise-telemetry",
     "pgvector>=0.5.1",
     "pydantic-settings>=2.16.2",
     "redis>=8.1.0",
@@ -26,3 +27,4 @@ build-backend = "uv_build"
 
 [tool.uv.sources]
 pagerwise-kafka = { workspace = true }
+pagerwise-telemetry = { workspace = true }

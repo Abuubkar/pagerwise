@@ -5,9 +5,13 @@ description = "Mock docs API serving the seeded runbooks and postmortems with Li
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.162.0",
+    "pagerwise-telemetry",
     "uvicorn>=0.54.0",
 ]
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+pagerwise-telemetry = { workspace = true }

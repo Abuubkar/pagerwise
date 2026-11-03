@@ -5,6 +5,8 @@ description = "Topics, headers, retry routing and the generated alert model shar
 requires-python = ">=3.13"
 dependencies = [
     "aiokafka>=0.15.0",
+    "opentelemetry-api>=1.45.2",
+    "opentelemetry-instrumentation-aiokafka>=0.66b2",
     "pydantic>=2.14.2",
 ]
 
