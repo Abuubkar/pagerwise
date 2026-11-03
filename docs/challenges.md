@@ -282,3 +282,34 @@ my local database was never re-imported, so every slice 6 eval and recording use
 
 **main already misses four triage gates, so a gate-checking CI job would be red forever.**
 - *Did:* asked; with `--baseline`, misses the baseline shares are reported, not failed (ADR 0011). No threshold moved.
+
+## Slice 8: Instrumentation
+
+**The aiokafka instrumentation exists, but its consumer spans end at the fetch.** Its `receive` spans close when
+`getmany` returns, and the consumer processes records later, in partition batches. Its producer *appends*
+`traceparent`, so a republished alert would carry two, and the next hop would read the stale one first.
+- *Did:* used it for publish spans (asked), and added our own per-message `process` span: its parent is the creation
+  context, and it links to the batch span. `route_failure` now drops incoming trace headers (ADR 0012).
+
+**A retried alert gets ~30 fetch spans.** Messages on a retry partition are re-fetched every time an earlier one
+becomes due: the consumer seeks back to the first not-yet-due message rather than holding it in memory. That's slice
+3's design (cheap re-reads, no memory), but the instrumentation makes each re-read a span.
+- *Did:* left as is; `scripts/trace.py` counts them and doesn't print them.
+
+**Tail sampling as planned dropped most triage traces.** A normal 40 s triage has no error and no degraded source,
+so only the 10% rule could keep it. The first done-when triage wasn't in Jaeger.
+- *Did:* added an `every-triage` policy (on `pagerwise.triage_id`). Triages are one per new incident, so the volume
+  is negligible. It's a deviation from the plan's list, called out in the PR.
+
+**The Ollama request wasn't under the chat span.** The ollama client sends the request on the first iteration of the
+stream, not when `chat()` returns, so the `trace.use_span` around `chat()` didn't cover it.
+- *Did:* the first chunk is awaited inside it too (`llm.chat_stream`).
+
+**Telemetry showed full-text search finding nothing for triage.** Every triage trace so far has `fts`
+`result_count=0` for both runbooks and postmortems. The triage query is long (title, services, alert summaries), and
+`websearch_to_tsquery` ANDs every term, so vector search carries triage alone.
+- *Not done:* changing retrieval belongs with an eval run (ADR 0009); noted for the next retrieval change.
+
+**Small things:** the collector renamed its `otlp`/`otlphttp` exporters to `otlp_grpc`/`otlp_http` (old names
+warn). Prometheus 3 writes histogram `le` labels as `5`, not `5.0`; the rules match either. Unit `"1"` on a gauge
+becomes a `_ratio` suffix, so `pagerwise.ollama.up` has no unit.

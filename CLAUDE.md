@@ -11,7 +11,8 @@ Incident-response copilot: alerts in, cited triage briefs out, built in thin sli
 ## Run it
 
 ```bash
-docker compose up -d --wait               # Postgres 18 + pgvector :5435, Redpanda (Kafka API) :19092, Redis :6379
+docker compose up -d --wait               # Postgres 18 + pgvector :5435, Redpanda (Kafka API) :19092, Redis :6379,
+                                          # OTel Collector :4317, Jaeger :16686, Prometheus :9090, Loki :3100, Grafana :3000
 uv run alembic upgrade head
 make topics                               # alerts.v1, alerts.retry.30s, alerts.retry.5m, alerts.dlq (idempotent)
 ollama pull qwen3.5:9b-q4_K_M             # once; Ollama runs natively on the Mac, not in Docker (ADR 0001)
@@ -21,7 +22,7 @@ uv run python scripts/seed.py graph       # data/service_graph.yaml -> services,
 uv run python scripts/seed.py alerts      # 500k historical alert_events via COPY (replaces earlier seeded history)
 uv run python -m pagerwise_docs_mock      # mock docs API on :8002 serving data/runbooks + data/corpus (--fail-rate 0.1)
 uv run python -m pagerwise_indexer        # import runbooks + postmortems from it; reruns send If-None-Match (304s)
-uv run uvicorn pagerwise_api.main:app --port 8001
+uv run python -m pagerwise_api            # the API on :8001 with telemetry (plain `uvicorn pagerwise_api.main:app` has none)
 uv run python -m pagerwise_api.worker     # triage worker: generates queued briefs (needs Ollama and docs_mock)
 cd apps/web && pnpm install && pnpm dev   # UI on :3001 (proxies HTTP to :8001; subscriptions use ws://localhost:8001)
 uv run python scripts/ask.py "Why is payments p99 high?"   # answer + citations resolved to chunk text
@@ -43,6 +44,9 @@ make codegen          # regenerate the clients (Python, web TS), contracts/schem
 make contract-check   # oasdiff: the app's emitted OpenAPI vs contracts/openapi.yaml
 make breaking-check   # REST, GraphQL and Kafka contracts vs origin/main (BASE=...); needs compose Redpanda
 make migration-lint   # squawk on the SQL of migrations added since origin/main
+make obs-check        # collector config validates, Prometheus rules parse, promtool tests each alert
+uv run python scripts/trace.py retry      # from Jaeger: one retried alert, hop by hop, and the batch that stored it
+uv run python scripts/trace.py triage     # the latest triage's span tree with per-stage durations
 ```
 
 Run scripts from the repo root: document paths are stored relative to it.
@@ -112,3 +116,16 @@ Run scripts from the repo root: document paths are stored relative to it.
   the models base image as RUNTIME. A new model in settings.py changes that image's tag, so release.yml rebuilds it.
 - In CI the eval runs with `--baseline` main's baseline: a gate main already misses is reported, not failed; a new
   miss or a quality drop fails. That's not a reason to move a gate.
+- Telemetry (ADR 0012): every app calls `pagerwise_telemetry.setup` first in its main, never on import (tests import
+  the modules). Take tracers and meters with `trace.get_tracer` / `metrics.get_meter` at module level.
+- Never put a query, prompt, model output or any user text on a span, event, log field or metric label: use
+  `retrieval.query_hash`. The denylist processor is a backstop, not the rule. Metric labels stay low-cardinality
+  (no ids).
+- A consumed record's work goes in `pagerwise_kafka.process_span` (parent: its creation context; link: the batch). A
+  republish is sent inside that span so the hop stays in the alert's trace; `route_failure` drops the old trace
+  headers because the producer instrumentation appends its own.
+- Don't `start_as_current_span` inside an async generator: the context leaks into the caller across yields. Start
+  the span and use `trace.use_span` around the awaits that need it (see `llm.chat_stream`).
+- Metric names and labels are an interface: a rename must update observability/prometheus/rules.yml, its tests and
+  the Grafana dashboards. Prometheus sees `pagerwise.ingest.freshness` (unit s) as
+  `pagerwise_ingest_freshness_seconds_bucket`, counters get `_total`, dots in labels become underscores.
