@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from pagerwise_api import bus, triage
 from pagerwise_api.db import SessionLocal, TriageRun, engine
-from pagerwise_api.embedding import embed_query, rerank
+from pagerwise_api.embedding import embed_query_v2, rerank
 from pagerwise_api.schemas import ProblemCode
 from pagerwise_api.service import stale_heartbeat
 from pagerwise_api.settings import settings
@@ -74,7 +74,7 @@ async def main() -> None:
         loop.add_signal_handler(sig, stopping.set)
     # Load the embedding model and the reranker before the first triage, so its document searches don't spend their
     # timeouts loading models and come back degraded.
-    await asyncio.to_thread(embed_query, "warm up")
+    await asyncio.to_thread(embed_query_v2, "warm up")
     await asyncio.to_thread(rerank, "warm up", ["load the reranker"])
     redis = bus.connect()
     async with httpx.AsyncClient(base_url=settings.deploy_source_url, timeout=5) as client:

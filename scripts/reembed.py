@@ -1,4 +1,5 @@
-"""Fill chunks.embedding_v2 (bge-base-en-v1.5) for chunks that don't have it yet: the v1 -> v2 switch (ADR 0009).
+"""Fill chunks.embedding_v2 (bge-base-en-v1.5) for chunks that don't have it yet: how the v1 -> v2 switch was filled (ADR 0009); the importer writes it for new
+chunks, so this is only needed after a model change.
 
 Walks chunks in id order in batches, one transaction each, so it can be stopped and rerun at any time: it only ever
 picks rows still missing embedding_v2. Throttled so it doesn't crowd out the API: after each batch it sleeps for a

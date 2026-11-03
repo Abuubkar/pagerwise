@@ -17,17 +17,13 @@ def embed_passages(texts: list[str]) -> list[list[float]]:
     return [v.tolist() for v in _model().passage_embed(texts)]
 
 
-def embed_query(text: str) -> list[float]:
-    return next(iter(_model().query_embed(text))).tolist()
-
-
 @cache
 def _model_v2() -> TextEmbedding:
     return TextEmbedding(model_name=settings.embedding_model_v2)
 
 
 def embed_passages_v2(texts: list[str]) -> list[list[float]]:
-    """bge-base, for chunks.embedding_v2 (migration 0009). Same input text as embed_passages."""
+    """bge-base, for chunks.embedding_v2 (migration 0009); embed_passages (bge-small) is for incidents."""
     return [v.tolist() for v in _model_v2().passage_embed(texts)]
 
 

@@ -66,3 +66,27 @@ run for a while (planned: after slice 5). Until then it costs disk, nothing else
 - Verified by `apps/api/tests/test_partition_swap_service.py`: 20k rows of history, a writer inserting one row per
   commit through 0006, the backfill and 0007; afterwards every row is present exactly once and a 7-day query scans 9
   of 30 partitions. With the backfill disabled, 0007 refuses to swap.
+
+## chunks.embedding (v1, bge-small): dropped in two steps (migrations 0010 and 0011)
+
+**Why.** Retrieval has read `chunks.embedding_v2` (bge-base) since slice 6a; 6b's triage eval held up on it, so the
+v1 column and its HNSW index go (ADR 0010). `incidents.embedding` (also bge-small, for clustering) stays.
+
+**The procedure.** The column is `NOT NULL`, and the old importer writes it, so code and schema move in turn:
+
+```bash
+uv run alembic upgrade 0010    # 1. chunks.embedding becomes nullable (catalog change, no scan)
+# 2. deploy the 6b code: the importer stops writing chunks.embedding, retrieval never read it
+uv run alembic upgrade 0011    # 3. DROP INDEX CONCURRENTLY ix_chunks_embedding_hnsw, then drop the column
+```
+
+Both steps set `lock_timeout = 2s`: dropping the column needs a brief `ACCESS EXCLUSIVE` lock, and waiting behind a
+long query in the lock queue would block every writer behind it. Re-run if it times out.
+
+**Rollback.**
+- *After 0010:* `alembic downgrade 0009` works while every row still has a v1 vector (nothing written by 6b code).
+- *After 0011:* `alembic downgrade 0010` brings the column and index back empty; the vectors are gone. Re-importing
+  with the pre-6b importer refills them; `downgrade 0009` then works again.
+
+**Check it worked.** `\d chunks` lists `embedding_v2` and `ix_chunks_embedding_v2_hnsw` only. Verified on dev: up,
+down to 0010 (column and index back), up again.
