@@ -4,6 +4,7 @@ Evals can record every call and replay it later without Ollama (`recording`): ea
 hash of its whole request (model, options, messages, output format), with the wall-clock time to its first piece
 and to its end, so offline runs reproduce the live run's metrics, latency included."""
 
+import difflib
 import hashlib
 import json
 import time
@@ -99,13 +100,31 @@ def _replayed(request: dict[str, Any]) -> tuple[list[str], ChatResult, int, int]
     assert _recorder is not None
     path = _recorder.path(request)
     if not path.exists():
-        raise FileNotFoundError(f"no recording for this request ({path.name}); run the eval with LIVE=1 first")
+        raise FileNotFoundError(f"no recording for this request ({path.name}); run the eval with LIVE=1 first\n"
+                                + _nearest_recording_diff(request))
     runs = json.loads(path.read_text())["runs"]
     i = _recorder._calls.get(path.name, 0)
     _recorder._calls[path.name] = i + 1
     run = runs[min(i, len(runs) - 1)]
     _recorder.timings.append((run["ttft_ms"], run["total_ms"]))
     return run["pieces"], ChatResult(**run["result"]), run["ttft_ms"], run["total_ms"]
+
+
+def _nearest_recording_diff(request: dict[str, Any]) -> str:
+    """Why a replay missed: the request's last message against the most similar recorded one."""
+    assert _recorder is not None
+    wanted = request["messages"][-1]["content"]
+    recorded = [json.loads(p.read_text())["request"] for p in _recorder.folder.glob("*.json")]
+    candidates = [r["messages"][-1]["content"] for r in recorded if r["messages"][:-1] == request["messages"][:-1]]
+    if not candidates:
+        return "no recording has the same earlier messages (system prompt)"
+    def similarity(c: str, quick: bool) -> float:
+        matcher = difflib.SequenceMatcher(None, c.splitlines(), wanted.splitlines(), autojunk=False)
+        return matcher.quick_ratio() if quick else matcher.ratio()
+    shortlist = sorted(candidates, key=lambda c: similarity(c, quick=True))[-5:]
+    nearest = max(shortlist, key=lambda c: similarity(c, quick=False))
+    diff = difflib.unified_diff(nearest.splitlines(), wanted.splitlines(), "recorded", "requested", lineterm="", n=1)
+    return "\n".join(list(diff)[:80])
 
 
 def _record(request: dict[str, Any], pieces: list[str], result: ChatResult, ttft_ms: int, total_ms: int) -> None:
