@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from pagerwise_api.chunking import embed_text
 from pagerwise_api.db import Chunk, Document
-from pagerwise_api.embedding import embed_query, embed_query_v2, rerank
+from pagerwise_api.embedding import embed_query_v2, rerank
 from pagerwise_api.settings import settings
 
 RRF_K = 60  # the constant from the original RRF paper; damps the difference between ranks 1 and 2
@@ -88,10 +88,6 @@ async def _vector(session: AsyncSession, column, vector: list[float], limit: int
     return [(i, float(d)) for i, d in rows.all()]
 
 
-# Which embedding column vector search reads, and the query embedding for it (settings.retrieval_embedding_version).
-EMBEDDINGS = {"v1": (Chunk.embedding, embed_query), "v2": (Chunk.embedding_v2, embed_query_v2)}
-
-
 async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
                         source_type: str | None = None) -> SearchResult:
     """source_type ("runbook" or "postmortem") limits both searches to that kind of document."""
@@ -104,12 +100,8 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
         timings[name] = round((now - since) * 1000, 1)
         return now
 
-    # v1 or v2 reads one embedding column; dual reads both and fuses them with full-text search (three lists), for
-    # comparing and switching models without a cliff.
-    version = settings.retrieval_embedding_version
-    versions = ["v1", "v2"] if version == "dual" else [version]
     # Embedding and reranking are CPU-bound ONNX work; keep them off the event loop.
-    vectors = {v: await asyncio.to_thread(EMBEDDINGS[v][1], query) for v in versions}
+    vector = await asyncio.to_thread(embed_query_v2, query)
     mark = lap("embed", started)
 
     async def timed(name: str, search):  # noqa: ANN001, ANN202 - a coroutine and its result
@@ -119,16 +111,14 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
         return result
 
     # More sessions on the same engine, so the searches really run concurrently (one connection each).
-    async with AsyncSession(bind=session.bind) as one, AsyncSession(bind=session.bind) as two:
-        own = {"v1": one, "v2": two}
-        fts, *vector_lists = await asyncio.gather(
+    async with AsyncSession(bind=session.bind) as own:
+        fts, vec = await asyncio.gather(
             timed("fts", _fts(session, query, CANDIDATES, source_type)),
-            *[timed("vector", _vector(own[v], EMBEDDINGS[v][0], vectors[v], CANDIDATES, source_type)) for v in versions],
+            timed("vector", _vector(own, Chunk.embedding_v2, vector, CANDIDATES, source_type)),
         )
     mark = lap("searches", mark)
-    vec = vector_lists[-1]  # the ranks reported as vector_rank: v2's in dual mode, the newer model
 
-    fused = reciprocal_rank_fusion([[i for i, _ in fts], *[[i for i, _ in lst] for lst in vector_lists]])[
+    fused = reciprocal_rank_fusion([[i for i, _ in fts], [i for i, _ in vec]])[
         : max(k, settings.rerank_candidates)]
     rows = {
         c.id: (c, d) for c, d in (await session.execute(

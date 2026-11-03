@@ -29,7 +29,7 @@ async def test_a_top_documents_other_chunks_follow_it_in_order(postgres_url):
             await session.flush()
             for i in range(count):
                 chunk = Chunk(id=uuid.uuid4(), document_id=doc.id, ordinal=i, heading_path=f"{name} {i}",
-                              text=f"{name}{i}", token_count=1, embedding=[0.0] * 384)
+                              text=f"{name}{i}", token_count=1, embedding_v2=[0.0] * 768)
                 session.add(chunk)
                 chunks[(name, i)] = (chunk, doc)
             docs.append(doc)

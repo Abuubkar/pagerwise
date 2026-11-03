@@ -19,13 +19,10 @@ class Settings(BaseSettings):
     llm_keep_alive: str = "10m"
     llm_timeout_s: float = 180.0
 
-    embedding_model: str = "BAAI/bge-small-en-v1.5"
-    # Which chunk embedding vector search reads: v1 (bge-small, chunks.embedding), v2 (bge-base, embedding_v2) or
-    # dual (both, fused with full-text search). See migration 0009 and docs/adr/0009.
-    retrieval_embedding_version: str = "v2"  # v2 won on both eval splits (docs/adr/0009); v1 stays until 6b
+    embedding_model: str = "BAAI/bge-small-en-v1.5"  # incidents.embedding, for clustering
     # A chunk in the top results brings its document's other chunks in right after it (retrieval._with_siblings).
     retrieval_sibling_chunks: bool = True
-    embedding_model_v2: str = "BAAI/bge-base-en-v1.5"
+    embedding_model_v2: str = "BAAI/bge-base-en-v1.5"  # chunks.embedding_v2, for retrieval (docs/adr/0009, 0010)
     # Chunks retrieved per question; each goes into the prompt as one [Cn] tag.
     retrieval_top_k: int = 8
     # Cross-encoder that can reorder hybrid search's candidates (docs/adr/0006). Off by default since slice 6: with
