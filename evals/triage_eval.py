@@ -12,6 +12,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 from metrics import percentile
 from pagerwise_api import citations, llm, prompts, triage
 from pagerwise_api.db import (
@@ -26,8 +29,6 @@ from pagerwise_api.db import (
 from pagerwise_api.settings import settings
 from pagerwise_docs_mock import DEFAULT_COLLECTIONS, DEFAULT_DEPLOYS, Faults, create_app
 from pagerwise_simulator import load_graph
-from sqlalchemy import func, select, text
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import seed  # the corpus generator: its failure modes' cause names

@@ -64,7 +64,7 @@ def reciprocal_rank_fusion(rankings: Sequence[Sequence[uuid.UUID]], k: int = RRF
     return sorted(scores.items(), key=lambda pair: -pair[1])
 
 
-def _only(statement, source_type: str | None):  # noqa: ANN001, ANN202 - a Select
+def _only(statement, source_type: str | None):
     return statement.join(Document).where(Document.source_type == source_type) if source_type else statement
 
 
@@ -79,7 +79,7 @@ async def _fts(session: AsyncSession, query: str, limit: int, source_type: str |
     return [(i, float(s)) for i, s in rows.all()]
 
 
-async def _vector(session: AsyncSession, column, vector: list[float], limit: int,  # noqa: ANN001 - a Column
+async def _vector(session: AsyncSession, column, vector: list[float], limit: int,
                   source_type: str | None) -> list[tuple[uuid.UUID, float]]:
     distance = column.cosine_distance(vector).label("distance")
     rows = await session.execute(
@@ -104,7 +104,7 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
     vector = await asyncio.to_thread(embed_query_v2, query)
     mark = lap("embed", started)
 
-    async def timed(name: str, search):  # noqa: ANN001, ANN202 - a coroutine and its result
+    async def timed(name: str, search):
         t = time.perf_counter()
         result = await search
         lap(name, t)

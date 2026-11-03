@@ -81,7 +81,7 @@ async def import_collection(client: httpx.AsyncClient, sessions: async_sessionma
         state = await session.get(ImportState, source) or ImportState(source=source, pages={})
         session.add(state)
         await session.commit()
-        url = state.next_url or first_page
+        url: str | None = state.next_url or first_page
         report.resumed = state.next_url is not None
 
         while url:

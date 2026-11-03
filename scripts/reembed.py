@@ -19,7 +19,7 @@ from pagerwise_api.db import Chunk, SessionLocal, engine
 from pagerwise_api.embedding import embed_passages_v2
 
 
-async def busy_connections(session) -> int:  # noqa: ANN001
+async def busy_connections(session) -> int:
     return await session.scalar(text(
         "SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' "
         "AND pid <> pg_backend_pid()"))

@@ -110,7 +110,7 @@ async def gather_evidence(session: AsyncSession, client: httpx.AsyncClient, inci
     gathered = Gathered()
     results: dict[str, list[EvidenceItem]] = {}
 
-    async def fetch(source: str, work, timeout_s: float) -> None:  # noqa: ANN001 - a coroutine
+    async def fetch(source: str, work, timeout_s: float) -> None:
         started = time.perf_counter()
         try:
             async with asyncio.timeout(timeout_s):
@@ -177,7 +177,7 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
     log.info("triage %s: %d evidence items, degraded %s, source ms %s", run.id, len(run.evidence),
              [d["source"] for d in gathered.degraded] or "none", gathered.timings_ms)
     for degraded in gathered.degraded:
-        yield "degraded_source", schemas.DegradedSourceEvent(**degraded)
+        yield "degraded_source", schemas.DegradedSourceEvent.model_validate(degraded)
 
     by_tag = {item["tag"]: item for item in run.evidence}
     evidence = [prompts.EvidenceChunk(tag=i["tag"], source=f"{i['source_type']} {i['source_id'].rsplit('/', 1)[-1]}",
@@ -259,7 +259,7 @@ def _brief(run: TriageRun, parsed: citations.ParsedBrief, by_tag: dict[str, dict
         model=run.model, prompt_version=run.prompt_version,
         usage=schemas.TriageUsage(prompt_tokens=run.prompt_tokens or 0, output_tokens=run.output_tokens or 0,
                                   ttft_ms=run.ttft_ms or 0, total_ms=run.total_ms or 0),
-        degraded_sources=[schemas.DegradedSource(**d) for d in run.degraded_sources],
+        degraded_sources=[schemas.DegradedSource.model_validate(d) for d in run.degraded_sources],
     )
 
 
@@ -272,8 +272,10 @@ async def fail(session: AsyncSession, run: TriageRun, code: ProblemCode, detail:
 
 def replay(run: TriageRun) -> list[TriageEvent]:
     """A finished run's events again, from what was stored, in the same shapes as the live stream."""
-    events: list[TriageEvent] = [("degraded_source", schemas.DegradedSourceEvent(**d)) for d in run.degraded_sources]
+    events: list[TriageEvent] = [("degraded_source", schemas.DegradedSourceEvent.model_validate(d))
+                                  for d in run.degraded_sources]
     if run.status == "failed":
+        assert run.error_code is not None  # fail() always stores one
         return [*events, ("error", schemas.ErrorEvent(code=ProblemCode(run.error_code), detail="this triage failed",
                                                       problems=run.problems))]
     assert run.brief is not None
@@ -282,13 +284,13 @@ def replay(run: TriageRun) -> list[TriageEvent]:
     events.append(("token", schemas.TokenEvent(text=text)))
     for key in citations.SECTIONS.values():
         for c in getattr(brief.sections, key).citations:
-            events.append(("citation", schemas.CitationEvent(**c.model_dump(), section=key)))
-        events.append(("section_complete", schemas.SectionCompleteEvent(section=key)))  # type: ignore[arg-type]
+            events.append(("citation", schemas.CitationEvent.model_validate({**c.model_dump(), "section": key})))
+        events.append(("section_complete", schemas.SectionCompleteEvent.model_validate({"section": key})))
     events.append(("done", brief))
     return events
 
 
-async def events(session: AsyncSession, redis, run_id: uuid.UUID) -> AsyncIterator[tuple[str, str]]:  # noqa: ANN001
+async def events(session: AsyncSession, redis, run_id: uuid.UUID) -> AsyncIterator[tuple[str, str]]:
     """Every event of the run as (name, JSON data), from its start, live until done or error, for any number of
     readers. Reads the run's Redis stream; if the run finished before this reader came and its stream has expired,
     or the stream goes silent while the database says the run is over, falls back to the stored result."""
@@ -313,5 +315,5 @@ async def events(session: AsyncSession, redis, run_id: uuid.UUID) -> AsyncIterat
         return
 
 
-async def publish(redis, run_id: uuid.UUID, name: str, payload: BaseModel) -> None:  # noqa: ANN001
+async def publish(redis, run_id: uuid.UUID, name: str, payload: BaseModel) -> None:
     await bus.append_triage_event(redis, run_id, name, payload.model_dump_json())

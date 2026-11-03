@@ -3,6 +3,7 @@
 from types import SimpleNamespace
 
 import pytest
+
 from pagerwise_api import llm
 
 pytestmark = pytest.mark.anyio

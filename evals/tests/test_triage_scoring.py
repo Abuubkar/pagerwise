@@ -1,5 +1,6 @@
 import pytest
 from sklearn.metrics import cohen_kappa_score
+
 from triage_eval import (
     cause_hits,
     claims,

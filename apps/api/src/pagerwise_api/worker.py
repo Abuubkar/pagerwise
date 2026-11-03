@@ -43,7 +43,7 @@ async def claim_next(sessions: async_sessionmaker[AsyncSession]) -> TriageRun | 
         return run
 
 
-async def run_one(sessions: async_sessionmaker[AsyncSession], redis, client: httpx.AsyncClient,  # noqa: ANN001
+async def run_one(sessions: async_sessionmaker[AsyncSession], redis, client: httpx.AsyncClient,
                   claimed: TriageRun) -> None:
     started = time.monotonic()
     final = "error"

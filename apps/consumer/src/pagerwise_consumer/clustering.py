@@ -100,7 +100,7 @@ async def _lock_services(session: AsyncSession, services: set[str]) -> None:
 
 
 async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple[str, str]],
-                       embed) -> StoreResult:  # noqa: ANN001 - async (list[str]) -> list[list[float]]
+                       embed) -> StoreResult:
     """Clusters and inserts a batch of alert rows (dicts of AlertEvent columns, without incident_id). Runs in the
     caller's transaction; the caller commits. Alerts already stored (redelivery) are skipped before clustering, so
     a duplicate can never open an incident."""
@@ -125,15 +125,15 @@ async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple
 
     first_of = {key: alerts[0] for key, alerts in groups.items()}
     recent: dict[tuple[str, str], list[RecentAlert]] = {key: [] for key in groups}
-    for service, fingerprint, incident_id, occurred_at, status in (await session.execute(
-        select(AlertEvent.service, AlertEvent.fingerprint, AlertEvent.incident_id, AlertEvent.occurred_at,
+    for service, fingerprint, joined_id, occurred_at, status in (await session.execute(
+        select(AlertEvent.service, AlertEvent.fingerprint, Incident.id, AlertEvent.occurred_at,
                Incident.status)
         .join(Incident, Incident.id == AlertEvent.incident_id)
         .where(tuple_(AlertEvent.service, AlertEvent.fingerprint).in_(list(groups)),
                AlertEvent.occurred_at >= min(times) - FINGERPRINT_WINDOW,
                AlertEvent.occurred_at <= max(times))
     )).all():
-        recent[(service, fingerprint)].append(RecentAlert(incident_id, occurred_at, status))
+        recent[(service, fingerprint)].append(RecentAlert(joined_id, occurred_at, status))
 
     # Only groups the fingerprint rule can't place need an embedding (most of a storm repeats known fingerprints).
     unplaced = [k for k in groups
@@ -175,9 +175,9 @@ async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple
             # Lock the row: a request resolving it, or another batch joining it, waits until this one commits. NO KEY
             # UPDATE, because only non-key columns change: it doesn't block the FOR KEY SHARE that inserting an
             # alert row referencing this incident takes, which plain FOR UPDATE did, deadlocking with the backfill.
-            status = await session.scalar(
+            locked = await session.scalar(
                 select(Incident.status).where(Incident.id == incident_id).with_for_update(key_share=True))
-            if status == "resolved":  # resolved between the lookup and the lock
+            if locked == "resolved":  # resolved between the lookup and the lock
                 incident_id = None
         if incident_id is None:
             vector = vectors.get(key) or (await embed([first["summary"]]))[0]
@@ -201,6 +201,7 @@ async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple
 
     last_seen: dict[uuid.UUID, datetime] = {}
     for incident_id, occurred_at in inserted:
+        assert incident_id is not None  # every row was inserted with one
         result.touched[incident_id].alerts += 1
         last_seen[incident_id] = max(last_seen.get(incident_id, occurred_at), occurred_at)
     for incident_id, touched in list(result.touched.items()):
@@ -210,7 +211,7 @@ async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple
             del result.touched[incident_id]
             continue
         changed = or_(literal(incident_id in new_kind), Incident.severity > worst[incident_id])
-        row = (await session.execute(
+        updated = (await session.execute(
             update(Incident).where(Incident.id == incident_id).values(
                 alert_count=Incident.alert_count + touched.alerts,
                 last_alert_at=func.greatest(Incident.last_alert_at, last_seen[incident_id]),
@@ -219,5 +220,5 @@ async def store_alerts(session: AsyncSession, rows: list[dict], edges: set[tuple
                 version=Incident.version + case((changed, 1), else_=0) if not touched.opened else Incident.version,
             ).returning(Incident.title, Incident.service, Incident.severity, Incident.version, Incident.alert_count)
         )).one()
-        touched.after = dict(row._mapping)
+        touched.after = dict(updated._mapping)
     return result

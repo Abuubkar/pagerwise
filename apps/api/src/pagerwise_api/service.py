@@ -120,7 +120,7 @@ async def list_incidents(
 ) -> Page:
     """Newest first (opened_at DESC, id DESC). The cursor is bound to the filters it was issued with."""
     filters = {"status": status, "service": service, "severity": severity}
-    query: Select[tuple[Incident]] = select(Incident)
+    query: Select[Incident] = select(Incident)
     for column, value in ((Incident.status, status), (Incident.service, service), (Incident.severity, severity)):
         if value is not None:
             query = query.where(column == value)
@@ -140,12 +140,12 @@ async def list_incidents(
 # --- Triage ----------------------------------------------------------------------------------------------------
 
 
-def stale_heartbeat():  # noqa: ANN202 - a SQL expression
+def stale_heartbeat():
     """A running triage whose heartbeat is this old was abandoned (its worker died)."""
     return TriageRun.heartbeat_at < func.now() - timedelta(seconds=settings.triage_abandoned_after_s)
 
 
-async def start_triage(session: AsyncSession, redis, incident_id: uuid.UUID,  # noqa: ANN001 - Redis
+async def start_triage(session: AsyncSession, redis, incident_id: uuid.UUID,
                        tenant: str = "default") -> TriageRun:
     """Queue a triage of the incident's current version for the triage worker. A second request while one is queued
     or running gets 409 with the existing run's id (the partial unique index decides, so concurrent requests can't

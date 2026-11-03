@@ -31,12 +31,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import asyncpg
 from faker import Faker
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-import asyncpg
 from sqlalchemy import delete
 
-from pagerwise_api.db import Service as ServiceRow, ServiceEdge, SessionLocal, engine
+from pagerwise_api.db import Service as ServiceRow
+from pagerwise_api.db import ServiceEdge, SessionLocal, engine
 from pagerwise_api.settings import settings
 from pagerwise_simulator import Service, fingerprint, load_graph, summary
 
@@ -105,8 +106,8 @@ MODES = [
          ["Scale out: `kubectl -n platform scale deploy/{service} --replicas=+2` (each pod brings its own pool).",
           "Kill transactions open for more than 60 s with `pg_terminate_backend` on {dependency}."],
          "ran out of database connections",
-         ["{version} of {component} opened a transaction before calling an external API, holding connections "
-          "for up to {peak} ms",
+         [("{version} of {component} opened a transaction before calling an external API, holding connections "
+          "for up to {peak} ms"),
           "a retry loop in {component} leaked one connection per failed attempt until the pool was empty"],
          ["pool_max_size", "pool_checkout_timeout_ms", "statement_timeout_ms"]),
     Mode("memory-pressure", "memory pressure and OOM kills", "MEM", "rss_pct_of_limit", (80, 97),
@@ -297,14 +298,14 @@ def corpus(seed: int, anchor: datetime) -> None:
         root_cause += "."
         duration = rng.randint(12, 190)
         alert = alert_name(service.name, mode)
-        times = sorted(rng.sample(range(0, duration), 4))
+        times = sorted(rng.sample(range(duration), 4))
         timeline = [
             ((start - timedelta(minutes=rng.randint(5, 40))).strftime("%H:%M"),
              f"{component} {version} deployed by {fake.name()}." if version in root_cause
              else f"Routine traffic; nothing unusual in {component}."),
             (start.strftime("%H:%M"), f"`{alert}` fired; on-call acknowledged."),
-            ((start + timedelta(minutes=times[0])).strftime("%H:%M"), f"Checked the {service.name} runbook for "
-                                                                      f"{mode.title}."),
+            ((start + timedelta(minutes=times[0])).strftime("%H:%M"), (f"Checked the {service.name} runbook for "
+                                                                      f"{mode.title}.")),
             ((start + timedelta(minutes=times[1])).strftime("%H:%M"), f"Found the cause in {component}."),
             ((start + timedelta(minutes=times[2])).strftime("%H:%M"), "Mitigation applied; error rate falling."),
             ((start + timedelta(minutes=duration)).strftime("%H:%M"), "Recovered; incident resolved."),

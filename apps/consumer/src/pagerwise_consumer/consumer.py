@@ -372,7 +372,7 @@ class AlertConsumer:
     async def _embed(texts: list[str]) -> list[list[float]]:
         return await asyncio.to_thread(embed_passages, texts) if texts else []  # CPU-bound ONNX work
 
-    async def _notify(self, touched, queued: list) -> None:  # noqa: ANN001 - Iterable[clustering.Touched]
+    async def _notify(self, touched, queued: list) -> None:
         """Best effort: a missed incident update is re-read from Postgres, and a missed wake-up only delays the
         triage worker until its next poll. Auto-started triages count against the default tenant's slots (force:
         never refused), so people asking for more see the queue is busy."""

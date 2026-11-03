@@ -18,7 +18,6 @@ import time
 from pathlib import Path
 
 import httpx
-
 from pagerwise_client import Client
 from pagerwise_client.api.default import create_incident, start_triage
 from pagerwise_client.models import (
@@ -31,6 +30,7 @@ from pagerwise_client.models import (
     TriageAccepted,
     TriageBrief,
 )
+
 from pagerwise_client_sse import stream_triage
 
 FACTS = json.loads((Path(__file__).resolve().parents[1] / "evals" / "planted_facts.json").read_text())["facts"]
@@ -77,7 +77,7 @@ try:
 finally:
     httpx.post(f"{args.docs}/_faults", json={}).raise_for_status()
 
-print(f"\n\n== Result")
+print("\n\n== Result")
 if brief is None:
     sys.exit(1)
 print(f"verdict {brief.verdict.value}, {brief.model}, {brief.prompt_version}; first token after "
