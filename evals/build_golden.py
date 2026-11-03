@@ -140,7 +140,7 @@ def build(seed_value: int) -> None:
         version = f"{rng.randint(1, 9)}.{rng.randint(0, 40)}.{rng.randint(1, 30)}"
         deploys.append({"id": f"gdep-{i:02}", "service": service, "version": version,
                         "commit_sha": hashlib.sha1(f"golden-{service}-{version}".encode()).hexdigest(),
-                        "author": "Golden Set", "summary": "Release with the regression", "status": "succeeded"})
+                        "author": "release-bot", "summary": f"Release {version}", "status": "succeeded"})  # nothing may give the cause away
         cases.append({
             "id": f"deg-{i:02}", "kind": "degraded", "service": service,
             "title": f"{alertname} on {service}", "category": "bad-deploy",

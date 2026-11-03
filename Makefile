@@ -39,14 +39,14 @@ storm:
 	uv run python scripts/storm.py
 
 # The eval over the golden set (evals/run.py): retrieval and clustering. Not part of `make test`; exits 1 on a
-# missed gate. EMBEDDING=v1|v2|dual overrides the chunk embedding (default: settings); BASELINE=evals/baseline.json
-# fails on any quality drop over 1.5 points.
+# missed gate. BASELINE=evals/baseline.json fails on any quality drop over 1.5 points.
+# LIVE=1 calls Ollama (and records every call into evals/recordings/); without it the model calls are replayed.
 eval:
-	uv run python evals/run.py --split dev $(if $(EMBEDDING),--embedding $(EMBEDDING)) $(if $(BASELINE),--baseline $(BASELINE))
+	uv run python evals/run.py --split dev $(if $(LIVE),--live) $(if $(BASELINE),--baseline $(BASELINE))
 
 # The held-out split: only for deciding a change, never for tuning one.
 eval-test:
-	uv run python evals/run.py --split test $(if $(EMBEDDING),--embedding $(EMBEDDING)) $(if $(BASELINE),--baseline $(BASELINE))
+	uv run python evals/run.py --split test $(if $(LIVE),--live) $(if $(BASELINE),--baseline $(BASELINE))
 
 golden:
 	uv run python evals/build_golden.py

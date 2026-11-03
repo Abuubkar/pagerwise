@@ -1,0 +1,1749 @@
+id,split,case,section,claim,cites,source_tag,source_type,source,label,reason
+cal-01,tune,ans-31,blast_radius,The incident summary indicates `api_gateway_consumer_lag_msgs` was at 224304 on api-gateway-0 .,1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,The deploy record states none of the consumer-lag facts the sentence claims.
+cal-03,tune,una-12,likely_cause,"The incident description mentions an `ApiGatewayProviderRateLimited` error, which indicates the api-gateway is receiving rate-limited responses from an external provider; however, the provided evidence does not contain a specific tag for this exact error or a recent deploy to the api-gateway that caused it.",1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,The gdep-06 record (an orders deploy) says nothing about a provider rate limit or api-gateway.
+cal-04,tune,una-09,likely_cause,"The incident involves a kernel soft lockup, which is not explicitly described as a likely cause in the provided evidence; however, recent deploys to `auth` (dep-0366  and gdep-04 ) occurred shortly before the incident.",2,C8,deploy,"Deploy dep-0366: auth version 8.14.25 deployed at 2026-10-28T11:18:00Z by Lori Krueger (commit 402607f1ea, succeeded). Change: Roll out inventory behind a flag.",yes,Cites 2: the deploy record states a deploy to auth shortly before 11:44; nothing contradicts.
+cal-05,tune,ans-22,blast_radius,"The incident summary states that 26,101 customers saw errors during a similar past incident involving orders, but for this specific api-gateway incident, the blast radius includes all users of the api-gateway service .",1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,"The gdep-06 record states neither the 26,101 customers nor the api-gateway blast radius."
+cal-06,tune,una-11,likely_cause,"The incident occurred shortly after deploys to api-gateway, ledger, and orders , which are candidates for the cause.",3,C8,deploy,"Deploy gdep-07: api-gateway version 2.31.1 deployed at 2026-10-28T08:08:43.659038Z by Golden Set (commit 2ddd3869d9, succeeded). Change: Release with the regression.",no,"Cites 3: gdep-07 was deployed at 08:08, after the incident started at 07:55, so 'shortly after a deploy to api-gateway' is contradicted."
+cal-07,tune,deg-10,likely_cause,"Without specific details on which deploy occurred immediately before this incident, we cannot pinpoint the exact commit, but the timing aligns with the ""regression after a deploy"" pattern described in the runbook .",1,C1,runbook,"# Ledger: regression after a deploy
+
+Alert: `LedgerPostDeployErrors` fires when errors in the 30 minutes after a deploy, `ledger_post_deploy_error_pct`, exceed their threshold. Ledger is a
+core-tier service owned by the ledger team; it calls
+postgres-primary, kafka-broker, and
+payments call it.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Config drift.** The release expects a setting that isn't present in production.
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+
+The most common cause on ledger is config drift: it explained 8 of the
+last 15 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `ledger-overview` dashboard and compare `ledger_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history ledger --since 2h`. A deploy in the last hour makes
+   ""config drift"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n ledger logs deploy/ledger --since 15m | grep LED-DEPLOY-586
+   ```
+
+4. If `ledger_post_deploy_error_pct` stays above 7 for 4 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback ledger`; don't wait to debug.
+2. Freeze deploys for ledger.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=34` on
+   ledger (`configctl set ledger deploy_batch_size 34`) and restart one pod at a
+   time.",yes,The runbook describes the 'regression after a deploy' pattern; the sentence doesn't overstate it.
+cal-08,tune,una-07,likely_cause,"The incident involves an external provider returning HTTP 429, which is not covered by the provided evidence regarding internal causes like bad deploys or redis-cache issues .",4,C1,runbook,"# Card auth: elevated error rate
+
+Alert: `CardAuthErrorRateHigh` fires when the share of 5xx responses in `card_auth_error_ratio_pct` stays above its threshold for 5 minutes. Card auth is a
+core-tier service owned by the payments team; it calls
+redis-cache, and
+payments call it.
+
+## Symptoms
+
+- 5xx responses rise across all endpoints, not one.
+- Retries from callers double the request rate.
+- Logs show the same error code repeating.
+
+## Likely causes
+
+- **Bad deploy.** A recent release introduced an exception on a common path.
+- **Dependency errors passed through.** redis-cache returns errors and the service doesn't degrade.
+- **Expired credentials.** A rotated secret wasn't picked up and calls to redis-cache are rejected.
+
+The most common cause on card-auth is bad deploy: it explained 20 of the
+last 25 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_error_ratio_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes
+   ""bad deploy"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-ERR-619
+   ```
+
+4. If `card_auth_error_ratio_pct` stays above 9 for 12 minutes, treat it as
+   elevated error rate and move to mitigation; below that it usually recovers on its own.
+5. Group errors by endpoint and by upstream: one endpoint means a code path, all of them means a dependency.",yes,"Cites 4: the runbook covers internal causes (bad deploy, redis-cache), not a provider's 429s."
+cal-09,tune,ans-29,likely_cause,"The alert `ApiGatewayErrorRateHigh` fired shortly after deploys to auth (dep-0366) and payments (dep-0367, dep-0365), making a bad deploy or expired credentials in a dependency the most likely causes .",4,C9,deploy,"Deploy dep-0366: auth version 8.14.25 deployed at 2026-10-28T11:18:00Z by Lori Krueger (commit 402607f1ea, succeeded). Change: Roll out inventory behind a flag.",yes,Cites 4: the deploy record states one of the deploys; contradicts nothing.
+cal-10,tune,una-11,blast_radius,"The incident affects the payments service and its callers, api-gateway and orders .",2,C8,deploy,"Deploy gdep-07: api-gateway version 2.31.1 deployed at 2026-10-28T08:08:43.659038Z by Golden Set (commit 2ddd3869d9, succeeded). Change: Release with the regression.",no,"Cites 2: the gdep-07 record names no payments callers, so it states none of the sentence's facts."
+cal-11,tune,una-13,likely_cause,"The incident occurred shortly after a deploy to the affected service, which is a candidate cause .",1,C8,deploy,"Deploy gdep-01: notifications version 8.27.26 deployed at 2026-10-28T08:16:04.847826Z by Golden Set (commit 6218110327, succeeded). Change: Release with the regression.",yes,"The deploy record shows a deploy to notifications shortly before 09:27, offered as a candidate."
+cal-13,tune,ans-06,likely_cause,"A deploy to orders (gdep-06) occurred shortly before the incident, but the evidence points to the notifications service itself as the affected component where the pool wait time is measured .",2,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",yes,Cites 2: gdep-06 to orders shortly before 07:10 is in the record.
+cal-14,tune,ans-32,likely_cause,"The incident involves `ApiGatewayCertExpiring` firing shortly after a deploy to the `orders` service, which is a dependency of `api-gateway` .",1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,Adds a dependency fact the deploy record doesn't state.
+cal-15,tune,ans-38,likely_cause,"A deploy to postgres-primary occurred shortly before the incident, which could be a candidate cause if the retention job failure pattern from  applies, but the evidence does not explicitly link this specific deploy to the current disk full state.",1,C5,postmortem,"# Postmortem: postgres-primary disk full (2026-10-17)
+
+## Summary
+
+On 2026-10-17, postgres-primary stopped accepting writes for 94 minutes. The cause was in postgres-primary.
+The incident was sev1 and was opened by `PostgresPrimaryDiskFull`.
+
+## Impact
+
+- 29% of postgres-primary requests failed or timed out at the peak.
+- Callers affected: auth, inventory, ledger, orders.
+- 34,068 customers saw errors; 98 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **08:55** Routine traffic; nothing unusual in postgres-primary.
+- **09:01** `PostgresPrimaryDiskFull` fired; on-call acknowledged.
+- **09:37** Checked the postgres-primary runbook for disk full.
+- **10:01** Found the cause in postgres-primary.
+- **10:05** Mitigation applied; error rate falling.
+- **10:35** Recovered; incident resolved.
+
+## Root cause
+
+The retention job for postgres-primary had failed for 408 hours after a cron syntax change.
+
+Category: disk full. Component: postgres-primary.
+
+## Contributing factors
+
+- The disk full alert for postgres-primary had no runbook link.
+- Two teams investigated the same symptom without knowing it.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- POST-8683 (platform): Add an alert on disk_used_pct for postgres-primary.
+- POST-9812 (platform): Add a regression test for: the retention job for postgres-primary had failed for 408 hours after a cron syntax change.
+- POST-2489 (platform): Link the runbook from the alert.",no,The postmortem has no deploy in it.
+cal-16,tune,ans-18,likely_cause,"A recent deploy to orders (which calls payments) may have triggered increased load, but the evidence points primarily to a slow dependency like the ledger pool or a stale query plan in payments/kafka-broker causing latency .",3,C6,postmortem,"# Postmortem: payments high p99 latency (2026-10-30)
+
+## Summary
+
+On 2026-10-30, payments was slow for 148 minutes. The cause was in payments.
+The incident was sev1 and was opened by `PaymentsLatencyHigh`.
+
+## Impact
+
+- 4% of payments requests failed or timed out at the peak.
+- Callers affected: api-gateway, orders.
+- 2,336 customers saw errors; 108 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **01:50** Routine traffic; nothing unusual in payments.
+- **02:08** `PaymentsLatencyHigh` fired; on-call acknowledged.
+- **02:24** Checked the payments runbook for high p99 latency.
+- **02:35** Found the cause in payments.
+- **03:11** Mitigation applied; error rate falling.
+- **04:36** Recovered; incident resolved.
+
+## Root cause
+
+A slow query plan in payments after statistics went stale made p99 climb to 2989 ms.
+
+Category: high p99 latency. Component: payments.
+
+## Contributing factors
+
+- The high p99 latency alert for payments had no runbook link.
+- Two teams investigated the same symptom without knowing it.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- PAYM-8817 (payments): Add an alert on p99_latency_ms for payments.
+- PAYM-3173 (payments): Add a regression test for: a slow query plan in payments after statistics went stale made p99 climb to 2989 ms.
+- PAYM-4358 (payments): Link the runbook from the alert.",yes,"Cites 3: the postmortem states the slow-dependency fact; hedged, contradicts nothing."
+cal-17,tune,ans-21,likely_cause,"The evidence indicates that recent deploys to postgres-primary have historically caused latency issues in inventory, but no specific deploy tag exists for postgres-primary in the provided evidence .",3,C6,postmortem,"# Postmortem: inventory queue backlog (2025-06-04)
+
+## Summary
+
+On 2025-06-04, inventory fell behind for 66 minutes. The cause was in postgres-primary.
+The incident was sev1 and was opened by `InventoryConsumerLagHigh`.
+
+## Impact
+
+- 15% of inventory requests failed or timed out at the peak.
+- Callers affected: orders, search.
+- 8,032 customers saw errors; 16 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **22:04** postgres-primary 7.35.3 deployed by Scott Roberts.
+- **22:09** `InventoryConsumerLagHigh` fired; on-call acknowledged.
+- **22:09** Checked the inventory runbook for queue backlog.
+- **22:10** Found the cause in postgres-primary.
+- **22:28** Mitigation applied; error rate falling.
+- **23:15** Recovered; incident resolved.
+
+## Root cause
+
+7.35.3 of postgres-primary made an external call per message, cutting throughput by two thirds.
+
+Category: queue backlog. Component: postgres-primary.
+
+## Contributing factors
+
+- The queue backlog alert for postgres-primary had no runbook link.
+- Logs were sampled at 1%, so the first errors weren't visible.
+
+## Action items
+
+- INVE-5512 (discovery): Add an alert on consumer_lag_msgs for postgres-primary.
+- INVE-8385 (discovery): Add a regression test for: 7.35.3 of postgres-primary made an external call per message, cutting throughput by two thirds.
+- INVE-1821 (platform): Link the runbook from the alert.",no,"The postmortem was a queue backlog (throughput), not latency: a different kind of failure, so contradicted even with 3 citations."
+cal-18,tune,ans-23,likely_cause,The evidence indicates that recent changes in redis-cache have previously caused CPU saturation via hot loops or regressions .,2,C6,postmortem,"# Postmortem: inventory CPU saturation (2026-06-16)
+
+## Summary
+
+On 2026-06-16, inventory was saturated for 175 minutes. The cause was in postgres-primary.
+The incident was sev2 and was opened by `InventoryCPUSaturated`.
+
+## Impact
+
+- 17% of inventory requests failed or timed out at the peak.
+- Callers affected: orders, search.
+- 12,273 customers saw errors; 72 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **00:29** postgres-primary 1.33.11 deployed by Melissa Sanchez.
+- **01:04** `InventoryCPUSaturated` fired; on-call acknowledged.
+- **01:07** Checked the inventory runbook for CPU saturation.
+- **01:27** Found the cause in postgres-primary.
+- **02:48** Mitigation applied; error rate falling.
+- **03:59** Recovered; incident resolved.
+
+## Root cause
+
+postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+
+Category: CPU saturation. Component: postgres-primary.
+
+## Contributing factors
+
+- The CPU saturation alert for postgres-primary had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+
+## Action items
+
+- INVE-3678 (platform): Add an alert on cpu_util_pct for postgres-primary.
+- INVE-1076 (platform): Add a regression test for: postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+- INVE-9516 (platform): Link the runbook from the alert.",no,"The postmortem's cause was postgres-primary, not redis-cache."
+cal-19,tune,ans-04,likely_cause,"A deploy to redis-cache (dep-0364) occurred shortly before the incident, making a regression less likely than a configuration issue like log volume .",1,C9,deploy,"Deploy dep-0364: redis-cache version 3.37.35 deployed at 2026-10-28T10:08:00Z by Regina Wade (commit f21f2caf97, succeeded). Change: Refactor refund client.",no,The deploy record doesn't support the 'regression less likely' reasoning built on it.
+cal-20,tune,ans-33,likely_cause,A deploy to orders shortly before the incident introduced a regression that likely caused high load or latency propagating to api-gateway .,1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,Adds a causal propagation fact the source doesn't state.
+cal-22,tune,deg-10,blast_radius,"The incident summary indicates `ledger_post_deploy_error_pct` is at 24% on ledger-1, implying significant failure rates affecting callers like payments .",3,C1,runbook,"# Ledger: regression after a deploy
+
+Alert: `LedgerPostDeployErrors` fires when errors in the 30 minutes after a deploy, `ledger_post_deploy_error_pct`, exceed their threshold. Ledger is a
+core-tier service owned by the ledger team; it calls
+postgres-primary, kafka-broker, and
+payments call it.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Config drift.** The release expects a setting that isn't present in production.
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+
+The most common cause on ledger is config drift: it explained 8 of the
+last 15 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `ledger-overview` dashboard and compare `ledger_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history ledger --since 2h`. A deploy in the last hour makes
+   ""config drift"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n ledger logs deploy/ledger --since 15m | grep LED-DEPLOY-586
+   ```
+
+4. If `ledger_post_deploy_error_pct` stays above 7 for 4 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback ledger`; don't wait to debug.
+2. Freeze deploys for ledger.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=34` on
+   ledger (`configctl set ledger deploy_batch_size 34`) and restart one pod at a
+   time.",yes,"Cites 3: the runbook states payments calls ledger; the 24% comes from the alert, cited alongside."
+cal-23,tune,deg-09,likely_cause,A recent deploy to `inventory` is a candidate cause because past incidents show errors in `search` were caused by issues in its dependency `inventory` .,2,C6,postmortem,"# Postmortem: orders elevated error rate (2026-02-07)
+
+## Summary
+
+On 2026-02-07, orders returned errors for 76 minutes. The cause was in inventory.
+The incident was sev2 and was opened by `OrdersErrorRateHigh`.
+
+## Impact
+
+- 51% of orders requests failed or timed out at the peak.
+- Callers affected: api-gateway.
+- 776 customers saw errors; 49 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **13:49** inventory 2.26.7 deployed by Benjamin Davis.
+- **14:20** `OrdersErrorRateHigh` fired; on-call acknowledged.
+- **14:22** Checked the orders runbook for elevated error rate.
+- **15:14** Found the cause in inventory.
+- **15:18** Mitigation applied; error rate falling.
+- **15:36** Recovered; incident resolved.
+
+## Root cause
+
+2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.
+
+Category: elevated error rate. Component: inventory.
+
+## Contributing factors
+
+- The elevated error rate alert for inventory had no runbook link.
+- Logs were sampled at 1%, so the first errors weren't visible.
+
+## Action items
+
+- ORDE-1624 (commerce): Add an alert on error_ratio_pct for inventory.
+- ORDE-9902 (discovery): Add a regression test for: 2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.
+- ORDE-3635 (discovery): Link the runbook from the alert.",no,"The postmortem is about orders, not search."
+cal-24,tune,ans-14,likely_cause,"Alternatively, a recent deploy to kafka-broker or a service it depends on is a candidate cause .",2,C5,postmortem,"# Postmortem: kafka-broker dependency timeouts (2026-05-06)
+
+## Summary
+
+On 2026-05-06, kafka-broker timed out calling its dependencies for 57 minutes. The cause was in kafka-broker.
+The incident was sev1 and was opened by `KafkaBrokerUpstreamTimeouts`.
+
+## Impact
+
+- 44% of kafka-broker requests failed or timed out at the peak.
+- Callers affected: ledger, notifications, payments.
+- 30,395 customers saw errors; 31 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **11:58** kafka-broker 8.40.20 deployed by Anthony Tate.
+- **12:25** `KafkaBrokerUpstreamTimeouts` fired; on-call acknowledged.
+- **12:26** Checked the kafka-broker runbook for dependency timeouts.
+- **12:48** Found the cause in kafka-broker.
+- **13:08** Mitigation applied; error rate falling.
+- **13:22** Recovered; incident resolved.
+
+## Root cause
+
+A config change in 8.40.20 cut the timeout to its database to below its normal p99.
+
+Category: dependency timeouts. Component: kafka-broker.
+
+## Contributing factors
+
+- The dependency timeouts alert for kafka-broker had no runbook link.
+- Logs were sampled at 1%, so the first errors weren't visible.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- KAFK-2600 (platform): Add an alert on upstream_timeout_pct for kafka-broker.
+- KAFK-5775 (platform): Add a regression test for: a config change in 8.40.20 cut the timeout to its database to below its normal p99.
+- KAFK-5438 (platform): Link the runbook from the alert.",yes,"Cites 2: the postmortem shows a kafka-broker deploy causing a past incident, cited as precedent for a hedged candidate (same as cal-26)."
+cal-25,tune,deg-03,likely_cause,A deploy shortly before the incident to the affected service is a candidate cause .,1,C3,runbook,"# Postgres primary: regression after a deploy
+
+Alert: `PostgresPrimaryPostDeployErrors` fires when errors in the 30 minutes after a deploy, `postgres_primary_post_deploy_error_pct`, exceed their threshold. Postgres primary is a
+data-tier service owned by the platform team; it calls
+no other internal services, and
+auth, inventory, ledger, orders call it.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+- **Config drift.** The release expects a setting that isn't present in production.
+
+The most common cause on postgres-primary is code regression: it explained 14 of the
+last 20 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `postgres-primary-overview` dashboard and compare `postgres_primary_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history postgres-primary --since 2h`. A deploy in the last hour makes
+   ""code regression"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/postgres-primary --since 15m | grep POS-DEPLOY-939
+   ```
+
+4. If `postgres_primary_post_deploy_error_pct` stays above 8 for 4 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.",yes,The runbook states that a deploy shortly before is a candidate cause.
+cal-26,tune,ans-12,likely_cause,"A deploy to redis-cache shortly before this incident is a candidate cause, as past incidents show that changes in redis-cache (such as version 4.24.18 or 5.11.11) have previously caused queue backlogs affecting search .",2,C6,postmortem,"# Postmortem: redis-cache queue backlog (2026-05-21)
+
+## Summary
+
+On 2026-05-21, redis-cache fell behind for 91 minutes. The cause was in redis-cache.
+The incident was sev2 and was opened by `RedisCacheConsumerLagHigh`.
+
+## Impact
+
+- 24% of redis-cache requests failed or timed out at the peak.
+- Callers affected: auth, card-auth, search.
+- 24,918 customers saw errors; 23 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **15:54** redis-cache 4.24.18 deployed by Amy Miles.
+- **16:04** `RedisCacheConsumerLagHigh` fired; on-call acknowledged.
+- **16:06** Checked the redis-cache runbook for queue backlog.
+- **16:35** Found the cause in redis-cache.
+- **16:55** Mitigation applied; error rate falling.
+- **17:35** Recovered; incident resolved.
+
+## Root cause
+
+4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.
+
+Category: queue backlog. Component: redis-cache.
+
+## Contributing factors
+
+- The queue backlog alert for redis-cache had no runbook link.
+- Two teams investigated the same symptom without knowing it.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- REDI-7488 (platform): Add an alert on consumer_lag_msgs for redis-cache.
+- REDI-2882 (platform): Add a regression test for: 4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.
+- REDI-9744 (platform): Link the runbook from the alert.",yes,"Cites 2: the postmortem states the past redis-cache change and the search backlog, framed as past."
+cal-27,tune,ans-23,likely_cause,A deploy to redis-cache shortly before the incident is a candidate cause .,2,C9,deploy,"Deploy dep-0364: redis-cache version 3.37.35 deployed at 2026-10-28T10:08:00Z by Regina Wade (commit f21f2caf97, succeeded). Change: Refactor refund client.",yes,"Cites 2: the deploy record shows a redis-cache deploy shortly before 10:10, offered as a candidate."
+cal-28,tune,ans-26,blast_radius,"Users impacted are those making orders requests, with past incidents showing up to 28% of requests failing or timing out at peak .",1,C5,postmortem,"# Postmortem: orders disk full (2026-05-23)
+
+## Summary
+
+On 2026-05-23, orders stopped accepting writes for 95 minutes. The cause was in orders.
+The incident was sev2 and was opened by `OrdersDiskFull`.
+
+## Impact
+
+- 28% of orders requests failed or timed out at the peak.
+- Callers affected: api-gateway.
+- 26,101 customers saw errors; 99 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **14:36** Routine traffic; nothing unusual in orders.
+- **14:42** `OrdersDiskFull` fired; on-call acknowledged.
+- **15:07** Checked the orders runbook for disk full.
+- **15:37** Found the cause in orders.
+- **15:46** Mitigation applied; error rate falling.
+- **16:17** Recovered; incident resolved.
+
+## Root cause
+
+Debug logging enabled during an earlier incident in orders was never turned off and filled the disk.
+
+Category: disk full. Component: orders.
+
+## Contributing factors
+
+- The disk full alert for orders had no runbook link.
+- Logs were sampled at 1%, so the first errors weren't visible.
+
+## Action items
+
+- ORDE-1659 (commerce): Add an alert on disk_used_pct for orders.
+- ORDE-5354 (commerce): Add a regression test for: debug logging enabled during an earlier incident in orders was never turned off and filled the disk.
+- ORDE-9884 (commerce): Link the runbook from the alert.",yes,"The postmortem states 28% at peak, and the sentence frames it as a past incident."
+cal-29,tune,ans-31,likely_cause,The incident description shows `ApiGatewayConsumerLagHigh` firing shortly after a deploy to orders (gdep-06) which calls api-gateway .,1,C8,deploy,"Deploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression.",no,"Adds caller facts the deploy record doesn't state, and they're wrong."
+cal-31,tune,ans-04,blast_radius,"The callers affected are auth, card-auth, and search, as they all call redis-cache .",1,C1,runbook,"# Redis cache: disk full
+
+Alert: `RedisCacheDiskFull` fires when disk usage, `redis_cache_disk_used_pct`, rises above its threshold. Redis cache is a
+data-tier service owned by the platform team; it calls
+no other internal services, and
+auth, card-auth, search call it.
+
+## Symptoms
+
+- Writes fail with 'no space left on device'.
+- Log volume grew sharply in the last day.
+- Compaction or cleanup jobs are behind.
+
+## Likely causes
+
+- **Log volume.** Debug logging left on after an investigation.
+- **Retention not applied.** A cleanup job failed silently and old data piled up.
+- **Large temporary files.** A batch job writes temp files it doesn't remove.
+
+The most common cause on redis-cache is log volume: it explained 14 of the
+last 20 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history redis-cache --since 2h`. A deploy in the last hour makes
+   ""log volume"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/redis-cache --since 15m | grep RED-DISK-856
+   ```
+
+4. If `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as
+   disk full and move to mitigation; below that it usually recovers on its own.
+5. Find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`.",yes,"The runbook lists auth, card-auth and search as callers of redis-cache."
+cal-33,tune,deg-03,blast_radius,"The incident impacts 45% of requests at peak if it is a regression after a deploy , or 10% if it is an elevated error rate .",2,C5,postmortem,"# Postmortem: postgres-primary elevated error rate (2026-10-18)
+
+## Summary
+
+On 2026-10-18, postgres-primary returned errors for 64 minutes. The cause was in postgres-primary.
+The incident was sev3 and was opened by `PostgresPrimaryErrorRateHigh`.
+
+## Impact
+
+- 10% of postgres-primary requests failed or timed out at the peak.
+- Callers affected: auth, inventory, ledger, orders.
+- 34,915 customers saw errors; 76 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **13:28** Routine traffic; nothing unusual in postgres-primary.
+- **13:57** `PostgresPrimaryErrorRateHigh` fired; on-call acknowledged.
+- **14:18** Checked the postgres-primary runbook for elevated error rate.
+- **14:30** Found the cause in postgres-primary.
+- **14:35** Mitigation applied; error rate falling.
+- **15:01** Recovered; incident resolved.
+
+## Root cause
+
+A credential for postgres-primary was rotated without restarting consumers, so every call was refused.
+
+Category: elevated error rate. Component: postgres-primary.
+
+## Contributing factors
+
+- The elevated error rate alert for postgres-primary had no runbook link.
+- Two teams investigated the same symptom without knowing it.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- POST-6352 (platform): Add an alert on error_ratio_pct for postgres-primary.
+- POST-8377 (platform): Add a regression test for: a credential for postgres-primary was rotated without restarting consumers, so every call was refused.
+- POST-3777 (platform): Link the runbook from the alert.",no,Presents a past incident's 10% as this incident's impact.
+cal-39,tune,una-08,first_steps,Search the logs for the error code this failure logs: `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-TLS-415`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-QUEUE-733`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678` .,3,C4,runbook,"# Orders: dependency timeouts
+
+Alert: `OrdersUpstreamTimeouts` fires when the share of calls to a dependency that time out, `orders_upstream_timeout_pct`, stays above its threshold for 5 minutes. Orders is a
+core-tier service owned by the commerce team; it calls
+payments, inventory, notifications, postgres-primary, and
+api-gateway call it.
+
+## Symptoms
+
+- Timeouts concentrate on calls to payments.
+- The service's own CPU and memory look normal.
+- Thread or connection pools fill while waiting.
+
+## Likely causes
+
+- **Network path.** Packet loss between zones adds retransmits.
+- **Dependency degraded.** payments itself is slow or partially down.
+- **Timeout set too low.** A recent config change shortened the timeout below normal latency.
+
+The most common cause on orders is network path: it explained 12 of the
+last 20 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_upstream_timeout_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes
+   ""network path"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678
+   ```
+
+4. If `orders_upstream_timeout_pct` stays above 8 for 5 minutes, treat it as
+   dependency timeouts and move to mitigation; below that it usually recovers on its own.
+5. Check payments's own dashboard before changing anything in orders.
+
+## Mitigation
+
+1. Open the circuit breaker for payments if the feature can degrade.
+2. Fail over calls to the standby region for payments if one exists.
+3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=40` on
+   orders (`configctl set orders upstream_timeout_ms 40`) and restart one pod at a
+   time.",yes,Cites 3: the runbook gives the orders log commands and error codes.
+cal-44,tune,ans-04,first_steps,Confirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the same hour last week .,1,C1,runbook,"# Redis cache: disk full
+
+Alert: `RedisCacheDiskFull` fires when disk usage, `redis_cache_disk_used_pct`, rises above its threshold. Redis cache is a
+data-tier service owned by the platform team; it calls
+no other internal services, and
+auth, card-auth, search call it.
+
+## Symptoms
+
+- Writes fail with 'no space left on device'.
+- Log volume grew sharply in the last day.
+- Compaction or cleanup jobs are behind.
+
+## Likely causes
+
+- **Log volume.** Debug logging left on after an investigation.
+- **Retention not applied.** A cleanup job failed silently and old data piled up.
+- **Large temporary files.** A batch job writes temp files it doesn't remove.
+
+The most common cause on redis-cache is log volume: it explained 14 of the
+last 20 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history redis-cache --since 2h`. A deploy in the last hour makes
+   ""log volume"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/redis-cache --since 15m | grep RED-DISK-856
+   ```
+
+4. If `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as
+   disk full and move to mitigation; below that it usually recovers on its own.
+5. Find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`.",yes,"The runbook's first step, word for word."
+cal-45,tune,ans-08,first_steps,Check recent changes: `deployctl history payments --since 2h` .,1,C1,runbook,"# Payments: dependency timeouts
+
+Alert: `PaymentsUpstreamTimeouts` fires when the share of calls to a dependency that time out, `payments_upstream_timeout_pct`, stays above its threshold for 5 minutes. Payments is a
+core-tier service owned by the payments team; it calls
+card-auth, ledger, kafka-broker, and
+api-gateway, orders call it.
+
+## Symptoms
+
+- Timeouts concentrate on calls to card-auth.
+- The service's own CPU and memory look normal.
+- Thread or connection pools fill while waiting.
+
+## Likely causes
+
+- **Timeout set too low.** A recent config change shortened the timeout below normal latency.
+- **Dependency degraded.** card-auth itself is slow or partially down.
+- **Network path.** Packet loss between zones adds retransmits.
+
+The most common cause on payments is timeout set too low: it explained 18 of the
+last 26 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `payments-overview` dashboard and compare `payments_upstream_timeout_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history payments --since 2h`. A deploy in the last hour makes
+   ""timeout set too low"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n payments logs deploy/payments --since 15m | grep PAY-DEP-357
+   ```
+
+4. If `payments_upstream_timeout_pct` stays above 4 for 3 minutes, treat it as
+   dependency timeouts and move to mitigation; below that it usually recovers on its own.
+5. Check card-auth's own dashboard before changing anything in payments.
+
+## Mitigation
+
+1. Open the circuit breaker for card-auth if the feature can degrade.
+2. Fail over calls to the standby region for card-auth if one exists.
+3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=200` on
+   payments (`configctl set payments upstream_timeout_ms 200`) and restart one pod at a
+   time.",yes,"The runbook's step, word for word."
+cal-48,tune,ans-15,likely_cause,"The most likely cause is a memory leak in a recent release of the auth service, as this explained 22 of the last 22 pages for this alert .",1,C1,runbook,"# Auth: memory pressure and OOM kills
+
+Alert: `AuthMemoryPressure` fires when container memory, `auth_rss_pct_of_limit`, stays above its threshold for 10 minutes or a pod is OOM-killed. Auth is a
+core-tier service owned by the identity team; it calls
+redis-cache, postgres-primary, and
+api-gateway call it.
+
+## Symptoms
+
+- Pods restart with reason OOMKilled.
+- Memory climbs steadily between restarts: a sawtooth.
+- Latency spikes right before each restart.
+
+## Likely causes
+
+- **Memory leak in a recent release.** A new code path keeps references to finished requests.
+- **Large payloads.** A few very large requests allocate far more than usual.
+- **Unbounded cache.** An in-process cache without a size limit grows with traffic.
+
+The most common cause on auth is memory leak in a recent release: it explained 22 of the
+last 22 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `auth-overview` dashboard and compare `auth_rss_pct_of_limit` with the
+   same hour last week.
+2. Check recent changes: `deployctl history auth --since 2h`. A deploy in the last hour makes
+   ""memory leak in a recent release"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n identity logs deploy/auth --since 15m | grep AUT-MEM-724
+   ```
+
+4. If `auth_rss_pct_of_limit` stays above 97 for 8 minutes, treat it as
+   memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own.
+5. Compare memory growth rate before and after the last deploy.",yes,The runbook states the memory leak explained 22 of the last 22 pages.
+cal-50,tune,ans-21,first_steps,"If `inventory_p99_latency_ms` stays above 1648 for 6 minutes, treat it as high p99 latency and move to mitigation; below that it usually recovers on its own .",1,C1,runbook,"# Inventory: high p99 latency
+
+Alert: `InventoryLatencyHigh` fires when the p99 of `inventory_p99_latency_ms` stays above its threshold for 5 minutes. Inventory is a
+supporting-tier service owned by the discovery team; it calls
+postgres-primary, and
+orders, search call it.
+
+## Symptoms
+
+- p99 rises first; p50 usually stays flat until the problem spreads.
+- Time spent waiting on postgres-primary grows faster than time spent in the service itself.
+- Request rate is normal: this is slowness, not extra load.
+
+## Likely causes
+
+- **Garbage collection pauses.** Heap close to its limit makes collection pauses show up in p99.
+- **Slow dependency.** Most latency is spent waiting on postgres-primary; check its own latency first.
+- **Lock contention.** Long-held row or mutex locks serialize requests under normal load.
+
+The most common cause on inventory is garbage collection pauses: it explained 22 of the
+last 28 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `inventory-overview` dashboard and compare `inventory_p99_latency_ms` with the
+   same hour last week.
+2. Check recent changes: `deployctl history inventory --since 2h`. A deploy in the last hour makes
+   ""garbage collection pauses"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n discovery logs deploy/inventory --since 15m | grep INV-LAT-501
+   ```
+
+4. If `inventory_p99_latency_ms` stays above 1648 for 6 minutes, treat it as
+   high p99 latency and move to mitigation; below that it usually recovers on its own.
+5. Compare the service's own processing time with the time spent waiting on postgres-primary.",yes,The runbook states the 1648 ms threshold and the 6 minutes.
+cal-52,tune,ans-28,first_steps,Check recent changes: `deployctl history search --since 2h` .,1,C1,runbook,"# Search: TLS certificate expiry
+
+Alert: `SearchCertExpiring` fires when a certificate's remaining validity, `search_cert_days_left`, drops below its threshold. Search is a
+supporting-tier service owned by the discovery team; it calls
+inventory, redis-cache, and
+api-gateway call it.
+
+## Symptoms
+
+- Handshake failures from clients with strict validation.
+- Errors start at the same minute everywhere.
+- Internal calls fail while external ones work, or the reverse.
+
+## Likely causes
+
+- **Renewal job failed.** cert-manager couldn't complete its challenge.
+- **Clock skew.** A node's clock is far enough off to reject valid certificates.
+- **Pinned intermediate.** A client pins an intermediate that rotated.
+
+The most common cause on search is renewal job failed: it explained 13 of the
+last 21 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `search-overview` dashboard and compare `search_cert_days_left` with the
+   same hour last week.
+2. Check recent changes: `deployctl history search --since 2h`. A deploy in the last hour makes
+   ""renewal job failed"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n discovery logs deploy/search --since 15m | grep SEA-TLS-832
+   ```
+
+4. If `search_cert_days_left` stays above 4 for 12 minutes, treat it as
+   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.
+5. Check expiry with `openssl s_client -connect search:443 | openssl x509 -noout -enddate`.
+
+## Mitigation
+
+1. Force renewal: `kubectl -n platform annotate certificate search renew=now`.
+2. Restart pods so they load the new certificate.
+3. If that doesn't help within 10 minutes, set `tls_min_version=63` on
+   search (`configctl set search tls_min_version 63`) and restart one pod at a
+   time.",yes,"The runbook's step, word for word."
+cal-53,tune,ans-31,first_steps,Scale consumers up to the partition count .,1,C1,runbook,"# Api gateway: queue backlog
+
+Alert: `ApiGatewayConsumerLagHigh` fires when consumer lag, `api_gateway_consumer_lag_msgs`, stays above its threshold for 10 minutes. Api gateway is a
+edge-tier service owned by the platform team; it calls
+auth, payments, orders, search.
+
+## Symptoms
+
+- Consumer lag grows steadily.
+- Processing rate is lower than the produce rate.
+- Downstream data is stale.
+
+## Likely causes
+
+- **Too few consumers.** Consumers crashed or were scaled down.
+- **Slow consumers.** Each message takes longer to process than usual.
+- **Poison message.** One message fails and blocks its partition.
+
+The most common cause on api-gateway is too few consumers: it explained 10 of the
+last 14 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_consumer_lag_msgs` with the
+   same hour last week.
+2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes
+   ""too few consumers"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-QUEUE-272
+   ```
+
+4. If `api_gateway_consumer_lag_msgs` stays above 65515 for 8 minutes, treat it as
+   queue backlog and move to mitigation; below that it usually recovers on its own.
+5. Check whether lag grows on all partitions or a few: a few points at a poison message or hot key.
+
+## Mitigation
+
+1. Scale consumers up to the partition count.
+2. Skip and dead-letter a poison message after 3 attempts.
+3. If that doesn't help within 10 minutes, set `dlq_after_attempts=9` on
+   api-gateway (`configctl set api-gateway dlq_after_attempts 9`) and restart one pod at a
+   time.",yes,The runbook's mitigation step.
+cal-55,tune,ans-38,first_steps,Check recent changes: `deployctl history ledger --since 2h` .,1,C1,runbook,"# Ledger: disk full
+
+Alert: `LedgerDiskFull` fires when disk usage, `ledger_disk_used_pct`, rises above its threshold. Ledger is a
+core-tier service owned by the ledger team; it calls
+postgres-primary, kafka-broker, and
+payments call it.
+
+## Symptoms
+
+- Writes fail with 'no space left on device'.
+- Log volume grew sharply in the last day.
+- Compaction or cleanup jobs are behind.
+
+## Likely causes
+
+- **Large temporary files.** A batch job writes temp files it doesn't remove.
+- **Log volume.** Debug logging left on after an investigation.
+- **Retention not applied.** A cleanup job failed silently and old data piled up.
+
+The most common cause on ledger is large temporary files: it explained 10 of the
+last 13 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `ledger-overview` dashboard and compare `ledger_disk_used_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history ledger --since 2h`. A deploy in the last hour makes
+   ""large temporary files"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n ledger logs deploy/ledger --since 15m | grep LED-DISK-809
+   ```
+
+4. If `ledger_disk_used_pct` stays above 89 for 6 minutes, treat it as
+   disk full and move to mitigation; below that it usually recovers on its own.
+5. Find the largest directories with `du -sh /var/lib/ledger/* | sort -h | tail`.
+
+## Mitigation
+
+1. Delete rotated logs older than 2 days.
+2. Expand the volume by 50% if cleanup isn't enough.
+3. If that doesn't help within 10 minutes, set `retention_days=4` on
+   ledger (`configctl set ledger retention_days 4`) and restart one pod at a
+   time.
+
+## Escalation
+
+Page the ledger secondary after 15 minutes without improvement, or at once if more than
+20% of ledger requests are failing. Coordinate in `#ledger-oncall`.",yes,"The runbook's step, word for word."
+cal-56,tune,una-05,first_steps,Check its database's own dashboard before changing anything in kafka-broker.,1,C1,runbook,"# Kafka broker: dependency timeouts
+
+Alert: `KafkaBrokerUpstreamTimeouts` fires when the share of calls to a dependency that time out, `kafka_broker_upstream_timeout_pct`, stays above its threshold for 5 minutes. Kafka broker is a
+data-tier service owned by the platform team; it calls
+no other internal services, and
+ledger, notifications, payments call it.
+
+## Symptoms
+
+- Timeouts concentrate on calls to its database.
+- The service's own CPU and memory look normal.
+- Thread or connection pools fill while waiting.
+
+## Likely causes
+
+- **Dependency degraded.** its database itself is slow or partially down.
+- **Network path.** Packet loss between zones adds retransmits.
+- **Timeout set too low.** A recent config change shortened the timeout below normal latency.
+
+The most common cause on kafka-broker is dependency degraded: it explained 14 of the
+last 16 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_upstream_timeout_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes
+   ""dependency degraded"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-DEP-358
+   ```
+
+4. If `kafka_broker_upstream_timeout_pct` stays above 9 for 4 minutes, treat it as
+   dependency timeouts and move to mitigation; below that it usually recovers on its own.
+5. Check its database's own dashboard before changing anything in kafka-broker.",yes,The runbook's step.
+cal-58,tune,una-11,first_steps,Search the logs for the error code this failure logs: `kubectl -n payments logs deploy/payments --since 15m | grep PAY-TLS-723` .,1,C1,runbook,"# Payments: TLS certificate expiry
+
+Alert: `PaymentsCertExpiring` fires when a certificate's remaining validity, `payments_cert_days_left`, drops below its threshold. Payments is a
+core-tier service owned by the payments team; it calls
+card-auth, ledger, kafka-broker, and
+api-gateway, orders call it.
+
+## Symptoms
+
+- Handshake failures from clients with strict validation.
+- Errors start at the same minute everywhere.
+- Internal calls fail while external ones work, or the reverse.
+
+## Likely causes
+
+- **Pinned intermediate.** A client pins an intermediate that rotated.
+- **Clock skew.** A node's clock is far enough off to reject valid certificates.
+- **Renewal job failed.** cert-manager couldn't complete its challenge.
+
+The most common cause on payments is pinned intermediate: it explained 11 of the
+last 12 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `payments-overview` dashboard and compare `payments_cert_days_left` with the
+   same hour last week.
+2. Check recent changes: `deployctl history payments --since 2h`. A deploy in the last hour makes
+   ""pinned intermediate"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n payments logs deploy/payments --since 15m | grep PAY-TLS-723
+   ```
+
+4. If `payments_cert_days_left` stays above 10 for 5 minutes, treat it as
+   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.
+5. Check expiry with `openssl s_client -connect payments:443 | openssl x509 -noout -enddate`.",yes,The runbook gives this command and PAY-TLS-723.
+cal-59,tune,una-13,first_steps,Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate` .,1,C1,runbook,"# Notifications: TLS certificate expiry
+
+Alert: `NotificationsCertExpiring` fires when a certificate's remaining validity, `notifications_cert_days_left`, drops below its threshold. Notifications is a
+supporting-tier service owned by the growth team; it calls
+kafka-broker, and
+orders call it.
+
+## Symptoms
+
+- Handshake failures from clients with strict validation.
+- Errors start at the same minute everywhere.
+- Internal calls fail while external ones work, or the reverse.
+
+## Likely causes
+
+- **Clock skew.** A node's clock is far enough off to reject valid certificates.
+- **Renewal job failed.** cert-manager couldn't complete its challenge.
+- **Pinned intermediate.** A client pins an intermediate that rotated.
+
+The most common cause on notifications is clock skew: it explained 9 of the
+last 14 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_cert_days_left` with the
+   same hour last week.
+2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes
+   ""clock skew"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-TLS-302
+   ```
+
+4. If `notifications_cert_days_left` stays above 8 for 10 minutes, treat it as
+   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.
+5. Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate`.",yes,The runbook gives this openssl command.
+cal-60,tune,deg-02,first_steps,Freeze deploys for redis-cache,1,C2,runbook,"## Mitigation
+
+1. Roll back: `deployctl rollback redis-cache`; don't wait to debug.
+2. Freeze deploys for redis-cache.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=29` on
+   redis-cache (`configctl set redis-cache deploy_batch_size 29`) and restart one pod at a
+   time.
+
+## Escalation
+
+Page the platform secondary after 30 minutes without improvement, or at once if more than
+5% of redis-cache requests are failing. Coordinate in `#platform-oncall`.",yes,The runbook's mitigation step.
+cal-62,holdout,deg-07,likely_cause,"The incident summary indicates `api_gateway_post_deploy_error_pct` is at 9%, exceeding the threshold mentioned in the diagnosis steps .",1,C1,runbook,"# Api gateway: regression after a deploy
+
+Alert: `ApiGatewayPostDeployErrors` fires when errors in the 30 minutes after a deploy, `api_gateway_post_deploy_error_pct`, exceed their threshold. Api gateway is a
+edge-tier service owned by the platform team; it calls
+auth, payments, orders, search.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+- **Config drift.** The release expects a setting that isn't present in production.
+
+The most common cause on api-gateway is code regression: it explained 8 of the
+last 10 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes
+   ""code regression"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-DEPLOY-811
+   ```
+
+4. If `api_gateway_post_deploy_error_pct` stays above 6 for 8 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback api-gateway`; don't wait to debug.
+2. Freeze deploys for api-gateway.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=40` on
+   api-gateway (`configctl set api-gateway deploy_batch_size 40`) and restart one pod at a
+   time.",no,"The 9% is from the alert, not this runbook, and the sentence cites only the runbook."
+cal-65,holdout,ans-21,likely_cause,"The incident occurred shortly after the deploy of search version 2.5.22 , which is a candidate cause if the regression affected dependent services like inventory.",1,C8,deploy,"Deploy gdep-09: search version 2.5.22 deployed at 2026-10-28T10:15:21.529837Z by Golden Set (commit 072c44b1d2, succeeded). Change: Release with the regression.",no,"Adds 'inventory depends on search', which the deploy record doesn't state (and it's backwards: search calls inventory)."
+cal-67,holdout,ans-33,blast_radius,"Users making requests to api-gateway, including those from orders and payments callers, are impacted .",2,C6,postmortem,"# Postmortem: search CPU saturation (2025-09-16)
+
+## Summary
+
+On 2025-09-16, search was saturated for 189 minutes. The cause was in redis-cache.
+The incident was sev2 and was opened by `SearchCPUSaturated`.
+
+## Impact
+
+- 53% of search requests failed or timed out at the peak.
+- Callers affected: api-gateway.
+- 32,871 customers saw errors; 97 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **12:50** redis-cache 3.19.0 deployed by Joel Jackson.
+- **13:01** `SearchCPUSaturated` fired; on-call acknowledged.
+- **13:46** Checked the search runbook for CPU saturation.
+- **13:49** Found the cause in redis-cache.
+- **14:00** Mitigation applied; error rate falling.
+- **16:10** Recovered; incident resolved.
+
+## Root cause
+
+A regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning CPU at 3206%.
+
+Category: CPU saturation. Component: redis-cache.
+
+## Contributing factors
+
+- The CPU saturation alert for redis-cache had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+
+## Action items
+
+- SEAR-2079 (platform): Add an alert on cpu_util_pct for redis-cache.
+- SEAR-2440 (discovery): Add a regression test for: a regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning cpu at 3206%.
+- SEAR-5727 (discovery): Link the runbook from the alert.",no,Cites 2: a search postmortem; it says nothing about api-gateway's users or orders/payments callers.
+cal-70,holdout,ans-09,likely_cause,"A deploy to payments shortly before the incident (gdep-05) makes ""retention not applied"" less likely than a regression .",1,C8,deploy,"Deploy gdep-05: payments version 3.16.16 deployed at 2026-10-28T08:59:55.051026Z by Golden Set (commit e944ba3b38, succeeded). Change: Release with the regression.",no,"gdep-05 was deployed at 08:59, after the incident started at 08:45: contradicts 'shortly before'."
+cal-71,holdout,ans-36,blast_radius,"Past incidents indicate that when api-gateway fails, callers such as auth are impacted .",3,C5,postmortem,"# Postmortem: orders elevated error rate (2025-12-21)
+
+## Summary
+
+On 2025-12-21, orders returned errors for 41 minutes. The cause was in payments.
+The incident was sev1 and was opened by `OrdersErrorRateHigh`.
+
+## Impact
+
+- 59% of orders requests failed or timed out at the peak.
+- Callers affected: api-gateway.
+- 18,487 customers saw errors; 38 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **14:30** payments 3.38.14 deployed by Angela Cole.
+- **14:48** `OrdersErrorRateHigh` fired; on-call acknowledged.
+- **14:48** Checked the orders runbook for elevated error rate.
+- **15:06** Found the cause in payments.
+- **15:11** Mitigation applied; error rate falling.
+- **15:29** Recovered; incident resolved.
+
+## Root cause
+
+3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.
+
+Category: elevated error rate. Component: payments.
+
+## Contributing factors
+
+- The elevated error rate alert for payments had no runbook link.
+- The on-call engineer had no access to the database dashboards.
+
+## Action items
+
+- ORDE-6061 (payments): Add an alert on error_ratio_pct for payments.
+- ORDE-2851 (commerce): Add a regression test for: 3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.
+- ORDE-6316 (payments): Link the runbook from the alert.",no,Cites 3: an orders postmortem; it says nothing about auth being hit when api-gateway fails.
+cal-76,holdout,ans-34,likely_cause,A deploy to ledger shortly before the incident introduced a regression .,1,C8,deploy,"Deploy gdep-10: ledger version 6.3.4 deployed at 2026-10-28T07:50:45.498366Z by Golden Set (commit 045622cdb6, succeeded). Change: Release with the regression.",no,"gdep-10 was deployed at 07:50, after the kafka-broker incident started at 07:41, and 'introduced a regression' is stated as certain."
+cal-84,holdout,deg-07,blast_radius,"Past incidents show that when api-gateway fails, callers such as orders and customers see errors .",2,C6,postmortem,"# Postmortem: payments regression after a deploy (2025-07-19)
+
+## Summary
+
+On 2025-07-19, payments broke after a deploy for 27 minutes. The cause was in card-auth.
+The incident was sev1 and was opened by `PaymentsPostDeployErrors`.
+
+## Impact
+
+- 8% of payments requests failed or timed out at the peak.
+- Callers affected: api-gateway, orders.
+- 9,569 customers saw errors; 40 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **06:02** card-auth 4.11.1 deployed by Jessica Edwards.
+- **06:23** `PaymentsPostDeployErrors` fired; on-call acknowledged.
+- **06:23** Checked the payments runbook for regression after a deploy.
+- **06:24** Found the cause in card-auth.
+- **06:40** Mitigation applied; error rate falling.
+- **06:50** Recovered; incident resolved.
+
+## Root cause
+
+4.11.1 of card-auth renamed a config key, so production fell back to a default of 2108.
+
+Category: regression after a deploy. Component: card-auth.
+
+## Contributing factors
+
+- The regression after a deploy alert for card-auth had no runbook link.
+- Two teams investigated the same symptom without knowing it.
+
+## Action items
+
+- PAYM-5895 (payments): Add an alert on post_deploy_error_pct for card-auth.
+- PAYM-2727 (payments): Add a regression test for: 4.11.1 of card-auth renamed a config key, so production fell back to a default of 2108.
+- PAYM-6307 (payments): Link the runbook from the alert.",no,Cites 2: a payments postmortem; it says nothing about what happens when api-gateway fails.
+cal-86,holdout,ans-14,likely_cause,A config change in deploy 8.40.20 cut the timeout to its database below its normal p99 .,1,C5,postmortem,"# Postmortem: kafka-broker dependency timeouts (2026-05-06)
+
+## Summary
+
+On 2026-05-06, kafka-broker timed out calling its dependencies for 57 minutes. The cause was in kafka-broker.
+The incident was sev1 and was opened by `KafkaBrokerUpstreamTimeouts`.
+
+## Impact
+
+- 44% of kafka-broker requests failed or timed out at the peak.
+- Callers affected: ledger, notifications, payments.
+- 30,395 customers saw errors; 31 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **11:58** kafka-broker 8.40.20 deployed by Anthony Tate.
+- **12:25** `KafkaBrokerUpstreamTimeouts` fired; on-call acknowledged.
+- **12:26** Checked the kafka-broker runbook for dependency timeouts.
+- **12:48** Found the cause in kafka-broker.
+- **13:08** Mitigation applied; error rate falling.
+- **13:22** Recovered; incident resolved.
+
+## Root cause
+
+A config change in 8.40.20 cut the timeout to its database to below its normal p99.
+
+Category: dependency timeouts. Component: kafka-broker.
+
+## Contributing factors
+
+- The dependency timeouts alert for kafka-broker had no runbook link.
+- Logs were sampled at 1%, so the first errors weren't visible.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- KAFK-2600 (platform): Add an alert on upstream_timeout_pct for kafka-broker.
+- KAFK-5775 (platform): Add a regression test for: a config change in 8.40.20 cut the timeout to its database to below its normal p99.
+- KAFK-5438 (platform): Link the runbook from the alert.",no,A past incident's root cause (2026-05-06) stated as this incident's likely cause.
+cal-64,holdout,deg-09,likely_cause,"The incident involves `search` shortly after a deploy, and the evidence indicates that bad deploys or code regressions are the most common causes for this alert .",2,C1,runbook,"# Search: elevated error rate
+
+Alert: `SearchErrorRateHigh` fires when the share of 5xx responses in `search_error_ratio_pct` stays above its threshold for 5 minutes. Search is a
+supporting-tier service owned by the discovery team; it calls
+inventory, redis-cache, and
+api-gateway call it.
+
+## Symptoms
+
+- 5xx responses rise across all endpoints, not one.
+- Retries from callers double the request rate.
+- Logs show the same error code repeating.
+
+## Likely causes
+
+- **Bad deploy.** A recent release introduced an exception on a common path.
+- **Expired credentials.** A rotated secret wasn't picked up and calls to inventory are rejected.
+- **Dependency errors passed through.** inventory returns errors and the service doesn't degrade.
+
+The most common cause on search is bad deploy: it explained 27 of the
+last 30 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `search-overview` dashboard and compare `search_error_ratio_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history search --since 2h`. A deploy in the last hour makes
+   ""bad deploy"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n discovery logs deploy/search --since 15m | grep SEA-ERR-826
+   ```
+
+4. If `search_error_ratio_pct` stays above 8 for 3 minutes, treat it as
+   elevated error rate and move to mitigation; below that it usually recovers on its own.
+5. Group errors by endpoint and by upstream: one endpoint means a code path, all of them means a dependency.
+
+## Mitigation
+
+1. Roll back the last deploy if it is less than two hours old: `deployctl rollback search`.
+2. Turn off the feature flag named in the error, if any.
+3. If that doesn't help within 10 minutes, set `retry_budget_pct=13` on
+   search (`configctl set search retry_budget_pct 13`) and restart one pod at a
+   time.",yes,Cites 2: the runbook says bad deploy is the most common cause on search; the code regression part can come from the other source.
+cal-68,holdout,una-13,likely_cause,"The most common causes for this alert are clock skew or expired credentials, but the evidence does not confirm which specific one applies here .",2,C1,runbook,"# Notifications: TLS certificate expiry
+
+Alert: `NotificationsCertExpiring` fires when a certificate's remaining validity, `notifications_cert_days_left`, drops below its threshold. Notifications is a
+supporting-tier service owned by the growth team; it calls
+kafka-broker, and
+orders call it.
+
+## Symptoms
+
+- Handshake failures from clients with strict validation.
+- Errors start at the same minute everywhere.
+- Internal calls fail while external ones work, or the reverse.
+
+## Likely causes
+
+- **Clock skew.** A node's clock is far enough off to reject valid certificates.
+- **Renewal job failed.** cert-manager couldn't complete its challenge.
+- **Pinned intermediate.** A client pins an intermediate that rotated.
+
+The most common cause on notifications is clock skew: it explained 9 of the
+last 14 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_cert_days_left` with the
+   same hour last week.
+2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes
+   ""clock skew"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-TLS-302
+   ```
+
+4. If `notifications_cert_days_left` stays above 8 for 10 minutes, treat it as
+   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.
+5. Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate`.",yes,Cites 2: the runbook says clock skew is the most common cause; expired credentials can come from the other source.
+cal-72,holdout,deg-01,blast_radius,"Callers affected include orders, which call notifications .",2,C1,runbook,"# Notifications: regression after a deploy
+
+Alert: `NotificationsPostDeployErrors` fires when errors in the 30 minutes after a deploy, `notifications_post_deploy_error_pct`, exceed their threshold. Notifications is a
+supporting-tier service owned by the growth team; it calls
+kafka-broker, and
+orders call it.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Config drift.** The release expects a setting that isn't present in production.
+
+The most common cause on notifications is schema mismatch: it explained 23 of the
+last 23 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes
+   ""schema mismatch"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-DEPLOY-333
+   ```
+
+4. If `notifications_post_deploy_error_pct` stays above 2 for 7 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback notifications`; don't wait to debug.
+2. Freeze deploys for notifications.
+3. If that doesn't help within 10 minutes, set `feature_flag_default=29` on
+   notifications (`configctl set notifications feature_flag_default 29`) and restart one pod at a
+   time.",yes,Cites 2: the runbook says orders calls notifications.
+cal-73,holdout,ans-21,blast_radius,"Users impacted include customers who see errors on inventory requests, with historical incidents affecting between 12,273 and 4,554 customers .",2,C5,postmortem,"# Postmortem: inventory CPU saturation (2026-06-16)
+
+## Summary
+
+On 2026-06-16, inventory was saturated for 175 minutes. The cause was in postgres-primary.
+The incident was sev2 and was opened by `InventoryCPUSaturated`.
+
+## Impact
+
+- 17% of inventory requests failed or timed out at the peak.
+- Callers affected: orders, search.
+- 12,273 customers saw errors; 72 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **00:29** postgres-primary 1.33.11 deployed by Melissa Sanchez.
+- **01:04** `InventoryCPUSaturated` fired; on-call acknowledged.
+- **01:07** Checked the inventory runbook for CPU saturation.
+- **01:27** Found the cause in postgres-primary.
+- **02:48** Mitigation applied; error rate falling.
+- **03:59** Recovered; incident resolved.
+
+## Root cause
+
+postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+
+Category: CPU saturation. Component: postgres-primary.
+
+## Contributing factors
+
+- The CPU saturation alert for postgres-primary had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+
+## Action items
+
+- INVE-3678 (platform): Add an alert on cpu_util_pct for postgres-primary.
+- INVE-1076 (platform): Add a regression test for: postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+- INVE-9516 (platform): Link the runbook from the alert.",yes,"Cites 2: the postmortem states 12,273 customers, framed as a past incident."
+cal-74,holdout,ans-27,blast_radius,"Additionally, customers using these services see errors, as seen in past incidents where 15,833 to 34,209 customers were affected by similar pool exhaustion or latency issues .",2,C5,postmortem,"# Postmortem: card-auth connection pool exhaustion (2025-10-20)
+
+## Summary
+
+On 2025-10-20, card-auth ran out of database connections for 164 minutes. The cause was in redis-cache.
+The incident was sev2 and was opened by `CardAuthPoolExhausted`.
+
+## Impact
+
+- 27% of card-auth requests failed or timed out at the peak.
+- Callers affected: payments.
+- 15,833 customers saw errors; 107 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **19:21** Routine traffic; nothing unusual in redis-cache.
+- **19:29** `CardAuthPoolExhausted` fired; on-call acknowledged.
+- **19:38** Checked the card-auth runbook for connection pool exhaustion.
+- **21:10** Found the cause in redis-cache.
+- **21:43** Mitigation applied; error rate falling.
+- **22:13** Recovered; incident resolved.
+
+## Root cause
+
+A retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
+
+Category: connection pool exhaustion. Component: redis-cache.
+
+## Contributing factors
+
+- The connection pool exhaustion alert for redis-cache had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+- Dashboards showed averages, which hid the p99.
+
+## Action items
+
+- CARD-6253 (payments): Add an alert on pool_wait_ms for redis-cache.
+- CARD-1877 (payments): Add a regression test for: a retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.
+- CARD-9476 (platform): Link the runbook from the alert.",yes,"Cites 2: the postmortem states 15,833 customers in a past pool exhaustion."
+cal-78,holdout,deg-07,likely_cause,"The alert `ApiGatewayPostDeployErrors` fired shortly after a deploy, which matches the pattern of code regression or config drift described in the runbook .",1,C1,runbook,"# Api gateway: regression after a deploy
+
+Alert: `ApiGatewayPostDeployErrors` fires when errors in the 30 minutes after a deploy, `api_gateway_post_deploy_error_pct`, exceed their threshold. Api gateway is a
+edge-tier service owned by the platform team; it calls
+auth, payments, orders, search.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+- **Config drift.** The release expects a setting that isn't present in production.
+
+The most common cause on api-gateway is code regression: it explained 8 of the
+last 10 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes
+   ""code regression"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-DEPLOY-811
+   ```
+
+4. If `api_gateway_post_deploy_error_pct` stays above 6 for 8 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback api-gateway`; don't wait to debug.
+2. Freeze deploys for api-gateway.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=40` on
+   api-gateway (`configctl set api-gateway deploy_batch_size 40`) and restart one pod at a
+   time.",yes,"The runbook describes this alert as errors after a deploy, with code regression and config drift as causes."
+cal-79,holdout,deg-03,blast_radius,"Customers seeing errors depend on the specific failure mode (e.g., 34,915 customers for elevated error rate vs 4,554 for inventory regression) .",2,C6,postmortem,"# Postmortem: inventory regression after a deploy (2026-04-27)
+
+## Summary
+
+On 2026-04-27, inventory broke after a deploy for 111 minutes. The cause was in postgres-primary.
+The incident was sev1 and was opened by `InventoryPostDeployErrors`.
+
+## Impact
+
+- 45% of inventory requests failed or timed out at the peak.
+- Callers affected: orders, search.
+- 4,554 customers saw errors; 67 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **18:22** postgres-primary 9.39.13 deployed by Pamela Berry.
+- **18:49** `InventoryPostDeployErrors` fired; on-call acknowledged.
+- **18:54** Checked the inventory runbook for regression after a deploy.
+- **19:34** Found the cause in postgres-primary.
+- **19:48** Mitigation applied; error rate falling.
+- **20:40** Recovered; incident resolved.
+
+## Root cause
+
+9.39.13 of postgres-primary renamed a config key, so production fell back to a default of 4250.
+
+Category: regression after a deploy. Component: postgres-primary.
+
+## Contributing factors
+
+- The regression after a deploy alert for postgres-primary had no runbook link.
+- The on-call engineer had no access to the database dashboards.
+
+## Action items
+
+- INVE-7709 (platform): Add an alert on post_deploy_error_pct for postgres-primary.
+- INVE-9206 (platform): Add a regression test for: 9.39.13 of postgres-primary renamed a config key, so production fell back to a default of 4250.
+- INVE-3526 (discovery): Link the runbook from the alert.",yes,"Cites 2: the postmortem states 4,554 customers for the inventory regression."
+cal-80,holdout,deg-09,blast_radius,"Users impacted are those making search requests, with specific counts of customers seeing errors in past incidents (e.g., 28,938 customers) .",1,C5,postmortem,"# Postmortem: search regression after a deploy (2026-01-31)
+
+## Summary
+
+On 2026-01-31, search broke after a deploy for 88 minutes. The cause was in inventory.
+The incident was sev2 and was opened by `SearchPostDeployErrors`.
+
+## Impact
+
+- 40% of search requests failed or timed out at the peak.
+- Callers affected: api-gateway.
+- 28,938 customers saw errors; 75 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **07:37** inventory 6.13.12 deployed by James Barnett.
+- **08:10** `SearchPostDeployErrors` fired; on-call acknowledged.
+- **08:36** Checked the search runbook for regression after a deploy.
+- **08:39** Found the cause in inventory.
+- **09:10** Mitigation applied; error rate falling.
+- **09:38** Recovered; incident resolved.
+
+## Root cause
+
+6.13.12 of inventory read a column that the migration hadn't added in production yet.
+
+Category: regression after a deploy. Component: inventory.
+
+## Contributing factors
+
+- The regression after a deploy alert for inventory had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+
+## Action items
+
+- SEAR-7621 (discovery): Add an alert on post_deploy_error_pct for inventory.
+- SEAR-3056 (discovery): Add a regression test for: 6.13.12 of inventory read a column that the migration hadn't added in production yet.
+- SEAR-9405 (discovery): Link the runbook from the alert.",yes,"The postmortem states 28,938 customers, framed as a past incident."
+cal-82,holdout,ans-21,blast_radius,"The incident affects the inventory service and its callers, orders and search .",3,C5,postmortem,"# Postmortem: inventory CPU saturation (2026-06-16)
+
+## Summary
+
+On 2026-06-16, inventory was saturated for 175 minutes. The cause was in postgres-primary.
+The incident was sev2 and was opened by `InventoryCPUSaturated`.
+
+## Impact
+
+- 17% of inventory requests failed or timed out at the peak.
+- Callers affected: orders, search.
+- 12,273 customers saw errors; 72 support tickets were opened.
+
+## Timeline
+
+All times UTC.
+
+- **00:29** postgres-primary 1.33.11 deployed by Melissa Sanchez.
+- **01:04** `InventoryCPUSaturated` fired; on-call acknowledged.
+- **01:07** Checked the inventory runbook for CPU saturation.
+- **01:27** Found the cause in postgres-primary.
+- **02:48** Mitigation applied; error rate falling.
+- **03:59** Recovered; incident resolved.
+
+## Root cause
+
+postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+
+Category: CPU saturation. Component: postgres-primary.
+
+## Contributing factors
+
+- The CPU saturation alert for postgres-primary had no runbook link.
+- A recent reorg left the alert routed to the wrong team.
+
+## Action items
+
+- INVE-3678 (platform): Add an alert on cpu_util_pct for postgres-primary.
+- INVE-1076 (platform): Add a regression test for: postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.
+- INVE-9516 (platform): Link the runbook from the alert.",yes,Cites 3: the postmortem names orders and search as inventory's callers.
+cal-85,holdout,ans-06,first_steps,Check recent changes: `deployctl history notifications --since 2h` .,1,C1,runbook,"# Notifications: connection pool exhaustion
+
+Alert: `NotificationsPoolExhausted` fires when the time requests wait for a database connection, `notifications_pool_wait_ms`, stays above its threshold for 3 minutes. Notifications is a
+supporting-tier service owned by the growth team; it calls
+kafka-broker, and
+orders call it.
+
+## Symptoms
+
+- Pool `waiting` count is above zero for minutes, not seconds.
+- Database CPU is normal: the queue is in the application, not the database.
+- Latency rises before errors do.
+
+## Likely causes
+
+- **Pool too small for the replica count.** Fewer pods than usual means each pod's pool takes more load.
+- **Long transactions holding connections.** A slow code path keeps connections checked out.
+- **Connection leak.** A code path that forgets to return connections after an error.
+
+The most common cause on notifications is pool too small for the replica count: it explained 29 of the
+last 30 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_pool_wait_ms` with the
+   same hour last week.
+2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes
+   ""pool too small for the replica count"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-POOL-255
+   ```
+
+4. If `notifications_pool_wait_ms` stays above 379 for 5 minutes, treat it as
+   connection pool exhaustion and move to mitigation; below that it usually recovers on its own.
+5. Run `notificationsctl pool stats` on two pods; idle near zero on both confirms exhaustion.",yes,"The runbook's step, word for word."
+cal-87,holdout,ans-22,first_steps,Find the largest directories with `du -sh /var/lib/api-gateway/* | sort -h | tail` .,1,C1,runbook,"# Api gateway: disk full
+
+Alert: `ApiGatewayDiskFull` fires when disk usage, `api_gateway_disk_used_pct`, rises above its threshold. Api gateway is a
+edge-tier service owned by the platform team; it calls
+auth, payments, orders, search.
+
+## Symptoms
+
+- Writes fail with 'no space left on device'.
+- Log volume grew sharply in the last day.
+- Compaction or cleanup jobs are behind.
+
+## Likely causes
+
+- **Log volume.** Debug logging left on after an investigation.
+- **Retention not applied.** A cleanup job failed silently and old data piled up.
+- **Large temporary files.** A batch job writes temp files it doesn't remove.
+
+The most common cause on api-gateway is log volume: it explained 18 of the
+last 24 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_disk_used_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes
+   ""log volume"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-DISK-815
+   ```
+
+4. If `api_gateway_disk_used_pct` stays above 87 for 5 minutes, treat it as
+   disk full and move to mitigation; below that it usually recovers on its own.
+5. Find the largest directories with `du -sh /var/lib/api-gateway/* | sort -h | tail`.
+
+## Mitigation
+
+1. Delete rotated logs older than 2 days.
+2. Expand the volume by 50% if cleanup isn't enough.
+3. If that doesn't help within 10 minutes, set `log_level=7` on
+   api-gateway (`configctl set api-gateway log_level 7`) and restart one pod at a
+   time.",yes,"The runbook's step, word for word."
+cal-91,holdout,deg-07,first_steps,Roll back: `deployctl rollback api-gateway`; don't wait to debug .,1,C1,runbook,"# Api gateway: regression after a deploy
+
+Alert: `ApiGatewayPostDeployErrors` fires when errors in the 30 minutes after a deploy, `api_gateway_post_deploy_error_pct`, exceed their threshold. Api gateway is a
+edge-tier service owned by the platform team; it calls
+auth, payments, orders, search.
+
+## Symptoms
+
+- Errors start within minutes of a deploy finishing.
+- Only pods on the new version show errors.
+- Canary metrics were borderline but passed.
+
+## Likely causes
+
+- **Code regression.** The new release breaks a path the tests don't cover.
+- **Schema mismatch.** The release reads a column a migration hasn't added yet.
+- **Config drift.** The release expects a setting that isn't present in production.
+
+The most common cause on api-gateway is code regression: it explained 8 of the
+last 10 pages for this alert.
+
+## Diagnosis
+
+1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_post_deploy_error_pct` with the
+   same hour last week.
+2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes
+   ""code regression"" less likely than a regression.
+3. Search the logs for the error code this failure logs:
+
+   ```bash
+   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-DEPLOY-811
+   ```
+
+4. If `api_gateway_post_deploy_error_pct` stays above 6 for 8 minutes, treat it as
+   regression after a deploy and move to mitigation; below that it usually recovers on its own.
+5. Compare error rates between pods on the old and new version.
+
+## Mitigation
+
+1. Roll back: `deployctl rollback api-gateway`; don't wait to debug.
+2. Freeze deploys for api-gateway.
+3. If that doesn't help within 10 minutes, set `deploy_batch_size=40` on
+   api-gateway (`configctl set api-gateway deploy_batch_size 40`) and restart one pod at a
+   time.",yes,"The runbook's rollback step, word for word."
