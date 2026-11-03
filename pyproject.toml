@@ -20,6 +20,7 @@ dev = [
     "openapi-python-client>=0.29.1",
     "pagerwise-client-sse",
     "pytest>=9.2.0",
+    "scikit-learn>=1.9.1",
     "testcontainers>=4.15.0",
 ]
 
