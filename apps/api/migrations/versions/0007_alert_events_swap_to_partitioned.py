@@ -51,8 +51,8 @@ def upgrade() -> None:
         "DROP FUNCTION alert_events_mirror()",
         "ALTER TABLE alert_events RENAME TO alert_events_old",
         "ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_pkey TO alert_events_old_pkey",
-        "ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_incident_id_fkey "
-        "TO alert_events_old_incident_id_fkey",
+        ("ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_incident_id_fkey "
+        "TO alert_events_old_incident_id_fkey"),
         "ALTER INDEX ix_alert_events_occurred_event RENAME TO ix_alert_events_old_occurred_event",
         *[f"ALTER INDEX ix_alert_events_{i} RENAME TO ix_alert_events_old_{i}" for i in INDEXES],
         "ALTER TABLE alert_events_p RENAME TO alert_events",
@@ -77,8 +77,8 @@ def downgrade() -> None:
         "ALTER TABLE alert_events RENAME TO alert_events_p",
         *[f"ALTER INDEX ix_alert_events_old_{i} RENAME TO ix_alert_events_{i}" for i in INDEXES],
         "ALTER INDEX ix_alert_events_old_occurred_event RENAME TO ix_alert_events_occurred_event",
-        "ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_old_incident_id_fkey "
-        "TO alert_events_incident_id_fkey",
+        ("ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_old_incident_id_fkey "
+        "TO alert_events_incident_id_fkey"),
         "ALTER TABLE alert_events_old RENAME CONSTRAINT alert_events_old_pkey TO alert_events_pkey",
         "ALTER TABLE alert_events_old RENAME TO alert_events",
     ]

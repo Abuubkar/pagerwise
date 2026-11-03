@@ -26,17 +26,18 @@ from pagerwise_client.models import (
     TriageBrief,
 )
 from pagerwise_client.types import UNSET
+
 from pagerwise_client_sse import stream_triage
 
 INCIDENTS = [
     ("Card authorizations timing out at 6%", "payments", Severity.SEV2,
      "PaymentsAcquirerTimeouts firing. payments_acquirer_call_seconds p99 is 4 s; ledger call time is normal."),
     ("Payments p99 above 800 ms", "payments", Severity.SEV2,
-     "PaymentsP99LatencyHigh for 12 minutes. payments_ledger_call_seconds is most of the increase; "
-     "ledgerctl pool stats on a ledger pod shows idle=12 in_use=28 waiting=7."),
+     ("PaymentsP99LatencyHigh for 12 minutes. payments_ledger_call_seconds is most of the increase; "
+     "ledgerctl pool stats on a ledger pod shows idle=12 in_use=28 waiting=7.")),
     ("Ledger writes failing with SQLSTATE 25006", "ledger", Severity.SEV1,
-     "LedgerWriteErrors at 9% since 14:02 UTC: 'cannot execute INSERT in a read-only transaction'. "
-     "postgres-primary failed over to postgres-primary-1 at 14:01 UTC."),
+     ("LedgerWriteErrors at 9% since 14:02 UTC: 'cannot execute INSERT in a read-only transaction'. "
+     "postgres-primary failed over to postgres-primary-1 at 14:01 UTC.")),
 ]
 
 parser = argparse.ArgumentParser()

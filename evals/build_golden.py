@@ -29,11 +29,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import seed  # noqa: E402  # the corpus generator: its failure modes and alert names are the golden set's vocabulary
-
-from pagerwise_api.chunking import chunk_markdown, parse_document  # noqa: E402
-from pagerwise_api.embedding import count_tokens  # noqa: E402
-from pagerwise_simulator import fingerprint, load_graph  # noqa: E402
+import seed  # the corpus generator: its failure modes and alert names are the golden set's vocabulary
+from pagerwise_api.chunking import chunk_markdown, parse_document
+from pagerwise_api.embedding import count_tokens
+from pagerwise_simulator import fingerprint, load_graph
 
 GOLDEN = ROOT / "evals" / "golden"
 WINDOW_START = datetime(2026, 10, 28, 6, 0, tzinfo=UTC)  # inside the seeded deploy log's 30 days
@@ -73,7 +72,7 @@ def alerts_for(rng: random.Random, service: str, alertname: str, severity: str, 
     return sorted(out, key=lambda a: a["offset_s"])
 
 
-def cascade(rng: random.Random, graph, service: str, span_s: int) -> list[dict]:  # noqa: ANN001
+def cascade(rng: random.Random, graph, service: str, span_s: int) -> list[dict]:
     """A neighbour's own alerts during the incident: a caller (or, failing that, a dependency) of the failing
     service fires its usual rule a little later, as callers of a broken dependency do. Same gold incident."""
     callers = sorted(s.name for s in graph.values() if service in s.depends_on)

@@ -26,6 +26,7 @@ uv run python evals/run.py [--split dev|test] [--only retrieval,clustering,triag
 import argparse
 import asyncio
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import asyncpg
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 import triage_eval
 from metrics import mrr_at_k, pairwise_prf, percentile, recall_at_k
 from pagerwise_api import retrieval, triage
@@ -44,8 +48,6 @@ from pagerwise_api.embedding import embed_passages
 from pagerwise_api.settings import settings
 from pagerwise_consumer import clustering
 from pagerwise_simulator import load_graph
-from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from triage_eval import KAPPA_MIN
 
 EVALS = Path(__file__).resolve().parent
@@ -165,8 +167,9 @@ async def eval_database() -> str:
             await admin.execute(f"CREATE DATABASE {EVAL_DB}")
     finally:
         await admin.close()
-    migrated = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], cwd=ROOT, capture_output=True,
-                              text=True, env={**__import__("os").environ, "DATABASE_URL": url})
+    migrated = await asyncio.to_thread(
+        subprocess.run, [sys.executable, "-m", "alembic", "upgrade", "head"], check=False, cwd=ROOT,
+        capture_output=True, text=True, env={**os.environ, "DATABASE_URL": url})
     if migrated.returncode != 0:
         raise RuntimeError(f"migrating {EVAL_DB} failed:\n{migrated.stderr[-2000:]}")
     return url

@@ -49,7 +49,7 @@ def stream_triage(client: Client, incident_id: UUID) -> Iterator[TriageEvent]:
         if response.status_code != 200:
             response.read()
             raise TriageStreamRefused(Problem.from_dict(response.json()))
-        event, data = "message", []
+        event, data = "message", list[str]()
         for line in response.iter_lines():
             if not line:  # a blank line ends an event
                 if data and event in EVENT_MODELS:

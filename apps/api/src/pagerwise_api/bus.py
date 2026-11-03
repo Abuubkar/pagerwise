@@ -15,7 +15,7 @@ import json
 import time
 import uuid
 from collections.abc import AsyncIterator
-from typing import Any
+from typing import Any, cast
 
 import redis.asyncio as aioredis
 
@@ -75,7 +75,9 @@ async def triage_events(redis: aioredis.Redis, triage_id: uuid.UUID,
         if not batch:
             yield None
             continue
-        for entry_id, fields in batch[0][1]:
+        # decode_responses and RESP2: [[stream, [(id, fields), ...]]]; redis-py's types cover every protocol.
+        entries = cast(list[tuple[str, dict[str, str]]], batch[0][1])  # type: ignore[index]
+        for entry_id, fields in entries:
             last = entry_id
             yield fields["event"], fields["data"]
             if fields["event"] in FINAL_EVENTS:

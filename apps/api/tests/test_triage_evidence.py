@@ -40,7 +40,7 @@ def sources(monkeypatch):
     behaviour: dict[str, object] = {"runbook": [item("runbook", 1)], "postmortem": [item("postmortem", 1)],
                                     "deploys": [item("deploy", 1)]}
 
-    async def act(key: str):  # noqa: ANN202
+    async def act(key: str):
         value = behaviour[key]
         if isinstance(value, float):  # seconds to hang
             await asyncio.sleep(value)

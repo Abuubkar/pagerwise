@@ -6,9 +6,9 @@ import json
 import uuid
 
 import pytest
+from pagerwise_client import models
 
 from pagerwise_api import schemas
-from pagerwise_client import models
 
 CHUNK = uuid.UUID(int=1)
 

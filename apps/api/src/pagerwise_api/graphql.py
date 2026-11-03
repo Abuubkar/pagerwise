@@ -8,8 +8,8 @@ reads, from its first event."""
 import json
 import uuid
 from collections.abc import AsyncGenerator
-from typing import Annotated
 from datetime import datetime, timedelta
+from typing import Annotated
 
 import strawberry
 from fastapi import Depends
@@ -195,7 +195,7 @@ class Subscription:
     async def incident_updated(
         self, info: strawberry.Info[Context],
         service_name: Annotated[str | None, strawberry.argument(name="service")] = None,
-    ) -> AsyncGenerator[Incident, None]:
+    ) -> AsyncGenerator[Incident]:
         session = info.context.session
         redis = bus.connect()
         try:
@@ -214,7 +214,7 @@ class Subscription:
 
     @strawberry.subscription(description="A triage's events from its first one, live, ending with done or error.")
     async def triage_progress(self, info: strawberry.Info[Context],
-                              triage_id: uuid.UUID) -> AsyncGenerator[TriageProgress, None]:
+                              triage_id: uuid.UUID) -> AsyncGenerator[TriageProgress]:
         redis = bus.connect()
         try:
             async for name, data in triage.events(info.context.session, redis, triage_id):

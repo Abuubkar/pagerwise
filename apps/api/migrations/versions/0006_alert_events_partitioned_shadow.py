@@ -100,15 +100,15 @@ def _lock(conn: sa.Connection, tables: str, mode: str) -> None:
 
 def upgrade() -> None:
     for statement in [  # one per call: asyncpg runs a single statement at a time
-        "CREATE TABLE alert_events_p (LIKE alert_events INCLUDING DEFAULTS INCLUDING CONSTRAINTS) "
-        "PARTITION BY RANGE (occurred_at)",
+        ("CREATE TABLE alert_events_p (LIKE alert_events INCLUDING DEFAULTS INCLUDING CONSTRAINTS) "
+        "PARTITION BY RANGE (occurred_at)"),
         # A unique key on a partitioned table must include the partition key.
         "ALTER TABLE alert_events_p ADD CONSTRAINT alert_events_p_pkey PRIMARY KEY (event_id, occurred_at)",
         "CREATE INDEX ix_alert_events_p_incident_id ON alert_events_p (incident_id)",
         "CREATE INDEX ix_alert_events_p_occurred_at ON alert_events_p (occurred_at)",
         "CREATE INDEX ix_alert_events_p_service ON alert_events_p (service)",
-        "CREATE INDEX ix_alert_events_p_service_fingerprint_occurred "
-        "ON alert_events_p (service, fingerprint, occurred_at DESC)",
+        ("CREATE INDEX ix_alert_events_p_service_fingerprint_occurred "
+        "ON alert_events_p (service, fingerprint, occurred_at DESC)"),
         "CREATE TABLE alert_events_default PARTITION OF alert_events_p DEFAULT",
     ]:
         op.execute(statement)

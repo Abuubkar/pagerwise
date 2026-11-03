@@ -36,10 +36,10 @@ def recorded(monkeypatch):
     items = [triage.EvidenceItem(e["source_type"], e["source_id"], e["chunk_id"], e["heading_path"], e["text"])
              for e in RECORDING["evidence"]]
 
-    async def gather(session, client, incident, query, neighbours):  # noqa: ANN001, ANN202
+    async def gather(session, client, incident, query, neighbours):
         return triage.Gathered(items=items, degraded=[{"source": "deploys", "reason": "HTTP 503"}])
 
-    async def chat_stream(messages, estimated_prompt_tokens):  # noqa: ANN001, ANN202
+    async def chat_stream(messages, estimated_prompt_tokens):
         text = RECORDING["raw_text"]
         for i in range(0, len(text), 5):
             await asyncio.sleep(0.002)
@@ -47,7 +47,7 @@ def recorded(monkeypatch):
         yield llm.ChatResult(content=text, model="recorded", prompt_tokens=3200, output_tokens=300, total_ms=1,
                              load_ms=0, prompt_eval_ms=0, eval_ms=0)
 
-    async def no_context(session, incident):  # noqa: ANN001, ANN202
+    async def no_context(session, incident):
         return [], []
 
     monkeypatch.setattr(triage, "gather_evidence", gather)
@@ -93,4 +93,4 @@ async def test_worker_streams_events_in_order_to_live_and_late_readers(client, r
     assert brief["degraded_sources"] == [{"source": "deploys", "reason": "HTTP 503"}]
 
     assert late_events == live_events  # a reader who came late gets every event, the same
-    assert [n for n, _ in stored_events][0] == "degraded_source" and stored_events[-1] == live_events[-1]
+    assert next(n for n, _ in stored_events) == "degraded_source" and stored_events[-1] == live_events[-1]

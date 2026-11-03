@@ -17,9 +17,11 @@ dev = [
     "faker>=40.44.0",
     "hypothesis>=6.170.14",
     "jinja2>=3.1.6",
+    "mypy>=2.4.1",
     "openapi-python-client>=0.29.1",
     "pagerwise-client-sse",
     "pytest>=9.2.0",
+    "ruff>=0.17.3",
     "scikit-learn>=1.9.1",
     "testcontainers>=4.15.0",
 ]
@@ -45,3 +47,21 @@ testpaths = ["apps/api/tests", "apps/consumer/tests", "apps/indexer/tests", "pac
 markers = ["integration: needs Docker (testcontainers); run with make test-int"]
 # importlib: test files in different packages may share a name.
 addopts = "--strict-markers --import-mode=importlib"
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+# Generated code is checked by its generator; the web app has eslint.
+extend-exclude = ["packages/clients/python", "packages/kafka/src/pagerwise_kafka/alert_v1.py", "apps/web"]
+src = ["apps/*/src", "packages/*/src", "evals", "scripts"]
+
+[tool.mypy]
+python_version = "3.13"
+files = ["apps/api/src", "apps/consumer/src", "apps/docs_mock/src", "apps/indexer/src", "apps/simulator/src",
+         "packages/kafka/src", "packages/client-sse/src"]
+exclude = ["packages/kafka/src/pagerwise_kafka/alert_v1.py"]
+
+[[tool.mypy.overrides]]
+# No type information shipped (aiokafka) or stubs not installed (PyYAML).
+module = ["aiokafka.*", "yaml"]
+ignore_missing_imports = true
