@@ -261,3 +261,24 @@ mentioned"). Unsupported-claim rate 0.046 → 0.158 and format validity under it
 run, then lengthened the prompt and went over it; a 26-brief smoke run's numbers read as new failures.
 - *Did:* gates are frozen for the rest of the slice; only full runs (all cases, 3 repeats) are judged against them;
   misses are reported as misses.
+
+## Slice 7: CI/CD
+
+**Lint had never run.** There was no ruff or mypy config, so ruff used its defaults and found 74 issues, mypy 30, and
+the code carried `noqa: ANN…` comments for rules nobody enabled. eslint wasn't installed (Next 16 dropped `next lint`).
+- *Did:* pinned the rules in pyproject.toml (ruff defaults at 120 columns, mypy on the apps), fixed every finding with
+  typing-only changes (integration tests pass, generated corpus and golden set byte-identical), added eslint 10 with
+  eslint-config-next; its one real finding was TriagePanel resetting state in an effect (now a `key`).
+
+**The triage recordings were made against a stale database.** CI imports the committed corpus fresh, and the first
+eval-offline run missed a recording. Slice 4b's seed change had reshuffled the action-item owners in 6 postmortems;
+my local database was never re-imported, so every slice 6 eval and recording used the old text of those 6.
+- *Did:* a replay miss now prints a diff against the nearest recording (that's how it was found); re-imported, and
+  re-recorded only the changed calls with `--fill` (which now covers triage and each repeat); the eval refuses to run
+  when the database's documents differ from `data/`.
+
+**rpk says a schema is compatible or not, and exits 0 either way.**
+- *Did:* `scripts/breaking_changes.sh` reads its JSON verdict; tested with a breaking and a compatible change.
+
+**main already misses four triage gates, so a gate-checking CI job would be red forever.**
+- *Did:* asked; with `--baseline`, misses the baseline shares are reported, not failed (ADR 0011). No threshold moved.

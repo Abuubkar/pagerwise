@@ -76,6 +76,24 @@ metrics are unaffected.
 The first live run of triage/6 showed a gate bug: when the model wrote the cause on the decision line
 (`Match: [C1] The pool…`) the gate dropped the whole line. It now keeps what follows the tags.
 
+**Correction (2026-11-03, slice 7).** The runs above used a stale local import: 6 postmortems had changed in slice 4b
+(only their action-item owners) and were never re-imported. Re-imported and re-recorded with `--fill` (17 cases
+whose evidence included one; everything else unchanged), triage/6 on the committed corpus:
+
+| Metric | dev | test | Gate |
+|---|---|---|---|
+| Root cause hit@1 | 0.800 | 0.800 | ≥ 0.60 |
+| Root cause hit@3 | 0.840 | 0.867 | ≥ 0.80 |
+| Abstention | 0.400 ✗ | 0.200 ✗ | ≥ 0.80 |
+| Format validity | 0.927 ✗ | 0.833 ✗ | ≥ 0.95 |
+| TTFT p95 | 20.7 s ✗ | 20.0 s (prompt cache) | ≤ 20 s |
+| Citation precision | 0.962 | 0.940 | ≥ 0.90 |
+| Unsupported-claim rate | 0.142 ✗ | 0.160 ✗ | ≤ 0.08 |
+
+`evals/results/20261103T110428-dev-v2.json`, `20261103T105301-test-v2.json`. The test TTFT passes only because
+repeats 2-3 hit Ollama's prompt cache (see above); its first repeats are over 20 s. The superseded recordings are in
+`evals/archive/recordings-stale-corpus/`.
+
 **triage/6 is kept, missing four gates.** It quadruples abstention but costs citation discipline: 13 uncited cause or
 impact sentences in the first repeat against triage/5's 3, many of them about the rule itself. triage/5 misses two
 gates, but names a cause for 9 in 10 incidents the evidence can't explain, and a wrong cause reads exactly like a
