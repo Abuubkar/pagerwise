@@ -1,5 +1,6 @@
 """Recording and replaying model calls (llm.recording): the eval's offline mode depends on an exact replay."""
 
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -53,3 +54,16 @@ async def test_a_recorded_call_replays_identically_without_the_model(tmp_path, m
 
     with llm.recording(tmp_path, replay=True), pytest.raises(FileNotFoundError):
         await collect([{"role": "user", "content": "something never recorded"}])
+
+
+async def test_fill_records_each_missing_repeat_and_replays_the_rest(tmp_path, monkeypatch):
+    monkeypatch.setattr(llm, "_client", lambda: FakeClient())
+    messages = [{"role": "user", "content": "triage this"}]
+    with llm.recording(tmp_path, replay=False):
+        await collect(messages)  # repeat 1 recorded
+    before = FakeClient.calls
+    with llm.recording(tmp_path, replay=True, fill=True):
+        await collect(messages)  # repeat 1: replayed
+        await collect(messages)  # repeat 2: not recorded yet, so the model is called
+    assert FakeClient.calls == before + 1
+    assert len(json.loads(next(tmp_path.glob("*.json")).read_text())["runs"]) == 2

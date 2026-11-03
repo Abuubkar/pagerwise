@@ -26,6 +26,7 @@ uv run python evals/run.py [--split dev|test] [--only retrieval,clustering,triag
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import shutil
@@ -349,13 +350,27 @@ def write_report(run: dict, missed: list[str]) -> None:
     report.write_text("\n".join(lines) + "\n")
 
 
+async def check_corpus_imported() -> None:
+    """The dev database must hold the committed corpus: gold evidence and the triage recordings were made against
+    it, and CI imports it fresh. A document changed in data/ but not re-imported changes prompts (challenges.md)."""
+    engine = create_async_engine(settings.database_url)
+    async with engine.connect() as conn:
+        stored = dict((await conn.execute(select(Document.path, Document.sha256))).all())
+    await engine.dispose()
+    stale = [path for path, sha in stored.items()
+             if not (ROOT / path).exists() or hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != sha]
+    if stale:
+        raise SystemExit(f"{len(stale)} documents in the database differ from data/ (e.g. {stale[0]}): "
+                         "re-import them with `uv run python -m pagerwise_indexer` (docs_mock running)")
+
+
 async def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--split", choices=["dev", "test"], default="dev")
     parser.add_argument("--only", default="retrieval,clustering,triage")
     parser.add_argument("--live", action="store_true", help="call Ollama and record; otherwise replay recordings")
     parser.add_argument("--fill", action="store_true",
-                        help="replay what's recorded, call Ollama only for the judge calls that aren't (and record them)")
+                        help="replay what's recorded; call Ollama only for calls (and repeats) that aren't, and record them")
     parser.add_argument("--judge-model", default=triage_eval.JUDGE_MODEL)
     parser.add_argument("--repeats", type=int, default=3, help="triage runs per case, for latency percentiles")
     parser.add_argument("--limit", type=int, help="only the first N cases of each kind (a smoke run)")
@@ -367,6 +382,8 @@ async def main() -> int:
     args = parser.parse_args()
     settings.rerank_candidates = args.rerank_candidates
     sections = set(args.only.split(","))
+    if sections & {"retrieval", "triage"}:
+        await check_corpus_imported()
     run = {"run": datetime.now(UTC).strftime("%Y%m%dT%H%M%S"), "at": datetime.now(UTC).isoformat(timespec="seconds"),
            "split": args.split, "embedding": "v2",  # the only one since migration 0011
            "reranker": settings.reranker_model,
@@ -395,7 +412,7 @@ async def main() -> int:
         if "triage" in sections or trusted:
             url = await eval_database()
             await triage_eval.prepare_corpus(url)
-            records = await triage_eval.generate_briefs(url, cases, args.repeats, args.live and "triage" in sections)
+            records = await triage_eval.generate_briefs(url, cases, args.repeats, args.live and "triage" in sections, args.fill)
             metrics, per_case = triage_eval.score_briefs(cases, records)
             run["metrics"] |= metrics
             run["triage"], run["repeats"], run["briefs"] = per_case, args.repeats, records

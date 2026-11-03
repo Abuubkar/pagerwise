@@ -140,7 +140,8 @@ async def prepare_corpus(eval_url: str) -> None:
     await target.dispose()
 
 
-async def generate_briefs(eval_url: str, cases: list[dict], repeats: int, live: bool) -> list[dict]:
+async def generate_briefs(eval_url: str, cases: list[dict], repeats: int, live: bool,
+                          fill: bool = False) -> list[dict]:
     """Every case `repeats` times, round-robin (so a repeat never follows its own prompt and gets Ollama's prompt
     cache). Returns one record per case and repeat."""
     graph = load_graph()
@@ -176,7 +177,7 @@ async def generate_briefs(eval_url: str, cases: list[dict], repeats: int, live: 
         await session.commit()
 
     records = []
-    with llm.recording(RECORDINGS, replay=not live) as recorder:
+    with llm.recording(RECORDINGS, replay=not live, fill=fill) as recorder:
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://deploys") as client:
             for repeat in range(repeats):
                 for n, case in enumerate(cases, start=1):
