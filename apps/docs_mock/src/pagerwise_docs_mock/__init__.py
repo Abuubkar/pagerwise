@@ -210,8 +210,9 @@ def main() -> None:
     import uvicorn
 
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--host", default="127.0.0.1", help="0.0.0.0 in a container")
     parser.add_argument("--port", type=int, default=8002)
     parser.add_argument("--fail-rate", type=float, default=0.0, help="share of listing requests that get a 503")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
-    uvicorn.run(create_app(faults=Faults(fail_rate=args.fail_rate, seed=args.seed)), port=args.port)
+    uvicorn.run(create_app(faults=Faults(fail_rate=args.fail_rate, seed=args.seed)), host=args.host, port=args.port)
