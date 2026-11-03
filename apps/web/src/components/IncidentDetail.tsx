@@ -59,7 +59,7 @@ export function IncidentDetail({ id }: { id: string }) {
         </section>
         <section aria-label="Triage brief">
           <h3>Triage brief</h3>
-          <TriagePanel incidentId={id} triageId={incident.triage?.id ?? null} />
+          <TriagePanel key={`${id}:${incident.triage?.id}`} incidentId={id} triageId={incident.triage?.id ?? null} />
         </section>
       </div>
     </div>
