@@ -1,0 +1,15 @@
+# The Python images' build context. The web image builds from apps/web with its own .dockerignore.
+.git
+.github
+**/.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.env
+build
+apps/web
+docs
+evals
+contracts/schema.graphql
