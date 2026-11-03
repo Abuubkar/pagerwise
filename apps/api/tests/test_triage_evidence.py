@@ -86,3 +86,8 @@ def test_degraded_sources_reach_the_prompt_with_the_rule_against_claims():
     assert "Unavailable sources (rule 7 applies): deploys" in messages[1]["content"]
     assert "never say this incident followed a deploy" in messages[0]["content"]
     assert "Unavailable sources" not in prompts.triage_messages("Title: x", evidence, [])[1]["content"]
+
+
+def test_deploys_say_how_long_before_the_incident_they_were():
+    at = datetime(2026, 10, 28, 7, 55, 30, tzinfo=UTC)
+    assert triage._before(at, "2026-10-28T07:15:00Z") == "It was 40 minutes before the incident opened."
