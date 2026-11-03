@@ -1,0 +1,275 @@
+# Checks for every pull request and every push to main. Actions are pinned to commit SHAs (tags can be moved:
+# CVE-2026-33634); each job gets only the permissions it uses. docs/adr/0011 has the choices behind this file.
+name: ci
+
+on:
+  pull_request:
+    # labeled/unlabeled: adding breaking-change-approved reruns the contract and migration checks.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  UV_VERSION: "0.13.7"
+  NODE_VERSION: "24"
+  # Contract and migration checks compare with the PR's base branch; on main, with the commit before the push.
+  BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+  ALLOW_BREAKING: ${{ contains(github.event.pull_request.labels.*.name, 'breaking-change-approved') && '1' || '0' }}
+  FASTEMBED_CACHE_PATH: ${{ github.workspace }}/.fastembed
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run mypy
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: apps/web/package.json
+          cache: true
+          cache_dependency_path: apps/web/pnpm-lock.yaml
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+        working-directory: apps/web
+      - run: pnpm typecheck
+        working-directory: apps/web
+      - run: pnpm lint --max-warnings 0
+        working-directory: apps/web
+      - name: actionlint
+        run: >-
+          docker run --rm -v "$PWD:/repo" -w /repo
+          rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+
+  contracts:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: apps/web/package.json
+          cache: true
+          cache_dependency_path: apps/web/pnpm-lock.yaml
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+        working-directory: apps/web
+      - name: Generated clients match the contracts
+        run: |
+          make codegen
+          git status --porcelain
+          test -z "$(git status --porcelain)" || { git diff; echo "run make codegen and commit the result"; exit 1; }
+      - name: The app matches contracts/openapi.yaml
+        run: make contract-check
+      - run: docker compose up -d --wait redpanda
+      - name: No breaking REST, GraphQL or Kafka change
+        run: make breaking-check BASE="$BASE_REF"
+
+  unit:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - run: make test
+
+  integration:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.FASTEMBED_CACHE_PATH }}
+          key: fastembed-${{ hashFiles('apps/api/src/pagerwise_api/settings.py', 'uv.lock') }}
+          restore-keys: fastembed-
+      - run: make test-int  # testcontainers: Postgres + pgvector, Redpanda, Redis
+
+  migrations:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg18-trixie
+        env:
+          POSTGRES_USER: pagerwise
+          POSTGRES_PASSWORD: pagerwise
+          POSTGRES_DB: pagerwise
+        ports: ["5435:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pagerwise -d pagerwise" --health-interval 2s --health-timeout 3s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - name: Up, down, up
+        run: uv run alembic upgrade head && uv run alembic downgrade base && uv run alembic upgrade head
+      - name: squawk on the migrations this change adds
+        run: make migration-lint BASE="$BASE_REF"
+
+  web:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: apps/web/package.json
+          cache: true
+          cache_dependency_path: apps/web/pnpm-lock.yaml
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test --ci
+
+  eval-offline:
+    # Retrieval and clustering run for real (no model); triage replays evals/recordings. A gate main already misses
+    # is reported, not failed; a new miss or a quality drop over 1.5 points fails (docs/adr/0011).
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: write  # the sticky metrics comment
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - run: uv sync --frozen
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.FASTEMBED_CACHE_PATH }}
+          key: fastembed-${{ hashFiles('apps/api/src/pagerwise_api/settings.py', 'uv.lock') }}
+          restore-keys: fastembed-
+      - run: docker compose up -d --wait postgres
+      - run: uv run alembic upgrade head
+      - name: Import the corpus through docs_mock
+        run: |
+          uv run python -m pagerwise_docs_mock > docs_mock.log 2>&1 &
+          curl --silent --retry 30 --retry-connrefused --retry-delay 1 -o /dev/null http://localhost:8002/v1/runbooks
+          uv run python -m pagerwise_indexer
+      - name: Eval against main's baseline
+        id: eval
+        run: |
+          git show "$BASE_REF:evals/baseline.json" > build-baseline.json
+          set +e
+          uv run python evals/run.py --split dev --baseline build-baseline.json | tee eval.log
+          status=${PIPESTATUS[0]}
+          echo "results=$(sed -n 's/.*results: //p' eval.log)" >> "$GITHUB_OUTPUT"
+          exit "$status"
+      - name: Sticky PR comment
+        if: always() && github.event_name == 'pull_request' && steps.eval.outputs.results != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULTS: ${{ steps.eval.outputs.results }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          uv run python evals/pr_comment.py "$RESULTS" build-baseline.json > comment.md
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+                 --jq '.[] | select(.body | startswith("<!-- pagerwise-eval -->")) | .id' | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@comment.md > /dev/null
+          else
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+          fi
+
+  load-smoke:
+    # Only when the consumer or the Kafka code changes: 60 s at 500 events/s with 1% malformed and 5% transient
+    # failures, one replica killed halfway; no valid event lost, every malformed one dead-lettered, lag recovered.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Consumer or Kafka code changed?
+        id: changed
+        run: |
+          if git diff --name-only "$BASE_REF"...HEAD \
+               | grep -qE '^(apps/consumer/|packages/kafka/|contracts/kafka/|scripts/storm\.py|docker-compose\.yml)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "nothing the load test covers changed"
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - if: steps.changed.outputs.run == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.FASTEMBED_CACHE_PATH }}
+          key: fastembed-${{ hashFiles('apps/api/src/pagerwise_api/settings.py', 'uv.lock') }}
+          restore-keys: fastembed-
+      - if: steps.changed.outputs.run == 'true'
+        name: Storm
+        run: |
+          uv sync --frozen
+          docker compose up -d --wait
+          uv run alembic upgrade head
+          make topics
+          uv run python scripts/seed.py graph
+          uv run python scripts/storm.py --rate 500 --duration 60 --kill-at 30
+      - if: failure() && steps.changed.outputs.run == 'true'
+        name: Consumer logs
+        run: tail -n 50 build/storm/*.log || true

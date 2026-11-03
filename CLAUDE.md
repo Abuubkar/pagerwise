@@ -31,6 +31,7 @@ uv run python -m pagerwise_consumer                                  # alerts.v1
 uv run python -m pagerwise_simulator --rate 200 --duration 10 --malformed-rate 0.01
 uv run python scripts/incidents.py        # busiest open incidents and the alerts clustered into each
 make storm            # done-when load test: 2,000/s for 3 min, a replica killed; takes ~10 min (5 min retries)
+make lint             # ruff, mypy, tsc, eslint: the CI lint job
 make test             # unit tests, offline (no Ollama, no DB, no model download)
 make test-int         # service tests (testcontainers Postgres + pgvector, Redpanda, Redis; needs Docker)
 make web-test         # Jest + TypeScript check for apps/web
@@ -40,6 +41,8 @@ make golden           # regenerate evals/golden/ (deterministic)
 uv run python scripts/reembed.py           # fill chunks.embedding_v2 after a model change (resumable, throttled)
 make codegen          # regenerate the clients (Python, web TS), contracts/schema.graphql, the Kafka alert model
 make contract-check   # oasdiff: the app's emitted OpenAPI vs contracts/openapi.yaml
+make breaking-check   # REST, GraphQL and Kafka contracts vs origin/main (BASE=...); needs compose Redpanda
+make migration-lint   # squawk on the SQL of migrations added since origin/main
 ```
 
 Run scripts from the repo root: document paths are stored relative to it.
@@ -103,4 +106,9 @@ Run scripts from the repo root: document paths are stored relative to it.
   `triage_runs.raw_text` is what the model wrote; the stream, the parsed brief and replays all go through the gate.
 - A deploy in triage evidence is never after the incident opened, and says how long before it was: small models
   misread timestamps. Golden deploys must look like any other deploy (nothing may give the cause away).
-
+- CI (`.github/workflows/`, ADR 0011): pin every action to a commit SHA with its tag in a comment, give each job
+  only the permissions it uses, and keep `persist-credentials: false`. actionlint runs in the lint job.
+- Images: every Python app builds from `docker/python.Dockerfile` (PACKAGE, COMMAND); apps that embed or rerank use
+  the models base image as RUNTIME. A new model in settings.py changes that image's tag, so release.yml rebuilds it.
+- In CI the eval runs with `--baseline` main's baseline: a gate main already misses is reported, not failed; a new
+  miss or a quality drop fails. That's not a reason to move a gate.

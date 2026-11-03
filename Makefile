@@ -1,6 +1,6 @@
-OASDIFF := docker run --rm -v $(CURDIR):/specs:ro tufin/oasdiff:v1.35.0
+OASDIFF := docker run --rm -v $(CURDIR):/specs:ro tufin/oasdiff:v1.35.0@sha256:82b1840a77335562bb11ce95f77ad31745a0c6f3a770929333ed1c5ef466e400
 
-.PHONY: codegen contract-check test test-int smoke topics storm web-test eval eval-test golden
+.PHONY: codegen contract-check breaking-check migration-lint lint test test-int smoke topics storm web-test eval eval-test golden
 
 # Regenerate everything derived from the contracts. Generated code is never edited by hand.
 codegen:
@@ -19,6 +19,20 @@ contract-check:
 	@mkdir -p build
 	uv run python -c "import json; from pagerwise_api.main import app; print(json.dumps(app.openapi(), indent=2))" > build/openapi.emitted.json
 	$(OASDIFF) breaking --fail-on ERR /specs/contracts/openapi.yaml /specs/build/openapi.emitted.json
+
+# Contracts against a base ref (BASE, default origin/main): breaking REST, GraphQL or Kafka changes fail.
+breaking-check:
+	OASDIFF="$(OASDIFF)" scripts/breaking_changes.sh $(or $(BASE),origin/main)
+
+# squawk on the SQL of migrations added since BASE (default origin/main).
+migration-lint:
+	scripts/lint_migrations.sh $(or $(BASE),origin/main)
+
+# The CI lint job: ruff, mypy, tsc, eslint (actionlint runs there in Docker).
+lint:
+	uv run ruff check .
+	uv run mypy
+	cd apps/web && pnpm typecheck && pnpm lint --max-warnings 0
 
 test:
 	uv run pytest -m "not integration"

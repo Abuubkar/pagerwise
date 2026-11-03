@@ -1,0 +1,206 @@
+# Images for every merge to main and every v* tag: multi-arch, pushed to GHCR, scanned (trivy fails the release on
+# a fixable CRITICAL), with SBOM and provenance attestations, signed keylessly with cosign. docs/adr/0011.
+name: release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false  # never leave a half-pushed release
+
+permissions: {}
+
+env:
+  UV_VERSION: "0.13.7"
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  models:
+    # The weights base image, tagged by a hash of the model names in settings.py and the fastembed version: built
+    # only when that tag isn't in GHCR yet.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # cosign keyless signing
+    outputs:
+      image: ${{ steps.ref.outputs.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - name: Models and tag
+        id: models
+        run: |
+          uv sync --frozen --package pagerwise-api
+          read -r embedding reranker fastembed < <(uv run --package pagerwise-api python -c "
+          from importlib.metadata import version
+          from pagerwise_api.settings import settings as s
+          print(s.embedding_model + ',' + s.embedding_model_v2, s.reranker_model, version('fastembed'))")
+          {
+            echo "embedding=${embedding/,/ }"
+            echo "reranker=$reranker"
+            echo "fastembed=$fastembed"
+            echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/pagerwise-models"
+            echo "tag=$(printf '%s %s %s' "$embedding" "$reranker" "$fastembed" | sha256sum | cut -c1-16)"
+          } >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Already built?
+        id: existing
+        env:
+          IMAGE: ${{ steps.models.outputs.name }}:${{ steps.models.outputs.tag }}
+        run: |
+          if docker buildx imagetools inspect "$IMAGE" > /dev/null 2>&1; then echo "found=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.existing.outputs.found != 'true'
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - if: steps.existing.outputs.found != 'true'
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - if: steps.existing.outputs.found != 'true'
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: docker/models.Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          tags: ${{ steps.models.outputs.name }}:${{ steps.models.outputs.tag }}
+          build-args: |
+            FASTEMBED_VERSION=${{ steps.models.outputs.fastembed }}
+            EMBEDDING_MODELS=${{ steps.models.outputs.embedding }}
+            RERANKER_MODEL=${{ steps.models.outputs.reranker }}
+          sbom: true
+          provenance: mode=max
+      - if: steps.existing.outputs.found != 'true'
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.1.4
+      - if: steps.existing.outputs.found != 'true'
+        env:
+          IMAGE: ${{ steps.models.outputs.name }}@${{ steps.build.outputs.digest }}
+        run: cosign sign --yes "$IMAGE"
+      - name: Reference by digest
+        id: ref
+        env:
+          IMAGE: ${{ steps.models.outputs.name }}:${{ steps.models.outputs.tag }}
+        run: |
+          digest=$(docker buildx imagetools inspect "$IMAGE" --format '{{json .Manifest.Digest}}' | tr -d '"')
+          echo "image=$IMAGE@$digest" >> "$GITHUB_OUTPUT"
+
+  images:
+    needs: models
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api  # also the triage worker: python -m pagerwise_api.worker
+            package: pagerwise-api
+            command: uvicorn pagerwise_api.main:app --host 0.0.0.0 --port 8001
+            models: true
+          - name: consumer
+            package: pagerwise-consumer
+            command: python -m pagerwise_consumer
+            models: true
+          - name: indexer
+            package: pagerwise-indexer
+            command: python -m pagerwise_indexer
+            models: true
+          - name: simulator
+            package: pagerwise-simulator
+            command: python -m pagerwise_simulator
+          - name: docs-mock
+            package: pagerwise-docs-mock
+            command: python -m pagerwise_docs_mock --host 0.0.0.0
+          - name: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build inputs
+        id: inputs
+        env:
+          MODELS_IMAGE: ${{ needs.models.outputs.image }}
+          NAME: ${{ matrix.name }}
+          PACKAGE: ${{ matrix.package }}
+          COMMAND: ${{ matrix.command }}
+          WITH_MODELS: ${{ matrix.models }}
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/pagerwise-$NAME" >> "$GITHUB_OUTPUT"
+          if [ "$NAME" = web ]; then
+            { echo "context=apps/web"; echo "file=apps/web/Dockerfile"; echo "args="; } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          { echo "context=."; echo "file=docker/python.Dockerfile"; echo "args<<EOF"
+            echo "PACKAGE=$PACKAGE"; echo "COMMAND=$COMMAND"
+            if [ "$WITH_MODELS" = true ]; then echo "RUNTIME=$MODELS_IMAGE"; fi
+            echo "EOF"; } >> "$GITHUB_OUTPUT"
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ steps.inputs.outputs.image }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Build for the scan (amd64, local)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ steps.inputs.outputs.context }}
+          file: ${{ steps.inputs.outputs.file }}
+          build-args: ${{ steps.inputs.outputs.args }}
+          platforms: linux/amd64
+          load: true
+          tags: scan/${{ matrix.name }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+      - name: trivy (fails on a fixable CRITICAL)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.76.1
+          image-ref: scan/${{ matrix.name }}:${{ github.sha }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Build and push (all platforms)
+        id: push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ steps.inputs.outputs.context }}
+          file: ${{ steps.inputs.outputs.file }}
+          build-args: ${{ steps.inputs.outputs.args }}
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+          sbom: true
+          provenance: mode=max
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.1.4
+      - name: Sign
+        env:
+          IMAGE: ${{ steps.inputs.outputs.image }}@${{ steps.push.outputs.digest }}
+        run: cosign sign --yes "$IMAGE"

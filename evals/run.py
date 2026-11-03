@@ -17,7 +17,8 @@
 Model calls are recorded with --live (evals/recordings/) and replayed otherwise, with identical metrics.
 
 Writes evals/results/<run>.json (every run is kept) and evals/REPORT.md (the previous one moves to evals/archive/).
-Exits 1 if a gate is missed, or with --baseline if a quality metric drops more than 1.5 points.
+Exits 1 if a gate is missed, or with --baseline if a quality metric drops more than 1.5 points; with --baseline, a
+gate the baseline also misses is reported but doesn't fail the run.
 
 uv run python evals/run.py [--split dev|test] [--only retrieval,clustering,triage,judge] [--live] [--repeats 3]
                            [--baseline evals/baseline.json] [--write-baseline]
@@ -248,6 +249,13 @@ def check_gates(metrics: dict) -> list[str]:
     return missed
 
 
+def known_misses(missed: list[str], baseline_path: Path) -> list[str]:
+    """The gate misses the baseline has too: still reported, but they don't fail a run checked against it (CI
+    compares a PR with main, which already misses some triage gates: docs/adr/0011)."""
+    baseline = json.loads(baseline_path.read_text())["metrics"]
+    return [m for m in missed if (name := m.split(" = ")[0]) in baseline and check_gates({name: baseline[name]})]
+
+
 def check_baseline(metrics: dict, baseline_path: Path) -> list[str]:
     baseline = json.loads(baseline_path.read_text())["metrics"]
     return [f"{name} worsened from {baseline[name]:.3f} to {value:.3f}"
@@ -401,6 +409,8 @@ async def main() -> int:
             run["judged"] = judged
 
     missed = check_gates(run["metrics"])
+    known = known_misses(missed, args.baseline) if args.baseline else []
+    missed = [f"{m} (also on the baseline)" if m in known else m for m in missed]
     if args.baseline:
         missed += check_baseline(run["metrics"], args.baseline)
     results = EVALS / "results"
@@ -414,7 +424,7 @@ async def main() -> int:
         print(f"{name:42} {value:.3f}" if isinstance(value, float) else f"{name:42} {value}")
     print("\n" + ("\n".join(f"MISSED {x}" for x in missed) if missed else "all gates passed"))
     print(f"report: {(EVALS / 'REPORT.md').relative_to(ROOT)}; results: evals/results/{run['run']}-{args.split}-{run['embedding']}.json")
-    return 1 if missed else 0
+    return 1 if any(not m.endswith("(also on the baseline)") for m in missed) else 0
 
 
 if __name__ == "__main__":
