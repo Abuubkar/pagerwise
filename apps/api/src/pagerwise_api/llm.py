@@ -93,7 +93,10 @@ def _replaying(request: dict[str, Any]) -> bool:
     """Whether this call is answered from the recording (False: it goes to the model, and is recorded)."""
     if _recorder is None or not _recorder.replay:
         return False
-    return not _recorder.fill or _recorder.path(request).exists()
+    if not _recorder.fill:
+        return True
+    path = _recorder.path(request)  # with fill, each repeat needs its own recorded run
+    return path.exists() and _recorder._calls.get(path.name, 0) < len(json.loads(path.read_text())["runs"])
 
 
 def _replayed(request: dict[str, Any]) -> tuple[list[str], ChatResult, int, int]:
