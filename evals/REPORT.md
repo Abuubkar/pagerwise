@@ -1,6 +1,6 @@
 # Eval report: dev split, embedding v2
 
-Run 20261103T085528 at 2026-11-03T08:55:28+00:00, reranker Xenova/ms-marco-MiniLM-L-6-v2 on the top 0.
+Run 20261103T093618 at 2026-11-03T09:36:18+00:00, reranker Xenova/ms-marco-MiniLM-L-6-v2 on the top 0.
 
 ## Gates
 
@@ -8,7 +8,7 @@ Run 20261103T085528 at 2026-11-03T08:55:28+00:00, reranker Xenova/ms-marco-MiniL
 |---|---|---|---|
 | retrieval.recall_at_8 | 1.000 | >= 0.9 | pass |
 | retrieval.mrr_at_10 | 1.000 | >= 0.7 | pass |
-| retrieval.latency_p95_ms | 37.600 | <= 250 | pass |
+| retrieval.latency_p95_ms | 56.100 | <= 250 | pass |
 | clustering.f1 | 0.847 | >= 0.84 | pass |
 | triage.root_cause_hit_at_1 | 0.800 | >= 0.6 | pass |
 | triage.root_cause_hit_at_3 | 0.840 | >= 0.8 | pass |
@@ -26,18 +26,18 @@ Run 20261103T085528 at 2026-11-03T08:55:28+00:00, reranker Xenova/ms-marco-MiniL
 
 | stage | Recall@8 | MRR@10 | p95 ms (cumulative) |
 |---|---|---|---|
-| full-text only | 0.000 | 0.000 | 4 |
-| vector only | 0.740 | 1.000 | 6 |
-| hybrid (RRF) | 0.740 | 1.000 | 39 |
-| hybrid + rerank | 0.740 | 1.000 | 39 |
-| final (+ sibling chunks) | 1.000 | 1.000 | 38 |
+| full-text only | 0.000 | 0.000 | 6 |
+| vector only | 0.740 | 1.000 | 11 |
+| hybrid (RRF) | 0.740 | 1.000 | 61 |
+| hybrid + rerank | 0.740 | 1.000 | 61 |
+| final (+ sibling chunks) | 1.000 | 1.000 | 56 |
 
 ### Retrieval cases short of perfect (0 of 25)
 
 
 ## Clustering
 
-508 alerts from 41 cases became 53 incidents (in 4.9s). Pairwise precision 0.983, recall 0.743, F1 0.847.
+508 alerts from 41 cases became 53 incidents (in 8.1s). Pairwise precision 0.983, recall 0.743, F1 0.847.
 
 - Split across several incidents (13): ans-06 (notifications) into 2, ans-09 (payments) into 2, ans-10 (kafka-broker) into 2, ans-14 (kafka-broker) into 2, ans-21 (inventory) into 2, ans-23 (search) into 2, ans-26 (orders) into 2, ans-27 (payments) into 2, ans-32 (api-gateway) into 3, ans-34 (kafka-broker) into 2, ans-36 (api-gateway) into 2, ans-38 (ledger) into 2, deg-09 (search) into 2
 - Merged with another case (4): ans-14 (kafka-broker) with ans-32, ans-23 (search) with deg-09, ans-32 (api-gateway) with ans-14, deg-09 (search) with ans-23
@@ -94,7 +94,7 @@ Against the hand labels: held-out 16 of 20 rows checkable, agreement 0.81, kappa
 
 ## Missed
 
-- triage.abstention = 0.400, gate >= 0.8
-- triage.format_validity = 0.927, gate >= 0.95
-- triage.ttft_p95_ms = 20376.000, gate <= 20000
-- triage.unsupported_claim_rate = 0.158, gate <= 0.08
+- triage.abstention = 0.400, gate >= 0.8 (also on the baseline)
+- triage.format_validity = 0.927, gate >= 0.95 (also on the baseline)
+- triage.ttft_p95_ms = 20376.000, gate <= 20000 (also on the baseline)
+- triage.unsupported_claim_rate = 0.158, gate <= 0.08 (also on the baseline)
