@@ -20,6 +20,7 @@ from pathlib import Path
 import yaml
 
 import pagerwise_kafka as k
+import pagerwise_telemetry as telemetry
 
 GRAPH_PATH = Path(__file__).resolve().parents[4] / "data" / "service_graph.yaml"
 
@@ -148,6 +149,8 @@ def main() -> None:
     parser.add_argument("--malformed-rate", type=float, default=0.0, help="share of events that are malformed")
     parser.add_argument("--seed", type=int)
     args = parser.parse_args()
+    telemetry.setup("pagerwise-simulator")
+    k.instrument()
     result = asyncio.run(produce(args.bootstrap, args.rate, args.duration, args.malformed_rate, seed=args.seed))
     print(f"run {result.run_id}: {result.sent} events ({len(result.valid_ids)} valid, {result.malformed} malformed) "
           f"in {result.seconds:.1f}s = {result.sent / result.seconds:.0f}/s")
