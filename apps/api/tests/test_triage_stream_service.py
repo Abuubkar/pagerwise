@@ -76,7 +76,9 @@ async def test_worker_streams_events_in_order_to_live_and_late_readers(client, r
     names = [name for name, _ in live_events]
     assert names[0] == "degraded_source" and live_events[0][1] == {"source": "deploys", "reason": "HTTP 503"}
     assert names[-1] == "done"
-    assert "".join(data["text"] for name, data in live_events if name == "token") == RECORDING["raw_text"]
+    # The decision line is the gate's, not the reader's: tokens are the model's text without it.
+    shown = RECORDING["raw_text"].replace("Match: [C1]\n", "", 1)
+    assert "".join(data["text"] for name, data in live_events if name == "token") == shown
     # Each section completes after its citations and before the next section's, in the contract's order.
     sections = [data["section"] for name, data in live_events if name == "section_complete"]
     assert sections == ["likely_cause", "blast_radius", "first_steps", "similar_incidents"]

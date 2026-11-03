@@ -2,9 +2,11 @@ import pytest
 
 from pagerwise_api.citations import (
     CitationEvent,
+    LikelyCauseGate,
     SectionCompleteEvent,
     TagScanner,
     TokenEvent,
+    gate_brief,
     parse_brief,
 )
 
@@ -86,3 +88,51 @@ def test_contract_breaks_have_no_verdict_and_say_why(broken, problem):
     parsed = parse_brief(broken, SUPPLIED)
     assert parsed.verdict is None
     assert any(p.startswith(problem) for p in parsed.problems), parsed.problems
+
+
+CAUSES = {"C1", "C2"}  # runbooks and postmortems; C3 is a deploy
+DECIDED = VALID.replace("## Likely cause\n", "## Likely cause\nMatch: [C1]\n")
+ABSTAINED = VALID.replace("Ledger still writes to the demoted primary [C1].", "INSUFFICIENT_EVIDENCE")
+
+
+@pytest.mark.parametrize(
+    ("line", "decision", "brief"),
+    [
+        ("Match: [C1]", "match", VALID),
+        ("**Match:** [C2]", "match", VALID),
+        ("Match: none", "none", ABSTAINED),
+        ("Match: [C3]", "not_a_cause", ABSTAINED),  # a deploy alone is not a cause
+        ("Match: [C9]", "not_a_cause", ABSTAINED),
+    ],
+)
+def test_gate_applies_the_decision_line_whatever_follows(line, decision, brief):
+    raw = VALID.replace("## Likely cause\n", f"## Likely cause\n{line}\n")
+    for size in (1, 4, 1000):
+        gate = LikelyCauseGate(CAUSES)
+        gated = "".join(gate.feed(raw[i : i + size]) for i in range(0, len(raw), size)) + gate.finish()
+        assert (gated, gate.decision) == (brief, decision)
+
+
+def test_gate_keeps_a_cause_written_on_the_decision_line():
+    raw = VALID.replace("## Likely cause\n", "## Likely cause\nMatch: [C1] ")
+    assert gate_brief(raw, CAUSES) == (VALID, "match")
+
+
+def test_gate_passes_text_through_as_it_arrives_outside_the_decision():
+    gate = LikelyCauseGate(CAUSES)
+    assert gate.feed("## Likely cause\nMat") == "## Likely cause\n"  # held until the decision line ends
+    assert gate.feed("ch: [C1]\nLedger sti") == "Ledger sti"
+    assert gate.feed("ll writes") == "ll writes"
+
+
+def test_gate_without_a_decision_line_changes_nothing_and_says_so():
+    assert gate_brief(VALID, CAUSES) == (VALID, "missing")
+    assert gate_brief("no sections at all", CAUSES) == ("no sections at all", None)
+    assert gate_brief("## Likely cause\nMatch: none", CAUSES) == ("## Likely cause\nINSUFFICIENT_EVIDENCE\n\n", "none")
+
+
+def test_abstained_brief_parses_as_an_abstention():
+    gated, _ = gate_brief(VALID.replace("## Likely cause\n", "## Likely cause\nMatch: none\nNo runbook fits [C1].\n"),
+                          CAUSES)
+    assert parse_brief(gated, SUPPLIED).verdict == "INSUFFICIENT_EVIDENCE"
+    assert parse_brief(gate_brief(DECIDED, CAUSES)[0], SUPPLIED).verdict == "CAUSE_IDENTIFIED"

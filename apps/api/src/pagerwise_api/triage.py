@@ -86,15 +86,23 @@ async def _documents(session: AsyncSession, query: str, source_type: str, k: int
 async def _deploys(client: httpx.AsyncClient, services: list[str], at: datetime) -> list[EvidenceItem]:
     response = await client.get("/v1/deploys", params={
         "service": services, "since": (at - timedelta(hours=settings.triage_deploy_window_h)).isoformat(),
-        "until": (at + timedelta(minutes=15)).isoformat(), "limit": settings.triage_deploys_max,
+        "until": at.isoformat(), "limit": settings.triage_deploys_max,  # a later deploy can't be the cause
     })
     response.raise_for_status()
     return [
         EvidenceItem("deploy", d["id"], None, f"deploy {d['service']} {d['version']}",
                      f"Deploy {d['id']}: {d['service']} version {d['version']} deployed at {d['deployed_at']} by "
-                     f"{d['author']} (commit {d['commit_sha'][:10]}, {d['status']}). Change: {d['summary']}.")
+                     f"{d['author']} (commit {d['commit_sha'][:10]}, {d['status']}). Change: {d['summary']}. "
+                     f"{_before(at, d['deployed_at'])}")
         for d in response.json()
     ]
+
+
+def _before(at: datetime, deployed_at: str) -> str:
+    """How long before the incident a deploy was, so the model needn't compare timestamps (small models misread
+    them: docs/adr/0010)."""
+    minutes = max(0, round((at - datetime.fromisoformat(deployed_at)).total_seconds() / 60))
+    return f"It was {minutes} minutes before the incident opened."
 
 
 async def gather_evidence(session: AsyncSession, client: httpx.AsyncClient, incident: Incident, query: str,
@@ -175,6 +183,7 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
     evidence = [prompts.EvidenceChunk(tag=i["tag"], source=f"{i['source_type']} {i['source_id'].rsplit('/', 1)[-1]}",
                                       heading_path=i["heading_path"], text=i["text"]) for i in run.evidence]
     messages = prompts.triage_messages(_incident_text(incident), evidence, [d["source"] for d in gathered.degraded])
+    gate = citations.LikelyCauseGate(cause_tags(run.evidence))
     scanner = citations.TagScanner(set(by_tag))
     started = last_beat = time.monotonic()
     result: llm.ChatResult | None = None
@@ -185,7 +194,7 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
                 continue
             if run.ttft_ms is None:
                 run.ttft_ms = int((time.monotonic() - started) * 1000)
-            for event in scanner.feed(piece):
+            for event in scanner.feed(gate.feed(piece)):
                 yield _scan_event(event, by_tag)
             if time.monotonic() - last_beat >= settings.triage_heartbeat_s:
                 run.heartbeat_at = datetime.now(UTC)
@@ -197,15 +206,18 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
     except ConnectionError:  # the ollama client's own error when Ollama isn't running
         yield await fail(session, run, ProblemCode.MODEL_UNAVAILABLE, "model server unreachable")
         return
-    for event in scanner.finish():
+    for event in [*scanner.feed(gate.finish()), *scanner.finish()]:
         yield _scan_event(event, by_tag)
 
     assert result is not None  # Ollama's last chunk (done=True) carries the counts
-    run.raw_text = result.content
+    run.raw_text = result.content  # what the model wrote, decision line included; the brief is scanner.text
     run.prompt_tokens, run.output_tokens = result.prompt_tokens, result.output_tokens
     run.total_ms = int((time.monotonic() - started) * 1000)
-    parsed = citations.parse_brief(result.content, set(by_tag))
-    if parsed.verdict is None:
+    log.info("triage %s: cause decision %s", run.id, gate.decision)
+    parsed = citations.parse_brief(scanner.text, set(by_tag))
+    if gate.decision == "missing":
+        parsed.problems.append("likely_cause: no Match line")
+    if parsed.verdict is None or parsed.problems:
         yield await fail(session, run, ProblemCode.FORMAT_INVALID, "the brief broke the section contract",
                           parsed.problems)
         return
@@ -216,6 +228,11 @@ async def generate(session: AsyncSession, client: httpx.AsyncClient, run: Triage
     run.brief = brief.model_dump(mode="json")
     await session.commit()
     yield "done", brief
+
+
+def cause_tags(evidence: list[dict]) -> set[str]:
+    """The items a Likely cause may rest on: runbooks and postmortems, never a deploy alone."""
+    return {item["tag"] for item in evidence if item["source_type"] in ("runbook", "postmortem")}
 
 
 def _scan_event(event: citations.ScanEvent, by_tag: dict[str, dict]) -> TriageEvent:
@@ -261,7 +278,8 @@ def replay(run: TriageRun) -> list[TriageEvent]:
                                                       problems=run.problems))]
     assert run.brief is not None
     brief = schemas.TriageBrief.model_validate(run.brief)
-    events.append(("token", schemas.TokenEvent(text=run.raw_text)))
+    text, _ = citations.gate_brief(run.raw_text, cause_tags(run.evidence))
+    events.append(("token", schemas.TokenEvent(text=text)))
     for key in citations.SECTIONS.values():
         for c in getattr(brief.sections, key).citations:
             events.append(("citation", schemas.CitationEvent(**c.model_dump(), section=key)))

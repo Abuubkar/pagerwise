@@ -1,7 +1,8 @@
 """Checks model output against the citation contracts in prompts.py. Deterministic: no model involved.
 
 Three users of one tag syntax: parse_answer (/v1/ask), parse_brief (the four-section triage brief, checked once the
-stream ends) and TagScanner (emits citation and section events while the brief streams)."""
+stream ends) and TagScanner (emits citation and section events while the brief streams). LikelyCauseGate sits in
+front of the last two: it turns the model's cause decision line into the brief's Likely cause."""
 
 import re
 from dataclasses import dataclass, field
@@ -104,6 +105,84 @@ def parse_brief(text: str, supplied_tags: set[str]) -> ParsedBrief:
     if not problems and likely is not None:
         verdict = "INSUFFICIENT_EVIDENCE" if likely.text == INSUFFICIENT_EVIDENCE else "CAUSE_IDENTIFIED"
     return ParsedBrief(verdict=verdict, sections=sections, problems=problems)
+
+
+# The first line of Likely cause, where the model names the item that describes the incident's failure (triage/6).
+MATCH_RE = re.compile(r"^[*_]*match[*_]*\s*:[*_]*\s*(.*)$", re.IGNORECASE)
+LEADING_TAGS_RE = re.compile(r"^(?:\s*\[C\d+\][\s,.;]*)+")
+Decision = Literal["match", "none", "not_a_cause", "missing"]
+
+
+class LikelyCauseGate:
+    """Applies the brief's cause decision in code, between the model and everything else (stream, parse, replay).
+    Likely cause must open with a line "Match: [Cn]" naming a runbook or postmortem, or "Match: none". The line
+    itself is dropped. If it names no item in cause_tags (none, or only a deploy: a deploy alone is not a cause),
+    the section becomes exactly INSUFFICIENT_EVIDENCE, whatever the model wrote after it. A small model reasons its
+    way to "nothing matches" far more reliably than it writes the token (docs/adr/0010).
+
+    Text passes through as it arrives, except from the Likely cause heading until its decision line has ended, and
+    in a dropped section until the next heading line has. decision stays "missing" if the section has no decision
+    line (it then passes through unchanged and the caller treats the brief as broken), None if there's no section."""
+
+    def __init__(self, cause_tags: set[str]):
+        self.cause_tags = cause_tags
+        self.state: Literal["before", "deciding", "passing", "dropping"] = "before"
+        self.line = ""  # the current line so far
+        self.held = ""  # text held back while deciding
+        self.decision: Decision | None = None
+
+    def feed(self, piece: str) -> str:
+        out: list[str] = []
+        for segment in re.split(r"(?<=\n)", piece):
+            if segment:
+                out.append(self._segment(segment))
+        return "".join(out)
+
+    def finish(self) -> str:
+        if self.state == "deciding" and self.line.strip():
+            return self._decide(self.line)
+        return self.held if self.state == "deciding" else ""
+
+    def _segment(self, segment: str) -> str:
+        self.line += segment
+        complete, line = segment.endswith("\n"), self.line
+        if complete:
+            self.line = ""
+        if self.state == "before":
+            heading = SECTION_RE.match(line.rstrip("\n")) if complete else None
+            if heading and SECTIONS.get(heading.group(1)) == "likely_cause":
+                self.state, self.decision = "deciding", "missing"
+            return segment
+        if self.state == "deciding":
+            self.held += segment
+            return self._decide(line) if complete and line.strip() else ""
+        if self.state == "dropping":
+            if complete and SECTION_RE.match(line.rstrip("\n")):
+                self.state = "passing"
+                return line
+            return ""
+        return segment
+
+    def _decide(self, line: str) -> str:
+        held, self.held = self.held, ""
+        match = MATCH_RE.match(line.strip())
+        if match is None:
+            self.state = "passing"
+            return held
+        tags = TAG_RE.findall(match.group(1))
+        if any(t in self.cause_tags for t in tags):
+            self.state, self.decision = "passing", "match"
+            rest = LEADING_TAGS_RE.sub("", match.group(1))  # the model sometimes goes on with the cause on this line
+            return f"{rest}\n" if rest else ""
+        self.state, self.decision = "dropping", ("not_a_cause" if tags else "none")
+        return f"{INSUFFICIENT_EVIDENCE}\n\n"
+
+
+def gate_brief(text: str, cause_tags: set[str]) -> tuple[str, Decision | None]:
+    """LikelyCauseGate on a whole text: (the brief as streamed, the decision)."""
+    gate = LikelyCauseGate(cause_tags)
+    gated = gate.feed(text) + gate.finish()
+    return gated, gate.decision
 
 
 @dataclass
