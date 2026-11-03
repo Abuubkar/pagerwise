@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nSearch the logs for the error code this failure logs: `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-TLS-415`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-QUEUE-733`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678` . (this sentence cites 3 sources)\n\nSource:\n# Orders: dependency timeouts\n\nAlert: `OrdersUpstreamTimeouts` fires when the share of calls to a dependency that time out, `orders_upstream_timeout_pct`, stays above its threshold for 5 minutes. Orders is a\ncore-tier service owned by the commerce team; it calls\npayments, inventory, notifications, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to payments.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Network path.** Packet loss between zones adds retransmits.\n- **Dependency degraded.** payments itself is slow or partially down.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on orders is network path: it explained 12 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes\n   \"network path\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678\n   ```\n\n4. If `orders_upstream_timeout_pct` stays above 8 for 5 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check payments's own dashboard before changing anything in orders.\n\n## Mitigation\n\n1. Open the circuit breaker for payments if the feature can degrade.\n2. Fail over calls to the standby region for payments if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=40` on\n   orders (`configctl set orders upstream_timeout_ms 40`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states at least one of the claim's facts, specifically the error code ORD-DEP-678, and contradicts none.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states at least one of the claim's facts, specifically the error code ORD-DEP-678, and contradicts none.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 695,
+    "output_tokens": 39,
+    "total_ms": 4415,
+    "load_ms": 1,
+    "prompt_eval_ms": 2750,
+    "eval_ms": 1612
+   },
+   "ttft_ms": 4436,
+   "total_ms": 4436
+  }
+ ]
+}

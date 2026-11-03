@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\ncard-auth, started 2026-10-28T06:17:03.719314+00:00\n\nSentence:\nThe incident involves an external provider returning HTTP 429, which is not covered by the provided evidence regarding internal causes like bad deploys or redis-cache issues . (this sentence cites 4 sources)\n\nSource:\n# Card auth: elevated error rate\n\nAlert: `CardAuthErrorRateHigh` fires when the share of 5xx responses in `card_auth_error_ratio_pct` stays above its threshold for 5 minutes. Card auth is a\ncore-tier service owned by the payments team; it calls\nredis-cache, and\npayments call it.\n\n## Symptoms\n\n- 5xx responses rise across all endpoints, not one.\n- Retries from callers double the request rate.\n- Logs show the same error code repeating.\n\n## Likely causes\n\n- **Bad deploy.** A recent release introduced an exception on a common path.\n- **Dependency errors passed through.** redis-cache returns errors and the service doesn't degrade.\n- **Expired credentials.** A rotated secret wasn't picked up and calls to redis-cache are rejected.\n\nThe most common cause on card-auth is bad deploy: it explained 20 of the\nlast 25 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_error_ratio_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes\n   \"bad deploy\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-ERR-619\n   ```\n\n4. If `card_auth_error_ratio_pct` stays above 9 for 12 minutes, treat it as\n   elevated error rate and move to mitigation; below that it usually recovers on its own.\n5. Group errors by endpoint and by upstream: one endpoint means a code path, all of them means a dependency."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"The incident involves an external provider returning HTTP 429\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"HTTP 429 is not covered by the provided evidence regarding internal causes\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident is card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident started on 2026-10-28T06:17:03.719314+00:00\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"5xx responses rise across all endpoints\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Retries from callers double the request rate\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Logs show the same error code repeating\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy is the most common cause on card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy explained 20 of the last 25 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A recent release introduced an exception on a common path\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is owned by the payments team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service calls redis-cache\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Payments call card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is a core-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The share of 5xx responses in card_auth_error_ratio_pct stays above its threshold for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is CardAuthErrorRateHigh\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The threshold for card_auth_error_ratio_pct is not specified\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is not real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"A deploy in the last hour makes bad deploy less likely\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A deploy in the last hour makes bad deploy more likely\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"Bad deploy is less likely than a regression\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy is more likely than a regression\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The error code is CAR-ERR-619\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The error code is not CAR-ERR-619\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes and it usually recovers on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes and it does not usually recover on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes and it usually recovers on its own\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes and it does not usually recover on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"The incident involves an external provider returning HTTP 429\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"HTTP 429 is not covered by the provided evidence regarding internal causes\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident is card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident started on 2026-10-28T06:17:03.719314+00:00\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"5xx responses rise across all endpoints\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Retries from callers double the request rate\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Logs show the same error code repeating\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy is the most common cause on card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy explained 20 of the last 25 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A recent release introduced an exception on a common path\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is owned by the payments team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service calls redis-cache\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Payments call card-auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The service is a core-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The share of 5xx responses in card_auth_error_ratio_pct stays above its threshold for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is CardAuthErrorRateHigh\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The threshold for card_auth_error_ratio_pct is not specified\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The alert is not real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"A deploy in the last hour makes bad deploy less likely\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A deploy in the last hour makes bad deploy more likely\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"Bad deploy is less likely than a regression\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Bad deploy is more likely than a regression\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The error code is CAR-ERR-619\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The error code is not CAR-ERR-619\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 5 minutes\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes and it usually recovers on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays above 9 for 12 minutes and it does not usually recover on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes and it usually recovers on its own\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"card_auth_error_ratio_pct stays below 9 for 12 minutes and it does not usually recover on its own\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"card_auth",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 713,
+    "output_tokens": 1024,
+    "total_ms": 45232,
+    "load_ms": 0,
+    "prompt_eval_ms": 2030,
+    "eval_ms": 43113
+   },
+   "ttft_ms": 45245,
+   "total_ms": 45245
+  }
+ ]
+}

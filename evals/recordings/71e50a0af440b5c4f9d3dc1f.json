@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nWithout specific details on which deploy occurred immediately before this incident, we cannot pinpoint the exact commit, but the timing aligns with the \"regression after a deploy\" pattern described in the runbook .\n\nSource:\n# Ledger: regression after a deploy\n\nAlert: `LedgerPostDeployErrors` fires when errors in the 30 minutes after a deploy, `ledger_post_deploy_error_pct`, exceed their threshold. Ledger is a\ncore-tier service owned by the ledger team; it calls\npostgres-primary, kafka-broker, and\npayments call it.\n\n## Symptoms\n\n- Errors start within minutes of a deploy finishing.\n- Only pods on the new version show errors.\n- Canary metrics were borderline but passed.\n\n## Likely causes\n\n- **Config drift.** The release expects a setting that isn't present in production.\n- **Code regression.** The new release breaks a path the tests don't cover.\n- **Schema mismatch.** The release reads a column a migration hasn't added yet.\n\nThe most common cause on ledger is config drift: it explained 8 of the\nlast 15 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `ledger-overview` dashboard and compare `ledger_post_deploy_error_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history ledger --since 2h`. A deploy in the last hour makes\n   \"config drift\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n ledger logs deploy/ledger --since 15m | grep LED-DEPLOY-586\n   ```\n\n4. If `ledger_post_deploy_error_pct` stays above 7 for 4 minutes, treat it as\n   regression after a deploy and move to mitigation; below that it usually recovers on its own.\n5. Compare error rates between pods on the old and new version.\n\n## Mitigation\n\n1. Roll back: `deployctl rollback ledger`; don't wait to debug.\n2. Freeze deploys for ledger.\n3. If that doesn't help within 10 minutes, set `deploy_batch_size=34` on\n   ledger (`configctl set ledger deploy_batch_size 34`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source describes a 'regression after a deploy' pattern, which is mentioned in the claim as the timing aligns with it.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source describes a 'regression after a deploy' pattern, which is mentioned in the claim as the timing aligns with it.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 643,
+    "output_tokens": 38,
+    "total_ms": 3840,
+    "load_ms": 2,
+    "prompt_eval_ms": 2198,
+    "eval_ms": 1629
+   },
+   "ttft_ms": 3862,
+   "total_ms": 3862
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe incident involves an external provider returning HTTP 429, which is not covered by the provided evidence regarding internal causes like bad deploys or redis-cache issues . (this sentence cites 4 sources)\n\nSource:\n# Card auth: elevated error rate\n\nAlert: `CardAuthErrorRateHigh` fires when the share of 5xx responses in `card_auth_error_ratio_pct` stays above its threshold for 5 minutes. Card auth is a\ncore-tier service owned by the payments team; it calls\nredis-cache, and\npayments call it.\n\n## Symptoms\n\n- 5xx responses rise across all endpoints, not one.\n- Retries from callers double the request rate.\n- Logs show the same error code repeating.\n\n## Likely causes\n\n- **Bad deploy.** A recent release introduced an exception on a common path.\n- **Dependency errors passed through.** redis-cache returns errors and the service doesn't degrade.\n- **Expired credentials.** A rotated secret wasn't picked up and calls to redis-cache are rejected.\n\nThe most common cause on card-auth is bad deploy: it explained 20 of the\nlast 25 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `card-auth-overview` dashboard and compare `card_auth_error_ratio_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history card-auth --since 2h`. A deploy in the last hour makes\n   \"bad deploy\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n payments logs deploy/card-auth --since 15m | grep CAR-ERR-619\n   ```\n\n4. If `card_auth_error_ratio_pct` stays above 9 for 12 minutes, treat it as\n   elevated error rate and move to mitigation; below that it usually recovers on its own.\n5. Group errors by endpoint and by upstream: one endpoint means a code path, all of them means a dependency."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": false, \"reason\": \"The source discusses internal causes like bad deploys or redis-cache issues, but does not mention HTTP 429 or external providers.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": false, \"reason\": \"The source discusses internal causes like bad deploys or redis-cache issues, but does not mention HTTP 429 or external providers.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 586,
+    "output_tokens": 36,
+    "total_ms": 3558,
+    "load_ms": 1,
+    "prompt_eval_ms": 2036,
+    "eval_ms": 1478
+   },
+   "ttft_ms": 3574,
+   "total_ms": 3574
+  }
+ ]
+}

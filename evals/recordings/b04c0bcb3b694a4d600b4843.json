@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe most likely cause is a memory leak in a recent release of the auth service, as this explained 22 of the last 22 pages for this alert .\n\nSource:\n# Auth: memory pressure and OOM kills\n\nAlert: `AuthMemoryPressure` fires when container memory, `auth_rss_pct_of_limit`, stays above its threshold for 10 minutes or a pod is OOM-killed. Auth is a\ncore-tier service owned by the identity team; it calls\nredis-cache, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Pods restart with reason OOMKilled.\n- Memory climbs steadily between restarts: a sawtooth.\n- Latency spikes right before each restart.\n\n## Likely causes\n\n- **Memory leak in a recent release.** A new code path keeps references to finished requests.\n- **Large payloads.** A few very large requests allocate far more than usual.\n- **Unbounded cache.** An in-process cache without a size limit grows with traffic.\n\nThe most common cause on auth is memory leak in a recent release: it explained 22 of the\nlast 22 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `auth-overview` dashboard and compare `auth_rss_pct_of_limit` with the\n   same hour last week.\n2. Check recent changes: `deployctl history auth --since 2h`. A deploy in the last hour makes\n   \"memory leak in a recent release\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n identity logs deploy/auth --since 15m | grep AUT-MEM-724\n   ```\n\n4. If `auth_rss_pct_of_limit` stays above 97 for 8 minutes, treat it as\n   memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own.\n5. Compare memory growth rate before and after the last deploy."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source lists a memory leak in a recent release as one of the likely causes of the symptoms.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source lists a memory leak in a recent release as one of the likely causes of the symptoms.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 584,
+    "output_tokens": 31,
+    "total_ms": 3870,
+    "load_ms": 1,
+    "prompt_eval_ms": 2373,
+    "eval_ms": 1416
+   },
+   "ttft_ms": 3907,
+   "total_ms": 3907
+  }
+ ]
+}

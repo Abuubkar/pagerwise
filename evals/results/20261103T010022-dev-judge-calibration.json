@@ -1,0 +1,107 @@
+{
+ "note": "Judge calibration runs from scripts outside run.py (tune rows only, then the held-out rows once for the final prompt). Model calls are in evals/recordings/.",
+ "runs": [
+  {
+   "judge_model": "llama3.1:8b",
+   "prompt": "judge/2",
+   "tune": {
+    "rows": 40,
+    "no_labels": 14,
+    "kappa": -0.020408163265306145,
+    "agreement": 0.375
+   },
+   "tune_disagreements": [
+    "cal-04 label yes judge False | not_stated: The incident involves a kernel soft lockup; contradicted: a kernel soft lockup is a likely cause; not_stated: gdep-04 occurred shortly before the incident; not_stated: the incident started 2026-10-28T11:44:00.366739+00:00; contradicted: the inciden",
+    "cal-07 label yes judge False | unparseable judge output: {",
+    "cal-08 label yes judge False | unparseable judge output: {",
+    "cal-09 label yes judge False | not_stated: dep-0367; not_stated: dep-0365; contradicted: shortly after deploys; contradicted: making a bad deploy; contradicted: expired credentials in a dependency; contradicted: the most likely causes",
+    "cal-10 label no judge True | not_stated: The incident affects the payments service; not_stated: The incident affects its callers",
+    "cal-11 label yes judge False | not_stated: the affected service is notifications; contradicted: the deploy was to notifications; not_stated: the deploy was by Golden Set; contradicted: the deploy was at 2026-10-28T09:27:22.427058+00:00; not_stated: the deploy was a candidate cause",
+    "cal-16 label yes judge False | not_stated: A recent deploy to orders (which calls payments); not_stated: may have triggered increased load; contradicted: A slow query plan in payments after statistics went stale made p99 climb to 2989 ms; not_stated: Add an alert on p99_latency_ms for payme",
+    "cal-22 label yes judge False | unparseable judge output: {",
+    "cal-23 label no judge True | not_stated: A recent deploy to `inventory`; not_stated: is a candidate cause; not_stated: the incident was sev2; not_stated: the incident was opened by `OrdersErrorRateHigh`",
+    "cal-24 label yes judge False | not_stated: the incident was sev1; not_stated: the incident was opened by `KafkaBrokerUpstreamTimeouts`; contradicted: the cause was in kafka-broker; contradicted: the incident started on 2026-05-06; contradicted: a config change in 8.40.20 cut the timeout to ",
+    "cal-25 label yes judge False | contradicted: a deploy in the last hour makes code regression less likely; not_stated: the incident happened within 15 minutes of a deploy finishing; not_stated: only pods on the new version show errors; not_stated: canary metrics were borderline but passed; n",
+    "cal-26 label yes judge False | not_stated: A deploy to redis-cache shortly before this incident is a candidate cause; not_stated: the incident was sev2; not_stated: the incident was opened by `RedisCacheConsumerLagHigh`; not_stated: 24% of redis-cache requests failed or timed out at the pea",
+    "cal-28 label yes judge False | not_stated: Users impacted are those making orders requests",
+    "cal-31 label yes judge False | not_stated: Debug logging left on after an investigation is a likely cause; not_stated: Retention not applied is a likely cause; not_stated: Large temporary files is a likely cause; not_stated: The alert is real; not_stated: The alert is not real; not_stated: ",
+    "cal-39 label yes judge False | unparseable judge output: {",
+    "cal-44 label yes judge False | not_stated: the alert is real; contradicted: writes fail with 'no space left on device'; contradicted: log volume grew sharply in the last day; contradicted: compaction or cleanup jobs are behind; contradicted: log volume is the most common cause of this alert",
+    "cal-45 label yes judge False | not_stated: the last hour; contradicted: a deploy in the last hour",
+    "cal-48 label yes judge False | unparseable judge output: {",
+    "cal-50 label yes judge False | contradicted: inventory_p99_latency_ms stays above 1648 for 5 minutes; not_stated: p99 rises first; not_stated: p50 usually stays flat until the problem spreads; not_stated: Time spent waiting on postgres-primary grows faster than time spent in the service its",
+    "cal-52 label yes judge False | not_stated: internal calls fail while external ones work is a common symptom; not_stated: search_cert_days_left stays above 4 for 12 minutes; not_stated: search_cert_days_left stays below 4 for 12 minutes; contradicted: set tls_min_version=63 on search and res",
+    "cal-53 label yes judge False | not_stated: Scale consumers up to the partition count; not_stated: The alert is real; not_stated: Recent changes should be checked; not_stated: The error code this failure logs is API-QUEUE-272; not_stated: The lag grows on all partitions; not_stated: The lag ",
+    "cal-56 label yes judge False | contradicted: Dependency degraded: its database itself is slow or partially down.; contradicted: The most common cause on kafka-broker is dependency degraded.; contradicted: Dependency degraded explained 14 of the last 16 pages for this alert.; not_stated: Pac",
+    "cal-58 label yes judge False | not_stated: Search the logs for the error code this failure logs: `kubectl -n payments logs deploy/payments --since 15m | grep PAY-TLS-723`; not_stated: Handshake failures from clients with strict validation are a symptom; not_stated: Internal calls fail while",
+    "cal-59 label yes judge False | unparseable judge output: {",
+    "cal-60 label yes judge False | not_stated: deployctl rollback redis-cache; not_stated: don't wait to debug; not_stated: set deploy_batch_size=29 on redis-cache; not_stated: configctl set redis-cache deploy_batch_size 29; not_stated: restart one pod at a time; not_stated: page the platform s"
+   ]
+  },
+  {
+   "judge_model": "gemma4:12b",
+   "prompt": "judge/2",
+   "tune": {
+    "rows": 40,
+    "no_labels": 14,
+    "kappa": 0.6,
+    "agreement": 0.8
+   },
+   "tune_disagreements": [
+    "cal-06 label no judge True | not_stated: The incident occurred shortly after a deploy to ledger.; not_stated: The incident occurred shortly after a deploy to orders.",
+    "cal-08 label yes judge False | not_stated: The incident involves an external provider returning HTTP 429.; contradicted: The evidence does not cover internal causes like bad deploys.; contradicted: The evidence does not cover internal causes like redis-cache issues.",
+    "cal-11 label yes judge False | contradicted: The incident occurred shortly after a deploy to the affected service.",
+    "cal-13 label yes judge False | contradicted: The deploy to orders (gdep-06) occurred shortly before the incident.; not_stated: The notifications service is the affected component.; not_stated: The pool wait time is measured in the notifications service.",
+    "cal-16 label yes judge False | not_stated: A deploy to orders triggered increased load; not_stated: A slow dependency like the ledger pool caused latency; contradicted: A stale query plan in payments/kafka-broker caused latency",
+    "cal-22 label yes judge False | not_stated: The `ledger_post_deploy_error_pct` is at 24% on ledger-1.; not_stated: The failure rates affect callers like payments.",
+    "cal-24 label yes judge False | contradicted: A recent deploy to kafka-broker is a cause.",
+    "cal-25 label yes judge False | not_stated: A deploy occurred shortly before the incident."
+   ]
+  },
+  {
+   "judge_model": "gemma4:12b",
+   "prompt": "judge/3",
+   "tune": {
+    "rows": 40,
+    "no_labels": 14,
+    "kappa": 0.5454545454545454,
+    "agreement": 0.8
+   },
+   "tune_disagreements": [
+    "cal-06 label no judge True | not_stated: a deploy to ledger is a candidate cause; not_stated: a deploy to orders is a candidate cause",
+    "cal-10 label no judge True | not_stated: the incident affects orders",
+    "cal-17 label no judge True | all stated",
+    "cal-22 label yes judge False | not_stated: ledger_post_deploy_error_pct is at 24% on ledger-1; not_stated: significant failure rates affect callers like payments",
+    "cal-23 label no judge True | not_stated: past incidents show errors in `search` were caused by issues in its dependency `inventory`",
+    "cal-33 label no judge True | not_stated: The incident impacts 45% of requests at peak if it is a regression after a deploy",
+    "cal-44 label yes judge False | not_stated: The alert is real.; not_stated: Open the `redis-cache-overview` dashboard.; not_stated: Compare `redis_cache_disk_used_pct` with the same hour last week.",
+    "cal-56 label yes judge False | not_stated: before changing anything in kafka-broker"
+   ]
+  },
+  {
+   "judge_model": "gemma4:12b",
+   "prompt": "judge/4",
+   "tune": {
+    "rows": 40,
+    "no_labels": 14,
+    "kappa": 0.6089385474860335,
+    "agreement": 0.825
+   },
+   "tune_disagreements": [
+    "cal-06 label no judge True | not_stated: a deploy to ledger is a candidate cause; not_stated: a deploy to orders is a candidate cause",
+    "cal-08 label yes judge False | not_stated: The incident involves an external provider returning HTTP 429",
+    "cal-17 label no judge True | all stated",
+    "cal-22 label yes judge False | not_stated: ledger_post_deploy_error_pct is at 24% on ledger-1; not_stated: significant failure rates affect callers like payments",
+    "cal-23 label no judge True | not_stated: past incidents show errors in `search` were caused by issues in its dependency `inventory`",
+    "cal-28 label yes judge False | not_stated: Users impacted are those making orders requests",
+    "cal-33 label no judge True | not_stated: the incident impacts 45% of requests at peak if it is a regression after a deploy"
+   ],
+   "holdout": {
+    "rows": 20,
+    "no_labels": 8,
+    "kappa": 0.2553,
+    "agreement": 0.65
+   }
+  }
+ ]
+}

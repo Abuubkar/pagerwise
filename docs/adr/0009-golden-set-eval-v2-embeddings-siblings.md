@@ -2,6 +2,7 @@
 status: accepted
 date: 2026-11-02
 supersedes: ADR 0006's reranker default (MiniLM on the top 10); the reranker stays available behind a setting
+superseded_by: ADR 0010 for the v1 column (dropped in migrations 0010-0011)
 ---
 
 # A golden set and gated eval; bge-base embeddings, sibling chunks, reranker off

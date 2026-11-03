@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nCheck its database's own dashboard before changing anything in kafka-broker.\n\nSource:\n# Kafka broker: dependency timeouts\n\nAlert: `KafkaBrokerUpstreamTimeouts` fires when the share of calls to a dependency that time out, `kafka_broker_upstream_timeout_pct`, stays above its threshold for 5 minutes. Kafka broker is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nledger, notifications, payments call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to its database.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Dependency degraded.** its database itself is slow or partially down.\n- **Network path.** Packet loss between zones adds retransmits.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on kafka-broker is dependency degraded: it explained 14 of the\nlast 16 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes\n   \"dependency degraded\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-DEP-358\n   ```\n\n4. If `kafka_broker_upstream_timeout_pct` stays above 9 for 4 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check its database's own dashboard before changing anything in kafka-broker."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states the claim's fact about checking the database's own dashboard before making changes to kafka-broker.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states the claim's fact about checking the database's own dashboard before making changes to kafka-broker.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 569,
+    "output_tokens": 33,
+    "total_ms": 3748,
+    "load_ms": 0,
+    "prompt_eval_ms": 2215,
+    "eval_ms": 1512
+   },
+   "ttft_ms": 3763,
+   "total_ms": 3763
+  }
+ ]
+}

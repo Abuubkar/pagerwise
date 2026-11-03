@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nsearch, started 2026-10-28T10:10:14.581171+00:00\n\nSentence:\nA deploy to redis-cache shortly before the incident is a candidate cause . (this sentence cites 2 sources)\n\nSource:\nDeploy dep-0364: redis-cache version 3.37.35 deployed at 2026-10-28T10:08:00Z by Regina Wade (commit f21f2caf97, succeeded). Change: Refactor refund client."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"A deploy to redis-cache occurred.\", \"status\": \"stated\"}, {\"fact\": \"The deploy occurred shortly before the incident.\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"A deploy to redis-cache occurred.\", \"status\": \"stated\"}, {\"fact\": \"The deploy occurred shortly before the incident.\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 409,
+    "output_tokens": 41,
+    "total_ms": 4615,
+    "load_ms": 3,
+    "prompt_eval_ms": 1405,
+    "eval_ms": 2730
+   },
+   "ttft_ms": 4632,
+   "total_ms": 4632
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nA recent deploy to `inventory` is a candidate cause because past incidents show errors in `search` were caused by issues in its dependency `inventory` . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: orders elevated error rate (2026-02-07)\n\n## Summary\n\nOn 2026-02-07, orders returned errors for 76 minutes. The cause was in inventory.\nThe incident was sev2 and was opened by `OrdersErrorRateHigh`.\n\n## Impact\n\n- 51% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 776 customers saw errors; 49 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **13:49** inventory 2.26.7 deployed by Benjamin Davis.\n- **14:20** `OrdersErrorRateHigh` fired; on-call acknowledged.\n- **14:22** Checked the orders runbook for elevated error rate.\n- **15:14** Found the cause in inventory.\n- **15:18** Mitigation applied; error rate falling.\n- **15:36** Recovered; incident resolved.\n\n## Root cause\n\n2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.\n\nCategory: elevated error rate. Component: inventory.\n\n## Contributing factors\n\n- The elevated error rate alert for inventory had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n\n## Action items\n\n- ORDE-1624 (commerce): Add an alert on error_ratio_pct for inventory.\n- ORDE-9902 (discovery): Add a regression test for: 2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.\n- ORDE-3635 (discovery): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that a past incident in `search` was caused by an issue in its dependency `inventory`, which matches one of the facts in the claim.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that a past incident in `search` was caused by an issue in its dependency `inventory`, which matches one of the facts in the claim.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 554,
+    "output_tokens": 43,
+    "total_ms": 3953,
+    "load_ms": 0,
+    "prompt_eval_ms": 1973,
+    "eval_ms": 1907
+   },
+   "ttft_ms": 3971,
+   "total_ms": 3971
+  }
+ ]
+}

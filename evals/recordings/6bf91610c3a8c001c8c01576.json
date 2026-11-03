@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nCheck recent changes: `deployctl history payments --since 2h` .\n\nSource:\n# Payments: dependency timeouts\n\nAlert: `PaymentsUpstreamTimeouts` fires when the share of calls to a dependency that time out, `payments_upstream_timeout_pct`, stays above its threshold for 5 minutes. Payments is a\ncore-tier service owned by the payments team; it calls\ncard-auth, ledger, kafka-broker, and\napi-gateway, orders call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to card-auth.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n- **Dependency degraded.** card-auth itself is slow or partially down.\n- **Network path.** Packet loss between zones adds retransmits.\n\nThe most common cause on payments is timeout set too low: it explained 18 of the\nlast 26 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `payments-overview` dashboard and compare `payments_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history payments --since 2h`. A deploy in the last hour makes\n   \"timeout set too low\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n payments logs deploy/payments --since 15m | grep PAY-DEP-357\n   ```\n\n4. If `payments_upstream_timeout_pct` stays above 4 for 3 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check card-auth's own dashboard before changing anything in payments.\n\n## Mitigation\n\n1. Open the circuit breaker for card-auth if the feature can degrade.\n2. Fail over calls to the standby region for card-auth if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=200` on\n   payments (`configctl set payments upstream_timeout_ms 200`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states the fact that the claim is to check recent changes.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states the fact that the claim is to check recent changes.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 635,
+    "output_tokens": 25,
+    "total_ms": 3349,
+    "load_ms": 0,
+    "prompt_eval_ms": 2297,
+    "eval_ms": 1022
+   },
+   "ttft_ms": 3377,
+   "total_ms": 3377
+  }
+ ]
+}

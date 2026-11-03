@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nkafka-broker, started 2026-10-28T07:04:33.112729+00:00\n\nSentence:\nA config change in deploy 8.40.20 cut the timeout to its database below its normal p99 .\n\nSource:\n# Postmortem: kafka-broker dependency timeouts (2026-05-06)\n\n## Summary\n\nOn 2026-05-06, kafka-broker timed out calling its dependencies for 57 minutes. The cause was in kafka-broker.\nThe incident was sev1 and was opened by `KafkaBrokerUpstreamTimeouts`.\n\n## Impact\n\n- 44% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 30,395 customers saw errors; 31 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **11:58** kafka-broker 8.40.20 deployed by Anthony Tate.\n- **12:25** `KafkaBrokerUpstreamTimeouts` fired; on-call acknowledged.\n- **12:26** Checked the kafka-broker runbook for dependency timeouts.\n- **12:48** Found the cause in kafka-broker.\n- **13:08** Mitigation applied; error rate falling.\n- **13:22** Recovered; incident resolved.\n\n## Root cause\n\nA config change in 8.40.20 cut the timeout to its database to below its normal p99.\n\nCategory: dependency timeouts. Component: kafka-broker.\n\n## Contributing factors\n\n- The dependency timeouts alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-2600 (platform): Add an alert on upstream_timeout_pct for kafka-broker.\n- KAFK-5775 (platform): Add a regression test for: a config change in 8.40.20 cut the timeout to its database to below its normal p99.\n- KAFK-5438 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"A config change in deploy 8.40.20 cut the timeout to its database below its normal p99\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"A config change in deploy 8.40.20 cut the timeout to its database below its normal p99\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 920,
+    "output_tokens": 41,
+    "total_ms": 9428,
+    "load_ms": 2,
+    "prompt_eval_ms": 4596,
+    "eval_ms": 2778
+   },
+   "ttft_ms": 9451,
+   "total_ms": 9451
+  }
+ ]
+}

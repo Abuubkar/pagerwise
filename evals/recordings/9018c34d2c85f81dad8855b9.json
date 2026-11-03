@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nsearch, started 2026-10-28T10:26:21.529837+00:00\n\nSentence:\nUsers impacted are those making search requests, with specific counts of customers seeing errors in past incidents (e.g., 28,938 customers) .\n\nSource:\n# Postmortem: search regression after a deploy (2026-01-31)\n\n## Summary\n\nOn 2026-01-31, search broke after a deploy for 88 minutes. The cause was in inventory.\nThe incident was sev2 and was opened by `SearchPostDeployErrors`.\n\n## Impact\n\n- 40% of search requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 28,938 customers saw errors; 75 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **07:37** inventory 6.13.12 deployed by James Barnett.\n- **08:10** `SearchPostDeployErrors` fired; on-call acknowledged.\n- **08:36** Checked the search runbook for regression after a deploy.\n- **08:39** Found the cause in inventory.\n- **09:10** Mitigation applied; error rate falling.\n- **09:38** Recovered; incident resolved.\n\n## Root cause\n\n6.13.12 of inventory read a column that the migration hadn't added in production yet.\n\nCategory: regression after a deploy. Component: inventory.\n\n## Contributing factors\n\n- The regression after a deploy alert for inventory had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n\n## Action items\n\n- SEAR-7621 (discovery): Add an alert on post_deploy_error_pct for inventory.\n- SEAR-3056 (discovery): Add a regression test for: 6.13.12 of inventory read a column that the migration hadn't added in production yet.\n- SEAR-9405 (discovery): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"Users impacted are those making search requests\", \"status\": \"not_stated\"}, {\"fact\": \"28,938 customers saw errors in past incidents\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"Users impacted are those making search requests\", \"status\": \"not_stated\"}, {\"fact\": \"28,938 customers saw errors in past incidents\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 883,
+    "output_tokens": 48,
+    "total_ms": 12854,
+    "load_ms": 8,
+    "prompt_eval_ms": 4857,
+    "eval_ms": 3273
+   },
+   "ttft_ms": 12873,
+   "total_ms": 12873
+  }
+ ]
+}

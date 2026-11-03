@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nA deploy to redis-cache shortly before this incident is a candidate cause, as past incidents show that changes in redis-cache (such as version 4.24.18 or 5.11.11) have previously caused queue backlogs affecting search . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: redis-cache queue backlog (2026-05-21)\n\n## Summary\n\nOn 2026-05-21, redis-cache fell behind for 91 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `RedisCacheConsumerLagHigh`.\n\n## Impact\n\n- 24% of redis-cache requests failed or timed out at the peak.\n- Callers affected: auth, card-auth, search.\n- 24,918 customers saw errors; 23 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **15:54** redis-cache 4.24.18 deployed by Amy Miles.\n- **16:04** `RedisCacheConsumerLagHigh` fired; on-call acknowledged.\n- **16:06** Checked the redis-cache runbook for queue backlog.\n- **16:35** Found the cause in redis-cache.\n- **16:55** Mitigation applied; error rate falling.\n- **17:35** Recovered; incident resolved.\n\n## Root cause\n\n4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.\n\nCategory: queue backlog. Component: redis-cache.\n\n## Contributing factors\n\n- The queue backlog alert for redis-cache had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- REDI-7488 (platform): Add an alert on consumer_lag_msgs for redis-cache.\n- REDI-2882 (platform): Add a regression test for: 4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.\n- REDI-9744 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that changes in redis-cache, such as version 4.24.18, have previously caused queue backlogs affecting search, which matches the claim's facts.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that changes in redis-cache, such as version 4.24.18, have previously caused queue backlogs affecting search, which matches the claim's facts.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 596,
+    "output_tokens": 46,
+    "total_ms": 4064,
+    "load_ms": 1,
+    "prompt_eval_ms": 2031,
+    "eval_ms": 1996
+   },
+   "ttft_ms": 4080,
+   "total_ms": 4080
+  }
+ ]
+}

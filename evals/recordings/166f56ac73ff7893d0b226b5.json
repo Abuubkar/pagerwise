@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\ninventory, started 2026-10-28T10:48:16.615577+00:00\n\nSentence:\nThe incident occurred shortly after the deploy of search version 2.5.22 , which is a candidate cause if the regression affected dependent services like inventory.\n\nSource:\nDeploy gdep-09: search version 2.5.22 deployed at 2026-10-28T10:15:21.529837Z by Golden Set (commit 072c44b1d2, succeeded). Change: Release with the regression."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"The incident occurred shortly after the deploy of search version 2.5.22\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"search version 2.5.22 was deployed\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"search version 2.5.22 was deployed at 2026-10-28T10:15:21.529837Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was by Golden Set\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was with commit 072c44b1d2\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy succeeded\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was of search version 2.5.22\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the incident occurred shortly after the deploy\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"the regression was in a release\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the regression affected dependent services like inventory\",\n      \"status\": \"contradicted\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"The incident occurred shortly after the deploy of search version 2.5.22\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"search version 2.5.22 was deployed\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"search version 2.5.22 was deployed at 2026-10-28T10:15:21.529837Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was by Golden Set\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was with commit 072c44b1d2\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy succeeded\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the deploy was of search version 2.5.22\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the incident occurred shortly after the deploy\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"the regression was in a release\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the regression affected dependent services like inventory\",\n      \"status\": \"contradicted\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 385,
+    "output_tokens": 301,
+    "total_ms": 13177,
+    "load_ms": 1,
+    "prompt_eval_ms": 607,
+    "eval_ms": 12509
+   },
+   "ttft_ms": 13192,
+   "total_ms": 13192
+  }
+ ]
+}

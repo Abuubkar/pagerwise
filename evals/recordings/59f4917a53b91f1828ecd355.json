@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nkafka-broker, started 2026-10-28T07:41:28.245561+00:00\n\nSentence:\nA deploy to ledger shortly before the incident introduced a regression .\n\nSource:\nDeploy gdep-10: ledger version 6.3.4 deployed at 2026-10-28T07:50:45.498366Z by Golden Set (commit 045622cdb6, succeeded). Change: Release with the regression."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"A deploy to ledger occurred.\", \"status\": \"stated\"}, {\"fact\": \"The deploy occurred shortly before the incident.\", \"status\": \"contradicted\"}, {\"fact\": \"The deploy introduced a regression.\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"A deploy to ledger occurred.\", \"status\": \"stated\"}, {\"fact\": \"The deploy occurred shortly before the incident.\", \"status\": \"contradicted\"}, {\"fact\": \"The deploy introduced a regression.\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 404,
+    "output_tokens": 56,
+    "total_ms": 7849,
+    "load_ms": 2,
+    "prompt_eval_ms": 1851,
+    "eval_ms": 3769
+   },
+   "ttft_ms": 7879,
+   "total_ms": 7879
+  }
+ ]
+}

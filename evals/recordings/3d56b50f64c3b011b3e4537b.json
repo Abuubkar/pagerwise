@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nkafka-broker, started 2026-10-28T08:14:25.334086+00:00\n\nSentence:\nCheck its database's own dashboard before changing anything in kafka-broker.\n\nSource:\n# Kafka broker: dependency timeouts\n\nAlert: `KafkaBrokerUpstreamTimeouts` fires when the share of calls to a dependency that time out, `kafka_broker_upstream_timeout_pct`, stays above its threshold for 5 minutes. Kafka broker is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nledger, notifications, payments call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to its database.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Dependency degraded.** its database itself is slow or partially down.\n- **Network path.** Packet loss between zones adds retransmits.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on kafka-broker is dependency degraded: it explained 14 of the\nlast 16 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes\n   \"dependency degraded\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-DEP-358\n   ```\n\n4. If `kafka_broker_upstream_timeout_pct` stays above 9 for 4 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check its database's own dashboard before changing anything in kafka-broker."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"Check its database's own dashboard before changing anything in kafka-broker.\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"Check its database's own dashboard before changing anything in kafka-broker.\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 857,
+    "output_tokens": 30,
+    "total_ms": 10386,
+    "load_ms": 11,
+    "prompt_eval_ms": 3922,
+    "eval_ms": 2026
+   },
+   "ttft_ms": 10413,
+   "total_ms": 10413
+  }
+ ]
+}

@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npayments, started 2026-10-28T07:23:58.523603+00:00\n\nSentence:\nAdditionally, customers using these services see errors, as seen in past incidents where 15,833 to 34,209 customers were affected by similar pool exhaustion or latency issues . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: card-auth connection pool exhaustion (2025-10-20)\n\n## Summary\n\nOn 2025-10-20, card-auth ran out of database connections for 164 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `CardAuthPoolExhausted`.\n\n## Impact\n\n- 27% of card-auth requests failed or timed out at the peak.\n- Callers affected: payments.\n- 15,833 customers saw errors; 107 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **19:21** Routine traffic; nothing unusual in redis-cache.\n- **19:29** `CardAuthPoolExhausted` fired; on-call acknowledged.\n- **19:38** Checked the card-auth runbook for connection pool exhaustion.\n- **21:10** Found the cause in redis-cache.\n- **21:43** Mitigation applied; error rate falling.\n- **22:13** Recovered; incident resolved.\n\n## Root cause\n\nA retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.\n\nCategory: connection pool exhaustion. Component: redis-cache.\n\n## Contributing factors\n\n- The connection pool exhaustion alert for redis-cache had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- CARD-6253 (payments): Add an alert on pool_wait_ms for redis-cache.\n- CARD-1877 (payments): Add a regression test for: a retry loop in redis-cache leaked one connection per failed attempt until the pool was empty.\n- CARD-9476 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"customers using these services see errors\", \"status\": \"not_stated\"}, {\"fact\": \"15,833 to 34,209 customers were affected by similar pool exhaustion or latency issues\", \"status\": \"contradicted\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"customers using these services see errors\", \"status\": \"not_stated\"}, {\"fact\": \"15,833 to 34,209 customers were affected by similar pool exhaustion or latency issues\", \"status\": \"contradicted\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 792,
+    "output_tokens": 60,
+    "total_ms": 13154,
+    "load_ms": 10,
+    "prompt_eval_ms": 5183,
+    "eval_ms": 4093
+   },
+   "ttft_ms": 13178,
+   "total_ms": 13178
+  }
+ ]
+}

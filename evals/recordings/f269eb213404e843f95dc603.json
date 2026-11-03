@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nCheck recent changes: `deployctl history search --since 2h` .\n\nSource:\n# Search: TLS certificate expiry\n\nAlert: `SearchCertExpiring` fires when a certificate's remaining validity, `search_cert_days_left`, drops below its threshold. Search is a\nsupporting-tier service owned by the discovery team; it calls\ninventory, redis-cache, and\napi-gateway call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n\nThe most common cause on search is renewal job failed: it explained 13 of the\nlast 21 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `search-overview` dashboard and compare `search_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history search --since 2h`. A deploy in the last hour makes\n   \"renewal job failed\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n discovery logs deploy/search --since 15m | grep SEA-TLS-832\n   ```\n\n4. If `search_cert_days_left` stays above 4 for 12 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect search:443 | openssl x509 -noout -enddate`.\n\n## Mitigation\n\n1. Force renewal: `kubectl -n platform annotate certificate search renew=now`.\n2. Restart pods so they load the new certificate.\n3. If that doesn't help within 10 minutes, set `tls_min_version=63` on\n   search (`configctl set search tls_min_version 63`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source describes a command to check recent changes, which matches the claim.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source describes a command to check recent changes, which matches the claim.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 627,
+    "output_tokens": 26,
+    "total_ms": 3814,
+    "load_ms": 6,
+    "prompt_eval_ms": 2519,
+    "eval_ms": 1215
+   },
+   "ttft_ms": 3833,
+   "total_ms": 3833
+  }
+ ]
+}

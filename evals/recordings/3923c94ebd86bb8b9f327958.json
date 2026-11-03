@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe evidence indicates that recent deploys to postgres-primary have historically caused latency issues in inventory, but no specific deploy tag exists for postgres-primary in the provided evidence . (this sentence cites 3 sources)\n\nSource:\n# Postmortem: inventory queue backlog (2025-06-04)\n\n## Summary\n\nOn 2025-06-04, inventory fell behind for 66 minutes. The cause was in postgres-primary.\nThe incident was sev1 and was opened by `InventoryConsumerLagHigh`.\n\n## Impact\n\n- 15% of inventory requests failed or timed out at the peak.\n- Callers affected: orders, search.\n- 8,032 customers saw errors; 16 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **22:04** postgres-primary 7.35.3 deployed by Scott Roberts.\n- **22:09** `InventoryConsumerLagHigh` fired; on-call acknowledged.\n- **22:09** Checked the inventory runbook for queue backlog.\n- **22:10** Found the cause in postgres-primary.\n- **22:28** Mitigation applied; error rate falling.\n- **23:15** Recovered; incident resolved.\n\n## Root cause\n\n7.35.3 of postgres-primary made an external call per message, cutting throughput by two thirds.\n\nCategory: queue backlog. Component: postgres-primary.\n\n## Contributing factors\n\n- The queue backlog alert for postgres-primary had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n\n## Action items\n\n- INVE-5512 (discovery): Add an alert on consumer_lag_msgs for postgres-primary.\n- INVE-8385 (discovery): Add a regression test for: 7.35.3 of postgres-primary made an external call per message, cutting throughput by two thirds.\n- INVE-1821 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that a recent deploy to postgres-primary caused latency issues in inventory, and also mentions that no specific deploy tag exists for postgres-primary in the provided evidence.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that a recent deploy to postgres-primary caused latency issues in inventory, and also mentions that no specific deploy tag exists for postgres-primary in the provided evidence.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 564,
+    "output_tokens": 44,
+    "total_ms": 3808,
+    "load_ms": 0,
+    "prompt_eval_ms": 1925,
+    "eval_ms": 1838
+   },
+   "ttft_ms": 3819,
+   "total_ms": 3819
+  }
+ ]
+}

@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npayments, started 2026-10-28T06:15:18.167220+00:00\n\nSentence:\nA recent deploy to orders (which calls payments) may have triggered increased load, but the evidence points primarily to a slow dependency like the ledger pool or a stale query plan in payments/kafka-broker causing latency . (this sentence cites 3 sources)\n\nSource:\n# Postmortem: payments high p99 latency (2026-10-30)\n\n## Summary\n\nOn 2026-10-30, payments was slow for 148 minutes. The cause was in payments.\nThe incident was sev1 and was opened by `PaymentsLatencyHigh`.\n\n## Impact\n\n- 4% of payments requests failed or timed out at the peak.\n- Callers affected: api-gateway, orders.\n- 2,336 customers saw errors; 108 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **01:50** Routine traffic; nothing unusual in payments.\n- **02:08** `PaymentsLatencyHigh` fired; on-call acknowledged.\n- **02:24** Checked the payments runbook for high p99 latency.\n- **02:35** Found the cause in payments.\n- **03:11** Mitigation applied; error rate falling.\n- **04:36** Recovered; incident resolved.\n\n## Root cause\n\nA slow query plan in payments after statistics went stale made p99 climb to 2989 ms.\n\nCategory: high p99 latency. Component: payments.\n\n## Contributing factors\n\n- The high p99 latency alert for payments had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- PAYM-8817 (payments): Add an alert on p99_latency_ms for payments.\n- PAYM-3173 (payments): Add a regression test for: a slow query plan in payments after statistics went stale made p99 climb to 2989 ms.\n- PAYM-4358 (payments): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"A recent deploy to orders (which calls payments)\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"may have triggered increased load\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"but the evidence points primarily to a slow dependency like the ledger pool or a stale query plan in payments/kafka-broker causing latency\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"payments was slow for 148 minutes\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The cause was in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident was sev1\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"4% of payments requests failed or timed out at the peak\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Callers affected: api-gateway, orders\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"2,336 customers saw errors; 108 support tickets were opened\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Routine traffic; nothing unusual in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"PaymentsLatencyHigh fired; on-call acknowledged\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Checked the payments runbook for high p99 latency\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Found the cause in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Mitigation applied; error rate falling\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Recovered; incident resolved\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A slow query plan in payments after statistics went stale made p99 climb to 2989 ms\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The high p99 latency alert for payments had no runbook link\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Two teams investigated the same symptom without knowing it\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Dashboards showed averages, which hid the p99\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Add an alert on p99_latency_ms for payments\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"Add a regression test for: a slow query plan in payments after statistics went stale made p99 climb to 2989 ms\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"Link the runbook from the alert\",\n      \"status\": \"not_stated\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"A recent deploy to orders (which calls payments)\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"may have triggered increased load\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"but the evidence points primarily to a slow dependency like the ledger pool or a stale query plan in payments/kafka-broker causing latency\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"payments was slow for 148 minutes\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The cause was in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The incident was sev1\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"4% of payments requests failed or timed out at the peak\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Callers affected: api-gateway, orders\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"2,336 customers saw errors; 108 support tickets were opened\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Routine traffic; nothing unusual in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"PaymentsLatencyHigh fired; on-call acknowledged\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Checked the payments runbook for high p99 latency\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Found the cause in payments\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Mitigation applied; error rate falling\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Recovered; incident resolved\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A slow query plan in payments after statistics went stale made p99 climb to 2989 ms\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The high p99 latency alert for payments had no runbook link\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Two teams investigated the same symptom without knowing it\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Dashboards showed averages, which hid the p99\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Add an alert on p99_latency_ms for payments\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"Add a regression test for: a slow query plan in payments after statistics went stale made p99 climb to 2989 ms\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"Link the runbook from the alert\",\n      \"status\": \"not_stated\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 701,
+    "output_tokens": 638,
+    "total_ms": 28807,
+    "load_ms": 0,
+    "prompt_eval_ms": 2041,
+    "eval_ms": 26707
+   },
+   "ttft_ms": 28820,
+   "total_ms": 28820
+  }
+ ]
+}

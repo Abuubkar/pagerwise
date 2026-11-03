@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe alert `ApiGatewayErrorRateHigh` fired shortly after deploys to auth (dep-0366) and payments (dep-0367, dep-0365), making a bad deploy or expired credentials in a dependency the most likely causes . (this sentence cites 4 sources)\n\nSource:\nDeploy dep-0366: auth version 8.14.25 deployed at 2026-10-28T11:18:00Z by Lori Krueger (commit 402607f1ea, succeeded). Change: Roll out inventory behind a flag."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"supports\": false,\n  \"reason\": \"The source does not mention the alert firing or the likelihood of a bad deploy or expired credentials.\"\n}"
+   ],
+   "result": {
+    "content": "{\n  \"supports\": false,\n  \"reason\": \"The source does not mention the alert firing or the likelihood of a bad deploy or expired credentials.\"\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 285,
+    "output_tokens": 33,
+    "total_ms": 2021,
+    "load_ms": 0,
+    "prompt_eval_ms": 602,
+    "eval_ms": 1380
+   },
+   "ttft_ms": 2034,
+   "total_ms": 2034
+  }
+ ]
+}

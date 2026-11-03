@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nIf `inventory_p99_latency_ms` stays above 1648 for 6 minutes, treat it as high p99 latency and move to mitigation; below that it usually recovers on its own .\n\nSource:\n# Inventory: high p99 latency\n\nAlert: `InventoryLatencyHigh` fires when the p99 of `inventory_p99_latency_ms` stays above its threshold for 5 minutes. Inventory is a\nsupporting-tier service owned by the discovery team; it calls\npostgres-primary, and\norders, search call it.\n\n## Symptoms\n\n- p99 rises first; p50 usually stays flat until the problem spreads.\n- Time spent waiting on postgres-primary grows faster than time spent in the service itself.\n- Request rate is normal: this is slowness, not extra load.\n\n## Likely causes\n\n- **Garbage collection pauses.** Heap close to its limit makes collection pauses show up in p99.\n- **Slow dependency.** Most latency is spent waiting on postgres-primary; check its own latency first.\n- **Lock contention.** Long-held row or mutex locks serialize requests under normal load.\n\nThe most common cause on inventory is garbage collection pauses: it explained 22 of the\nlast 28 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `inventory-overview` dashboard and compare `inventory_p99_latency_ms` with the\n   same hour last week.\n2. Check recent changes: `deployctl history inventory --since 2h`. A deploy in the last hour makes\n   \"garbage collection pauses\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n discovery logs deploy/inventory --since 15m | grep INV-LAT-501\n   ```\n\n4. If `inventory_p99_latency_ms` stays above 1648 for 6 minutes, treat it as\n   high p99 latency and move to mitigation; below that it usually recovers on its own.\n5. Compare the service's own processing time with the time spent waiting on postgres-primary."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states the claim's facts, specifically that if `inventory_p99_latency_ms` stays above 1648 for 6 minutes, it should be treated as high p99 latency and moved to mitigation.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states the claim's facts, specifically that if `inventory_p99_latency_ms` stays above 1648 for 6 minutes, it should be treated as high p99 latency and moved to mitigation.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 601,
+    "output_tokens": 53,
+    "total_ms": 4875,
+    "load_ms": 1,
+    "prompt_eval_ms": 2442,
+    "eval_ms": 2338
+   },
+   "ttft_ms": 4904,
+   "total_ms": 4904
+  }
+ ]
+}

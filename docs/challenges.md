@@ -217,3 +217,47 @@ became v2, and the baseline treated a faster clustering run (fewer seconds) as a
 
 **Full-text search contributes nothing on incident queries** (0.00 on both metrics): `websearch_to_tsquery` ANDs
 every word. Noted in ADR 0009; OR-of-terms is the next thing to try.
+
+## Slice 6b: triage eval, citation checks, cause decision line
+
+**No local judge model could be trusted for citations.** judge/1 with llama3.1:8b got kappa 0.371 against the hand
+labels; three of those disagreements were my own labelling mistakes (one inconsistent with another row, one needing
+a time the judge couldn't see). Per-fact statuses with the yes/no rule in code helped gemma4:12b to 0.60–0.61 on the
+tune rows, but held-out rows gave 0.26: the prompt was fitting the tune rows.
+- *Did:* stopped tuning; citations are checked deterministically (tokens in the cited source, deploy timing,
+  postmortems framed as past). Held-out agreement 0.81, kappa 0.61. ADR 0010.
+
+**The label check compared labels with the wrong briefs.** It took each labelled sentence's other citations from the
+run being scored; after a fresh live run those sentences didn't exist, multi-cite rows failed, and kappa "fell" from
+0.61 to 0.375.
+- *Did:* the check reads the run the labels were drawn from (`CALIBRATION_BRIEFS`): it measures the check, not a run.
+
+**The model cited deploys from after the incident as its cause.** The deploy window ran 15 minutes past the open
+time, and a 9B model can't compare ISO timestamps reliably. The golden deploys also gave the cause away (author
+"Golden Set", summaries naming the failure).
+- *Did:* deploys end at the open time and each says "It was N minutes before the incident opened"; golden deploys
+  look like any release. Deploy citations after start: 5 → 0.
+
+**The model reasons its way to "no match" but won't write the token.** With every rule in prose, 12 of 30
+unanswerable briefs explained that nothing matched and still came out CAUSE_IDENTIFIED; 12 blamed a nearby deploy.
+- *Did:* Likely cause opens with `Match: [Cn]` or `Match: none`, applied in code (`LikelyCauseGate`); a deploy alone is
+  never a cause. Abstention 0.10 → 0.40 on the full dev run, still under its 0.80 gate. What's left is the model
+  matching a runbook for a different failure (kernel soft lockup → "CPU saturation"), the misleading-context failure
+  small models are known for; no wording change will fix it on this model.
+
+**The gate dropped causes written on the decision line.** The model sometimes wrote `Match: [C1] The pool is
+exhausted…` on one line; the gate dropped the whole line and left Likely cause empty (3 `format_invalid` briefs in
+the full run).
+- *Did:* the gate keeps what follows the tags on that line; a test covers it. Replaying the same recorded outputs
+  through the fixed gate: format validity 0.902 → 0.927, hit@1 0.76 → 0.80.
+
+**The decision line cost citation discipline.** triage/6 briefs have 13 uncited cause or impact sentences in the
+first repeat, triage/5 had 3; many are sentences about the rule itself ("A deploy shortly before the incident is not
+mentioned"). Unsupported-claim rate 0.046 → 0.158 and format validity under its gate.
+- *Did:* kept triage/6 anyway: a wrong cause on an unanswerable incident looks exactly like a right one, while a
+  missing tag is visible. Recorded as a miss in ADR 0010; not tuned further.
+
+**I moved gates after seeing results, and showed smoke-run noise as misses.** I proposed TTFT 20 s from one 18.8 s
+run, then lengthened the prompt and went over it; a 26-brief smoke run's numbers read as new failures.
+- *Did:* gates are frozen for the rest of the slice; only full runs (all cases, 3 repeats) are judged against them;
+  misses are reported as misses.

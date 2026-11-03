@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe evidence indicates that recent changes in redis-cache have previously caused CPU saturation via hot loops or regressions . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: inventory CPU saturation (2026-06-16)\n\n## Summary\n\nOn 2026-06-16, inventory was saturated for 175 minutes. The cause was in postgres-primary.\nThe incident was sev2 and was opened by `InventoryCPUSaturated`.\n\n## Impact\n\n- 17% of inventory requests failed or timed out at the peak.\n- Callers affected: orders, search.\n- 12,273 customers saw errors; 72 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **00:29** postgres-primary 1.33.11 deployed by Melissa Sanchez.\n- **01:04** `InventoryCPUSaturated` fired; on-call acknowledged.\n- **01:07** Checked the inventory runbook for CPU saturation.\n- **01:27** Found the cause in postgres-primary.\n- **02:48** Mitigation applied; error rate falling.\n- **03:59** Recovered; incident resolved.\n\n## Root cause\n\npostgres-primary recomputed a full price table per request after a cache key change in 1.33.11.\n\nCategory: CPU saturation. Component: postgres-primary.\n\n## Contributing factors\n\n- The CPU saturation alert for postgres-primary had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n\n## Action items\n\n- INVE-3678 (platform): Add an alert on cpu_util_pct for postgres-primary.\n- INVE-1076 (platform): Add a regression test for: postgres-primary recomputed a full price table per request after a cache key change in 1.33.11.\n- INVE-9516 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that a recent change in postgres-primary caused CPU saturation, which matches one of the facts in the claim.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that a recent change in postgres-primary caused CPU saturation, which matches one of the facts in the claim.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 549,
+    "output_tokens": 35,
+    "total_ms": 3201,
+    "load_ms": 0,
+    "prompt_eval_ms": 1768,
+    "eval_ms": 1415
+   },
+   "ttft_ms": 3215,
+   "total_ms": 3215
+  }
+ ]
+}

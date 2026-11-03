@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nnotifications, started 2026-10-28T09:27:22.427058+00:00\n\nSentence:\nCheck expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate` .\n\nSource:\n# Notifications: TLS certificate expiry\n\nAlert: `NotificationsCertExpiring` fires when a certificate's remaining validity, `notifications_cert_days_left`, drops below its threshold. Notifications is a\nsupporting-tier service owned by the growth team; it calls\nkafka-broker, and\norders call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n\nThe most common cause on notifications is clock skew: it explained 9 of the\nlast 14 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes\n   \"clock skew\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-TLS-302\n   ```\n\n4. If `notifications_cert_days_left` stays above 8 for 10 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate`."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate`\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"Check expiry with `openssl s_client -connect notifications:443 | openssl x509 -noout -enddate`\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 737,
+    "output_tokens": 46,
+    "total_ms": 9703,
+    "load_ms": 17,
+    "prompt_eval_ms": 3960,
+    "eval_ms": 3113
+   },
+   "ttft_ms": 9749,
+   "total_ms": 9749
+  }
+ ]
+}

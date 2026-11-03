@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nauth, started 2026-10-28T09:42:17.580818+00:00\n\nSentence:\nThe most likely cause is a memory leak in a recent release of the auth service, as this explained 22 of the last 22 pages for this alert .\n\nSource:\n# Auth: memory pressure and OOM kills\n\nAlert: `AuthMemoryPressure` fires when container memory, `auth_rss_pct_of_limit`, stays above its threshold for 10 minutes or a pod is OOM-killed. Auth is a\ncore-tier service owned by the identity team; it calls\nredis-cache, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Pods restart with reason OOMKilled.\n- Memory climbs steadily between restarts: a sawtooth.\n- Latency spikes right before each restart.\n\n## Likely causes\n\n- **Memory leak in a recent release.** A new code path keeps references to finished requests.\n- **Large payloads.** A few very large requests allocate far more than usual.\n- **Unbounded cache.** An in-process cache without a size limit grows with traffic.\n\nThe most common cause on auth is memory leak in a recent release: it explained 22 of the\nlast 22 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `auth-overview` dashboard and compare `auth_rss_pct_of_limit` with the\n   same hour last week.\n2. Check recent changes: `deployctl history auth --since 2h`. A deploy in the last hour makes\n   \"memory leak in a recent release\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n identity logs deploy/auth --since 15m | grep AUT-MEM-724\n   ```\n\n4. If `auth_rss_pct_of_limit` stays above 97 for 8 minutes, treat it as\n   memory pressure and OOM kills and move to mitigation; below that it usually recovers on its own.\n5. Compare memory growth rate before and after the last deploy."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"The most likely cause is a memory leak in a recent release of the auth service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"this explained 22 of the last 22 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Auth is a core-tier service owned by the identity team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"it calls redis-cache, postgres-primary, and api-gateway\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"memory leak in a recent release is the most common cause on auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"it explained 22 of the last 22 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a new code path keeps references to finished requests\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"a few very large requests allocate far more than usual\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"an in-process cache without a size limit grows with traffic\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"the auth service is a core-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the auth service is owned by the identity team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the auth service calls redis-cache, postgres-primary, and api-gateway\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"memory pressure and OOM kills are treated as a single issue\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a single issue with memory pressure\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n   "
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"The most likely cause is a memory leak in a recent release of the auth service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"this explained 22 of the last 22 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Auth is a core-tier service owned by the identity team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"it calls redis-cache, postgres-primary, and api-gateway\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"memory leak in a recent release is the most common cause on auth\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"it explained 22 of the last 22 pages for this alert\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a new code path keeps references to finished requests\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"a few very large requests allocate far more than usual\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"an in-process cache without a size limit grows with traffic\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"the auth service is a core-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the auth service is owned by the identity team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the auth service calls redis-cache, postgres-primary, and api-gateway\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"memory pressure and OOM kills are treated as a single issue\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a single issue with memory pressure\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"OOM kills are treated as a separate issue from memory pressure\",\n      \"status\": \"contradicted\"\n   ",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 710,
+    "output_tokens": 1024,
+    "total_ms": 45392,
+    "load_ms": 0,
+    "prompt_eval_ms": 2051,
+    "eval_ms": 43304
+   },
+   "ttft_ms": 45410,
+   "total_ms": 45410
+  }
+ ]
+}
