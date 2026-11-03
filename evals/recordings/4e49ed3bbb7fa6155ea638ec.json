@@ -1,0 +1,168 @@
+{
+ "request": {
+  "model": "qwen3.5:9b-q4_K_M",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You write the first triage brief for an incident, for the on-call engineer. Use only the evidence below. It comes from three sources: runbooks (how to handle a failure), postmortems (past incidents) and deploys (recent releases). Each item starts with a tag such as [C1]. The incident description after the evidence is what you are triaging; it is not evidence and not a past incident.\n\nWrite exactly these four sections, in this order, each starting with its heading line, and nothing before the first:\n\n## Likely cause\n## Blast radius\n## First steps\n## Similar incidents\n\nRules:\n1. End every sentence that states a fact with the tag of the item that supports it, for example: \"Payments p99 rises when the ledger pool drops below 20 idle connections [C2].\" If two items support it, write both tags: [C2][C5].\n2. Only use tags that appear in the evidence. Never make up a tag. Do not use knowledge from outside the evidence.\n3. Likely cause: its first line is \"Match: \" and the tag of the runbook or postmortem that describes this incident's failure (the same kind of symptom on the affected service or one it depends on), or \"Match: none\" if no item does. A runbook for a different failure does not match, and a deploy never does. After \"Match: none\", write nothing else in the section. After a match, on the next lines, give the most likely cause and why, in at most 3 sentences; a deploy shortly before the incident (each deploy says how long before it was) to the affected service or a service it depends on is a candidate cause: say so with its tag.\n4. Blast radius: which services and users are affected, per the evidence. If the evidence says nothing about it, the whole section is exactly INSUFFICIENT_EVIDENCE.\n5. First steps: a numbered list of at most 5 steps from the evidence, each ending with its tag. Include the exact commands from the items. If there are none, the whole section is exactly INSUFFICIENT_EVIDENCE.\n6. Similar incidents: past incidents that a postmortem describes, with tags. A runbook's instructions and a deploy are not past incidents. If no postmortem describes a similar past incident, the whole section is exactly: None in the evidence.\n7. Unavailable sources: if the message lists sources that were unavailable, you know nothing about them. Do not state, guess or imply anything about what they contain, including that they contain nothing. Other evidence does not stand in for them: if deploys are unavailable, never say this incident followed a deploy, or that it didn't, even when a postmortem or runbook mentions a deploy; a postmortem describes a past incident, not this one. You may add a first step to check that source by hand, without a tag."
+   },
+   {
+    "role": "user",
+    "content": "Evidence:\n\n[C1] (runbook search-dependency-timeout.md: Search: dependency timeouts)\n# Search: dependency timeouts\n\nAlert: `SearchUpstreamTimeouts` fires when the share of calls to a dependency that time out, `search_upstream_timeout_pct`, stays above its threshold for 5 minutes. Search is a\nsupporting-tier service owned by the discovery team; it calls\ninventory, redis-cache, and\napi-gateway call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to inventory.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n- **Network path.** Packet loss between zones adds retransmits.\n- **Dependency degraded.** inventory itself is slow or partially down.\n\nThe most common cause on search is timeout set too low: it explained 19 of the\nlast 27 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `search-overview` dashboard and compare `search_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history search --since 2h`. A deploy in the last hour makes\n   \"timeout set too low\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n discovery logs deploy/search --since 15m | grep SEA-DEP-164\n   ```\n\n4. If `search_upstream_timeout_pct` stays above 1 for 12 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check inventory's own dashboard before changing anything in search.\n\n## Mitigation\n\n1. Open the circuit breaker for inventory if the feature can degrade.\n2. Fail over calls to the standby region for inventory if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=180` on\n   search (`configctl set search upstream_timeout_ms 180`) and restart one pod at a\n   time.\n\n[C2] (runbook search-dependency-timeout.md: Search: dependency timeouts > Escalation)\n## Escalation\n\nPage the discovery secondary after 30 minutes without improvement, or at once if more than\n20% of search requests are failing. Coordinate in `#discovery-oncall`.\n\n[C3] (runbook search-cert-expiry.md: Search: TLS certificate expiry)\n# Search: TLS certificate expiry\n\nAlert: `SearchCertExpiring` fires when a certificate's remaining validity, `search_cert_days_left`, drops below its threshold. Search is a\nsupporting-tier service owned by the discovery team; it calls\ninventory, redis-cache, and\napi-gateway call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n\nThe most common cause on search is renewal job failed: it explained 13 of the\nlast 21 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `search-overview` dashboard and compare `search_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history search --since 2h`. A deploy in the last hour makes\n   \"renewal job failed\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n discovery logs deploy/search --since 15m | grep SEA-TLS-832\n   ```\n\n4. If `search_cert_days_left` stays above 4 for 12 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect search:443 | openssl x509 -noout -enddate`.\n\n## Mitigation\n\n1. Force renewal: `kubectl -n platform annotate certificate search renew=now`.\n2. Restart pods so they load the new certificate.\n3. If that doesn't help within 10 minutes, set `tls_min_version=63` on\n   search (`configctl set search tls_min_version 63`) and restart one pod at a\n   time.\n\n[C4] (runbook search-cert-expiry.md: Search: TLS certificate expiry > Escalation)\n## Escalation\n\nPage the discovery secondary after 45 minutes without improvement, or at once if more than\n10% of search requests are failing. Coordinate in `#discovery-oncall`.\n\n[C5] (postmortem 2026-02-13-search-connection-pool.md: Postmortem: search connection pool exhaustion (2026-02-13))\n# Postmortem: search connection pool exhaustion (2026-02-13)\n\n## Summary\n\nOn 2026-02-13, search ran out of database connections for 116 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `SearchPoolExhausted`.\n\n## Impact\n\n- 47% of search requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 11,589 customers saw errors; 25 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **01:37** redis-cache 5.11.11 deployed by Jody Evans.\n- **01:50** `SearchPoolExhausted` fired; on-call acknowledged.\n- **02:13** Checked the search runbook for connection pool exhaustion.\n- **02:17** Found the cause in redis-cache.\n- **02:25** Mitigation applied; error rate falling.\n- **03:46** Recovered; incident resolved.\n\n## Root cause\n\n5.11.11 of redis-cache opened a transaction before calling an external API, holding connections for up to 3577 ms.\n\nCategory: connection pool exhaustion. Component: redis-cache.\n\n## Contributing factors\n\n- The connection pool exhaustion alert for redis-cache had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n\n## Action items\n\n- SEAR-9117 (platform): Add an alert on pool_wait_ms for redis-cache.\n- SEAR-3872 (discovery): Add a regression test for: 5.11.11 of redis-cache opened a transaction before calling an external api, holding connections for up to 3577 ms.\n- SEAR-3245 (discovery): Link the runbook from the alert.\n\n[C6] (postmortem 2026-08-07-search-disk-full.md: Postmortem: search disk full (2026-08-07))\n# Postmortem: search disk full (2026-08-07)\n\n## Summary\n\nOn 2026-08-07, search stopped accepting writes for 145 minutes. The cause was in redis-cache.\nThe incident was sev1 and was opened by `SearchDiskFull`.\n\n## Impact\n\n- 48% of search requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 23,376 customers saw errors; 81 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **19:13** Routine traffic; nothing unusual in redis-cache.\n- **19:29** `SearchDiskFull` fired; on-call acknowledged.\n- **20:22** Checked the search runbook for disk full.\n- **20:56** Found the cause in redis-cache.\n- **21:14** Mitigation applied; error rate falling.\n- **21:54** Recovered; incident resolved.\n\n## Root cause\n\nThe retention job for redis-cache had failed for 143 hours after a cron syntax change.\n\nCategory: disk full. Component: redis-cache.\n\n## Contributing factors\n\n- The disk full alert for redis-cache had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- SEAR-5495 (platform): Add an alert on disk_used_pct for redis-cache.\n- SEAR-7548 (discovery): Add a regression test for: the retention job for redis-cache had failed for 143 hours after a cron syntax change.\n- SEAR-1218 (discovery): Link the runbook from the alert.\n\n[C7] (postmortem 2025-09-16-search-cpu-saturation.md: Postmortem: search CPU saturation (2025-09-16))\n# Postmortem: search CPU saturation (2025-09-16)\n\n## Summary\n\nOn 2025-09-16, search was saturated for 189 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `SearchCPUSaturated`.\n\n## Impact\n\n- 53% of search requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 32,871 customers saw errors; 97 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **12:50** redis-cache 3.19.0 deployed by Joel Jackson.\n- **13:01** `SearchCPUSaturated` fired; on-call acknowledged.\n- **13:46** Checked the search runbook for CPU saturation.\n- **13:49** Found the cause in redis-cache.\n- **14:00** Mitigation applied; error rate falling.\n- **16:10** Recovered; incident resolved.\n\n## Root cause\n\nA regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning CPU at 3206%.\n\nCategory: CPU saturation. Component: redis-cache.\n\n## Contributing factors\n\n- The CPU saturation alert for redis-cache had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n\n## Action items\n\n- SEAR-2079 (platform): Add an alert on cpu_util_pct for redis-cache.\n- SEAR-2440 (discovery): Add a regression test for: a regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning cpu at 3206%.\n- SEAR-5727 (discovery): Link the runbook from the alert.\n\n[C8] (deploy dep-0363: deploy api-gateway 4.23.26)\nDeploy dep-0363: api-gateway version 4.23.26 deployed at 2026-10-28T08:56:00Z by Gloria Jackson (commit a0f24fe0b4, succeeded). Change: Increase refund cache TTL. It was 10 minutes before the incident opened.\n\n[C9] (deploy gdep-07: deploy api-gateway 2.31.1)\nDeploy gdep-07: api-gateway version 2.31.1 deployed at 2026-10-28T08:08:43.659038Z by release-bot (commit 2ddd3869d9, succeeded). Change: Release 2.31.1. It was 57 minutes before the incident opened.\n\nIncident:\nTitle: SearchDnsResolutionFailures on search\nService: search\nSeverity: sev1\nOpened: 2026-10-28T09:05:50.169293+00:00\nSummary: DNS lookups failing with SERVFAIL for 60% of calls on search-4"
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3418,
+    "output_tokens": 40,
+    "total_ms": 18629,
+    "load_ms": 1,
+    "prompt_eval_ms": 16041,
+    "eval_ms": 1850
+   },
+   "ttft_ms": 16801,
+   "total_ms": 18644
+  },
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3418,
+    "output_tokens": 40,
+    "total_ms": 18920,
+    "load_ms": 1,
+    "prompt_eval_ms": 16140,
+    "eval_ms": 1817
+   },
+   "ttft_ms": 17122,
+   "total_ms": 18929
+  },
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3418,
+    "output_tokens": 40,
+    "total_ms": 18979,
+    "load_ms": 2,
+    "prompt_eval_ms": 16227,
+    "eval_ms": 1840
+   },
+   "ttft_ms": 17155,
+   "total_ms": 18989
+  }
+ ]
+}

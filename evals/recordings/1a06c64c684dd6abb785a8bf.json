@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nScale consumers up to the partition count .\n\nSource:\n# Api gateway: queue backlog\n\nAlert: `ApiGatewayConsumerLagHigh` fires when consumer lag, `api_gateway_consumer_lag_msgs`, stays above its threshold for 10 minutes. Api gateway is a\nedge-tier service owned by the platform team; it calls\nauth, payments, orders, search.\n\n## Symptoms\n\n- Consumer lag grows steadily.\n- Processing rate is lower than the produce rate.\n- Downstream data is stale.\n\n## Likely causes\n\n- **Too few consumers.** Consumers crashed or were scaled down.\n- **Slow consumers.** Each message takes longer to process than usual.\n- **Poison message.** One message fails and blocks its partition.\n\nThe most common cause on api-gateway is too few consumers: it explained 10 of the\nlast 14 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `api-gateway-overview` dashboard and compare `api_gateway_consumer_lag_msgs` with the\n   same hour last week.\n2. Check recent changes: `deployctl history api-gateway --since 2h`. A deploy in the last hour makes\n   \"too few consumers\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/api-gateway --since 15m | grep API-QUEUE-272\n   ```\n\n4. If `api_gateway_consumer_lag_msgs` stays above 65515 for 8 minutes, treat it as\n   queue backlog and move to mitigation; below that it usually recovers on its own.\n5. Check whether lag grows on all partitions or a few: a few points at a poison message or hot key.\n\n## Mitigation\n\n1. Scale consumers up to the partition count.\n2. Skip and dead-letter a poison message after 3 attempts.\n3. If that doesn't help within 10 minutes, set `dlq_after_attempts=9` on\n   api-gateway (`configctl set api-gateway dlq_after_attempts 9`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that the most common cause of the alert is too few consumers, which supports the claim to scale consumers up to the partition count.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that the most common cause of the alert is too few consumers, which supports the claim to scale consumers up to the partition count.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 615,
+    "output_tokens": 40,
+    "total_ms": 4539,
+    "load_ms": 1,
+    "prompt_eval_ms": 2611,
+    "eval_ms": 1898
+   },
+   "ttft_ms": 4560,
+   "total_ms": 4560
+  }
+ ]
+}

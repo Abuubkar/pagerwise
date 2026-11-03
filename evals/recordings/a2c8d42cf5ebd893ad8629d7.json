@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nSearch the logs for the error code this failure logs: `kubectl -n payments logs deploy/payments --since 15m | grep PAY-TLS-723` .\n\nSource:\n# Payments: TLS certificate expiry\n\nAlert: `PaymentsCertExpiring` fires when a certificate's remaining validity, `payments_cert_days_left`, drops below its threshold. Payments is a\ncore-tier service owned by the payments team; it calls\ncard-auth, ledger, kafka-broker, and\napi-gateway, orders call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n\nThe most common cause on payments is pinned intermediate: it explained 11 of the\nlast 12 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `payments-overview` dashboard and compare `payments_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history payments --since 2h`. A deploy in the last hour makes\n   \"pinned intermediate\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n payments logs deploy/payments --since 15m | grep PAY-TLS-723\n   ```\n\n4. If `payments_cert_days_left` stays above 10 for 5 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect payments:443 | openssl x509 -noout -enddate`."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states the fact that the claim is to search the logs for the error code this failure logs.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states the fact that the claim is to search the logs for the error code this failure logs.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 571,
+    "output_tokens": 32,
+    "total_ms": 3697,
+    "load_ms": 0,
+    "prompt_eval_ms": 2106,
+    "eval_ms": 1580
+   },
+   "ttft_ms": 3707,
+   "total_ms": 3707
+  }
+ ]
+}

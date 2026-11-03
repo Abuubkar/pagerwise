@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nAlternatively, a recent deploy to kafka-broker or a service it depends on is a candidate cause . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: kafka-broker dependency timeouts (2026-05-06)\n\n## Summary\n\nOn 2026-05-06, kafka-broker timed out calling its dependencies for 57 minutes. The cause was in kafka-broker.\nThe incident was sev1 and was opened by `KafkaBrokerUpstreamTimeouts`.\n\n## Impact\n\n- 44% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 30,395 customers saw errors; 31 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **11:58** kafka-broker 8.40.20 deployed by Anthony Tate.\n- **12:25** `KafkaBrokerUpstreamTimeouts` fired; on-call acknowledged.\n- **12:26** Checked the kafka-broker runbook for dependency timeouts.\n- **12:48** Found the cause in kafka-broker.\n- **13:08** Mitigation applied; error rate falling.\n- **13:22** Recovered; incident resolved.\n\n## Root cause\n\nA config change in 8.40.20 cut the timeout to its database to below its normal p99.\n\nCategory: dependency timeouts. Component: kafka-broker.\n\n## Contributing factors\n\n- The dependency timeouts alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-2600 (platform): Add an alert on upstream_timeout_pct for kafka-broker.\n- KAFK-5775 (platform): Add a regression test for: a config change in 8.40.20 cut the timeout to its database to below its normal p99.\n- KAFK-5438 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source describes a past incident where a deploy to kafka-broker caused a timeout, which matches the claim's facts.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source describes a past incident where a deploy to kafka-broker caused a timeout, which matches the claim's facts.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 590,
+    "output_tokens": 35,
+    "total_ms": 3800,
+    "load_ms": 1,
+    "prompt_eval_ms": 2065,
+    "eval_ms": 1695
+   },
+   "ttft_ms": 3826,
+   "total_ms": 3826
+  }
+ ]
+}

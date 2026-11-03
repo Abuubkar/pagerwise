@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npostgres-primary, started 2026-10-28T08:36:57.279467+00:00\n\nSentence:\nCustomers seeing errors depend on the specific failure mode (e.g., 34,915 customers for elevated error rate vs 4,554 for inventory regression) . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: inventory regression after a deploy (2026-04-27)\n\n## Summary\n\nOn 2026-04-27, inventory broke after a deploy for 111 minutes. The cause was in postgres-primary.\nThe incident was sev1 and was opened by `InventoryPostDeployErrors`.\n\n## Impact\n\n- 45% of inventory requests failed or timed out at the peak.\n- Callers affected: orders, search.\n- 4,554 customers saw errors; 67 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **18:22** postgres-primary 9.39.13 deployed by Pamela Berry.\n- **18:49** `InventoryPostDeployErrors` fired; on-call acknowledged.\n- **18:54** Checked the inventory runbook for regression after a deploy.\n- **19:34** Found the cause in postgres-primary.\n- **19:48** Mitigation applied; error rate falling.\n- **20:40** Recovered; incident resolved.\n\n## Root cause\n\n9.39.13 of postgres-primary renamed a config key, so production fell back to a default of 4250.\n\nCategory: regression after a deploy. Component: postgres-primary.\n\n## Contributing factors\n\n- The regression after a deploy alert for postgres-primary had no runbook link.\n- The on-call engineer had no access to the database dashboards.\n\n## Action items\n\n- INVE-7709 (platform): Add an alert on post_deploy_error_pct for postgres-primary.\n- INVE-9206 (platform): Add a regression test for: 9.39.13 of postgres-primary renamed a config key, so production fell back to a default of 4250.\n- INVE-3526 (discovery): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"34,915 customers for elevated error rate\", \"status\": \"not_stated\"}, {\"fact\": \"4,554 customers for inventory regression\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"34,915 customers for elevated error rate\", \"status\": \"not_stated\"}, {\"fact\": \"4,554 customers for inventory regression\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 924,
+    "output_tokens": 49,
+    "total_ms": 9582,
+    "load_ms": 10,
+    "prompt_eval_ms": 4575,
+    "eval_ms": 3334
+   },
+   "ttft_ms": 9603,
+   "total_ms": 9603
+  }
+ ]
+}

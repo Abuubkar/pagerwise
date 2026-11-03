@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nredis-cache, started 2026-10-28T10:39:15.304277+00:00\n\nSentence:\nA deploy to redis-cache (dep-0364) occurred shortly before the incident, making a regression less likely than a configuration issue like log volume .\n\nSource:\nDeploy dep-0364: redis-cache version 3.37.35 deployed at 2026-10-28T10:08:00Z by Regina Wade (commit f21f2caf97, succeeded). Change: Refactor refund client."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"A deploy to redis-cache occurred\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was dep-0364\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy occurred shortly before the incident\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A regression is less likely than a configuration issue\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was a cause of the incident\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The deploy was due to a configuration issue like log volume\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The deploy was version 3.37.35\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The deploy was done at 2026-10-28T10:08:00Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was done by Regina Wade\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was done with commit f21f2caf97\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was successful\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was to refactor the refund client\",\n      \"status\": \"stated\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"A deploy to redis-cache occurred\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was dep-0364\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy occurred shortly before the incident\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"A regression is less likely than a configuration issue\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was a cause of the incident\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The deploy was due to a configuration issue like log volume\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"The deploy was version 3.37.35\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"The deploy was done at 2026-10-28T10:08:00Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was done by Regina Wade\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was done with commit f21f2caf97\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was successful\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"The deploy was to refactor the refund client\",\n      \"status\": \"stated\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 381,
+    "output_tokens": 337,
+    "total_ms": 14626,
+    "load_ms": 1,
+    "prompt_eval_ms": 600,
+    "eval_ms": 13990
+   },
+   "ttft_ms": 14637,
+   "total_ms": 14637
+  }
+ ]
+}

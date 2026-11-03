@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npayments, started 2026-10-28T08:45:45.593063+00:00\n\nSentence:\nA deploy to payments shortly before the incident (gdep-05) makes \"retention not applied\" less likely than a regression .\n\nSource:\nDeploy gdep-05: payments version 3.16.16 deployed at 2026-10-28T08:59:55.051026Z by Golden Set (commit e944ba3b38, succeeded). Change: Release with the regression."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"A deploy to payments shortly before the incident\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"gdep-05\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"makes 'retention not applied' less likely than a regression\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a deploy to payments shortly before the incident\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"the incident\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"payments version 3.16.16 deployed\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"at 2026-10-28T08:59:55.051026Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"by Golden Set\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"commit e944ba3b38\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"succeeded\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Release with the regression\",\n      \"status\": \"stated\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"A deploy to payments shortly before the incident\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"gdep-05\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"makes 'retention not applied' less likely than a regression\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a deploy to payments shortly before the incident\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"the incident\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"payments version 3.16.16 deployed\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"at 2026-10-28T08:59:55.051026Z\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"by Golden Set\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"commit e944ba3b38\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"succeeded\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"Release with the regression\",\n      \"status\": \"stated\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 379,
+    "output_tokens": 288,
+    "total_ms": 12586,
+    "load_ms": 1,
+    "prompt_eval_ms": 630,
+    "eval_ms": 11914
+   },
+   "ttft_ms": 12597,
+   "total_ms": 12597
+  }
+ ]
+}

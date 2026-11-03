@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\").\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. Facts the incident line gives (its service, its start) count as stated. \"Shortly before the incident\" means up to 2 hours before its start. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\napi-gateway, started 2026-10-28T08:43:43.659038+00:00\n\nSentence:\nPast incidents show that when api-gateway fails, callers such as orders and customers see errors . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: payments regression after a deploy (2025-07-19)\n\n## Summary\n\nOn 2025-07-19, payments broke after a deploy for 27 minutes. The cause was in card-auth.\nThe incident was sev1 and was opened by `PaymentsPostDeployErrors`.\n\n## Impact\n\n- 8% of payments requests failed or timed out at the peak.\n- Callers affected: api-gateway, orders.\n- 9,569 customers saw errors; 40 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **06:02** card-auth 4.11.1 deployed by Jessica Edwards.\n- **06:23** `PaymentsPostDeployErrors` fired; on-call acknowledged.\n- **06:23** Checked the payments runbook for regression after a deploy.\n- **06:24** Found the cause in card-auth.\n- **06:40** Mitigation applied; error rate falling.\n- **06:50** Recovered; incident resolved.\n\n## Root cause\n\n4.11.1 of card-auth renamed a config key, so production fell back to a default of 2108.\n\nCategory: regression after a deploy. Component: card-auth.\n\n## Contributing factors\n\n- The regression after a deploy alert for card-auth had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n\n## Action items\n\n- PAYM-5895 (payments): Add an alert on post_deploy_error_pct for card-auth.\n- PAYM-2727 (payments): Add a regression test for: 4.11.1 of card-auth renamed a config key, so production fell back to a default of 2108.\n- PAYM-6307 (payments): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"api-gateway is a service\", \"status\": \"stated\"}, {\"fact\": \"api-gateway started 2026-10-28T08:43:43.659038+00:00\", \"status\": \"stated\"}, {\"fact\": \"when api-gateway fails, callers such as orders see errors\", \"status\": \"stated\"}, {\"fact\": \"when api-gateway fails, customers see errors\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"api-gateway is a service\", \"status\": \"stated\"}, {\"fact\": \"api-gateway started 2026-10-28T08:43:43.659038+00:00\", \"status\": \"stated\"}, {\"fact\": \"when api-gateway fails, callers such as orders see errors\", \"status\": \"stated\"}, {\"fact\": \"when api-gateway fails, customers see errors\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 880,
+    "output_tokens": 113,
+    "total_ms": 12395,
+    "load_ms": 5,
+    "prompt_eval_ms": 4518,
+    "eval_ms": 7807
+   },
+   "ttft_ms": 12418,
+   "total_ms": 12418
+  }
+ ]
+}

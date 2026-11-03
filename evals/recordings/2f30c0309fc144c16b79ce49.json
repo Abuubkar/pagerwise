@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\napi-gateway, started 2026-10-28T06:23:03.886228+00:00\n\nSentence:\nThe incident description shows `ApiGatewayConsumerLagHigh` firing shortly after a deploy to orders (gdep-06) which calls api-gateway .\n\nSource:\nDeploy gdep-06: orders version 2.35.4 deployed at 2026-10-28T06:13:30.557091Z by Golden Set (commit a7a41bb54c, succeeded). Change: Release with the regression. (This deploy was 10 minutes before the incident started.)"
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"The `ApiGatewayConsumerLagHigh` alert fired shortly after a deploy to orders (gdep-06)\", \"status\": \"stated\"}, {\"fact\": \"the deploy to orders (gdep-06) calls api-gateway\", \"status\": \"not_stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"The `ApiGatewayConsumerLagHigh` alert fired shortly after a deploy to orders (gdep-06)\", \"status\": \"stated\"}, {\"fact\": \"the deploy to orders (gdep-06) calls api-gateway\", \"status\": \"not_stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 558,
+    "output_tokens": 66,
+    "total_ms": 7167,
+    "load_ms": 13,
+    "prompt_eval_ms": 1801,
+    "eval_ms": 4496
+   },
+   "ttft_ms": 7198,
+   "total_ms": 7198
+  }
+ ]
+}

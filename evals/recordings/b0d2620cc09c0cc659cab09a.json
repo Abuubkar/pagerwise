@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npayments, started 2026-10-28T06:57:13.737409+00:00\n\nSentence:\nCheck recent changes: `deployctl history payments --since 2h` .\n\nSource:\n# Payments: dependency timeouts\n\nAlert: `PaymentsUpstreamTimeouts` fires when the share of calls to a dependency that time out, `payments_upstream_timeout_pct`, stays above its threshold for 5 minutes. Payments is a\ncore-tier service owned by the payments team; it calls\ncard-auth, ledger, kafka-broker, and\napi-gateway, orders call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to card-auth.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n- **Dependency degraded.** card-auth itself is slow or partially down.\n- **Network path.** Packet loss between zones adds retransmits.\n\nThe most common cause on payments is timeout set too low: it explained 18 of the\nlast 26 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `payments-overview` dashboard and compare `payments_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history payments --since 2h`. A deploy in the last hour makes\n   \"timeout set too low\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n payments logs deploy/payments --since 15m | grep PAY-DEP-357\n   ```\n\n4. If `payments_upstream_timeout_pct` stays above 4 for 3 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check card-auth's own dashboard before changing anything in payments.\n\n## Mitigation\n\n1. Open the circuit breaker for card-auth if the feature can degrade.\n2. Fail over calls to the standby region for card-auth if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=200` on\n   payments (`configctl set payments upstream_timeout_ms 200`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"Check recent changes: `deployctl history payments --since 2h`\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"deployctl history payments --since 2h\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the last hour\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour\",\n      \"status\": \"contradicted\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"Check recent changes: `deployctl history payments --since 2h`\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"deployctl history payments --since 2h\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"the last hour\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour\",\n      \"status\": \"contradicted\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 761,
+    "output_tokens": 117,
+    "total_ms": 7268,
+    "load_ms": 1,
+    "prompt_eval_ms": 2340,
+    "eval_ms": 4869
+   },
+   "ttft_ms": 7279,
+   "total_ms": 7279
+  }
+ ]
+}

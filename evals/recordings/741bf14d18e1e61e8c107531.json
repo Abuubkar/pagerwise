@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nsearch, started 2026-10-28T07:30:45.907391+00:00\n\nSentence:\nA deploy to redis-cache shortly before this incident is a candidate cause, as past incidents show that changes in redis-cache (such as version 4.24.18 or 5.11.11) have previously caused queue backlogs affecting search . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: redis-cache queue backlog (2026-05-21)\n\n## Summary\n\nOn 2026-05-21, redis-cache fell behind for 91 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `RedisCacheConsumerLagHigh`.\n\n## Impact\n\n- 24% of redis-cache requests failed or timed out at the peak.\n- Callers affected: auth, card-auth, search.\n- 24,918 customers saw errors; 23 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **15:54** redis-cache 4.24.18 deployed by Amy Miles.\n- **16:04** `RedisCacheConsumerLagHigh` fired; on-call acknowledged.\n- **16:06** Checked the redis-cache runbook for queue backlog.\n- **16:35** Found the cause in redis-cache.\n- **16:55** Mitigation applied; error rate falling.\n- **17:35** Recovered; incident resolved.\n\n## Root cause\n\n4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.\n\nCategory: queue backlog. Component: redis-cache.\n\n## Contributing factors\n\n- The queue backlog alert for redis-cache had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- REDI-7488 (platform): Add an alert on consumer_lag_msgs for redis-cache.\n- REDI-2882 (platform): Add a regression test for: 4.24.18 of redis-cache made an external call per message, cutting throughput by two thirds.\n- REDI-9744 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"A deploy to redis-cache occurred shortly before the incident.\", \"status\": \"not_stated\"}, {\"fact\": \"Changes in redis-cache version 4.24.18 caused queue backlogs affecting search.\", \"status\": \"stated\"}, {\"fact\": \"Changes in redis-cache version 5.11.11 caused queue backlogs affecting search.\", \"status\": \"not_stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"A deploy to redis-cache occurred shortly before the incident.\", \"status\": \"not_stated\"}, {\"fact\": \"Changes in redis-cache version 4.24.18 caused queue backlogs affecting search.\", \"status\": \"stated\"}, {\"fact\": \"Changes in redis-cache version 5.11.11 caused queue backlogs affecting search.\", \"status\": \"not_stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 819,
+    "output_tokens": 93,
+    "total_ms": 11310,
+    "load_ms": 2,
+    "prompt_eval_ms": 4516,
+    "eval_ms": 6389
+   },
+   "ttft_ms": 11327,
+   "total_ms": 11327
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nA recent deploy to orders (which calls payments) may have triggered increased load, but the evidence points primarily to a slow dependency like the ledger pool or a stale query plan in payments/kafka-broker causing latency . (this sentence cites 3 sources)\n\nSource:\n# Postmortem: payments high p99 latency (2026-10-30)\n\n## Summary\n\nOn 2026-10-30, payments was slow for 148 minutes. The cause was in payments.\nThe incident was sev1 and was opened by `PaymentsLatencyHigh`.\n\n## Impact\n\n- 4% of payments requests failed or timed out at the peak.\n- Callers affected: api-gateway, orders.\n- 2,336 customers saw errors; 108 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **01:50** Routine traffic; nothing unusual in payments.\n- **02:08** `PaymentsLatencyHigh` fired; on-call acknowledged.\n- **02:24** Checked the payments runbook for high p99 latency.\n- **02:35** Found the cause in payments.\n- **03:11** Mitigation applied; error rate falling.\n- **04:36** Recovered; incident resolved.\n\n## Root cause\n\nA slow query plan in payments after statistics went stale made p99 climb to 2989 ms.\n\nCategory: high p99 latency. Component: payments.\n\n## Contributing factors\n\n- The high p99 latency alert for payments had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- PAYM-8817 (payments): Add an alert on p99_latency_ms for payments.\n- PAYM-3173 (payments): Add a regression test for: a slow query plan in payments after statistics went stale made p99 climb to 2989 ms.\n- PAYM-4358 (payments): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that a slow query plan in payments after statistics went stale made p99 climb to 2989 ms, which supports the claim that a stale query plan in payments/kafka-broker could be causing latency.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that a slow query plan in payments after statistics went stale made p99 climb to 2989 ms, which supports the claim that a stale query plan in payments/kafka-broker could be causing latency.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 575,
+    "output_tokens": 55,
+    "total_ms": 4244,
+    "load_ms": 1,
+    "prompt_eval_ms": 1909,
+    "eval_ms": 2303
+   },
+   "ttft_ms": 4255,
+   "total_ms": 4255
+  }
+ ]
+}

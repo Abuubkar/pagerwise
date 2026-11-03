@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nUsers impacted are those making orders requests, with past incidents showing up to 28% of requests failing or timing out at peak .\n\nSource:\n# Postmortem: orders disk full (2026-05-23)\n\n## Summary\n\nOn 2026-05-23, orders stopped accepting writes for 95 minutes. The cause was in orders.\nThe incident was sev2 and was opened by `OrdersDiskFull`.\n\n## Impact\n\n- 28% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 26,101 customers saw errors; 99 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **14:36** Routine traffic; nothing unusual in orders.\n- **14:42** `OrdersDiskFull` fired; on-call acknowledged.\n- **15:07** Checked the orders runbook for disk full.\n- **15:37** Found the cause in orders.\n- **15:46** Mitigation applied; error rate falling.\n- **16:17** Recovered; incident resolved.\n\n## Root cause\n\nDebug logging enabled during an earlier incident in orders was never turned off and filled the disk.\n\nCategory: disk full. Component: orders.\n\n## Contributing factors\n\n- The disk full alert for orders had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n\n## Action items\n\n- ORDE-1659 (commerce): Add an alert on disk_used_pct for orders.\n- ORDE-5354 (commerce): Add a regression test for: debug logging enabled during an earlier incident in orders was never turned off and filled the disk.\n- ORDE-9884 (commerce): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states that 28% of orders requests failed or timed out at the peak, which matches the claim.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states that 28% of orders requests failed or timed out at the peak, which matches the claim.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 527,
+    "output_tokens": 34,
+    "total_ms": 3168,
+    "load_ms": 5,
+    "prompt_eval_ms": 1751,
+    "eval_ms": 1403
+   },
+   "ttft_ms": 3194,
+   "total_ms": 3194
+  }
+ ]
+}

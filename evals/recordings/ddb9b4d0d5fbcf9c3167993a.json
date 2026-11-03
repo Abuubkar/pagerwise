@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\napi-gateway, started 2026-10-28T10:05:10.858714+00:00\n\nSentence:\nPast incidents indicate that when api-gateway fails, callers such as auth are impacted . (this sentence cites 3 sources)\n\nSource:\n# Postmortem: orders elevated error rate (2025-12-21)\n\n## Summary\n\nOn 2025-12-21, orders returned errors for 41 minutes. The cause was in payments.\nThe incident was sev1 and was opened by `OrdersErrorRateHigh`.\n\n## Impact\n\n- 59% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 18,487 customers saw errors; 38 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **14:30** payments 3.38.14 deployed by Angela Cole.\n- **14:48** `OrdersErrorRateHigh` fired; on-call acknowledged.\n- **14:48** Checked the orders runbook for elevated error rate.\n- **15:06** Found the cause in payments.\n- **15:11** Mitigation applied; error rate falling.\n- **15:29** Recovered; incident resolved.\n\n## Root cause\n\n3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.\n\nCategory: elevated error rate. Component: payments.\n\n## Contributing factors\n\n- The elevated error rate alert for payments had no runbook link.\n- The on-call engineer had no access to the database dashboards.\n\n## Action items\n\n- ORDE-6061 (payments): Add an alert on error_ratio_pct for payments.\n- ORDE-2851 (commerce): Add a regression test for: 3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.\n- ORDE-6316 (payments): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"when api-gateway fails, callers such as auth are impacted\", \"status\": \"not_stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"when api-gateway fails, callers such as auth are impacted\", \"status\": \"not_stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 867,
+    "output_tokens": 30,
+    "total_ms": 6250,
+    "load_ms": 8,
+    "prompt_eval_ms": 4151,
+    "eval_ms": 2012
+   },
+   "ttft_ms": 6282,
+   "total_ms": 6282
+  }
+ ]
+}

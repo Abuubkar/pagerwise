@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\").\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. Facts the incident line gives (its service, its start) count as stated. \"Shortly before the incident\" means up to 2 hours before its start. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\napi-gateway, started 2026-10-28T07:23:00.809048+00:00\n\nSentence:\nUsers making requests to api-gateway, including those from orders and payments callers, are impacted . (this sentence cites 2 sources)\n\nSource:\n# Postmortem: search CPU saturation (2025-09-16)\n\n## Summary\n\nOn 2025-09-16, search was saturated for 189 minutes. The cause was in redis-cache.\nThe incident was sev2 and was opened by `SearchCPUSaturated`.\n\n## Impact\n\n- 53% of search requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 32,871 customers saw errors; 97 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **12:50** redis-cache 3.19.0 deployed by Joel Jackson.\n- **13:01** `SearchCPUSaturated` fired; on-call acknowledged.\n- **13:46** Checked the search runbook for CPU saturation.\n- **13:49** Found the cause in redis-cache.\n- **14:00** Mitigation applied; error rate falling.\n- **16:10** Recovered; incident resolved.\n\n## Root cause\n\nA regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning CPU at 3206%.\n\nCategory: CPU saturation. Component: redis-cache.\n\n## Contributing factors\n\n- The CPU saturation alert for redis-cache had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n\n## Action items\n\n- SEAR-2079 (platform): Add an alert on cpu_util_pct for redis-cache.\n- SEAR-2440 (discovery): Add a regression test for: a regex added in 3.19.0 of redis-cache backtracked on long inputs, pinning cpu at 3206%.\n- SEAR-5727 (discovery): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"Users making requests to api-gateway are impacted\", \"status\": \"stated\"}, {\"fact\": \"requests from orders callers are impacted\", \"status\": \"not_stated\"}, {\"fact\": \"requests from payments callers are impacted\", \"status\": \"not_stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"Users making requests to api-gateway are impacted\", \"status\": \"stated\"}, {\"fact\": \"requests from orders callers are impacted\", \"status\": \"not_stated\"}, {\"fact\": \"requests from payments callers are impacted\", \"status\": \"not_stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 873,
+    "output_tokens": 63,
+    "total_ms": 9278,
+    "load_ms": 4,
+    "prompt_eval_ms": 4905,
+    "eval_ms": 4301
+   },
+   "ttft_ms": 9302,
+   "total_ms": 9302
+  }
+ ]
+}

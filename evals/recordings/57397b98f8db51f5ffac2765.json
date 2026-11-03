@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nA deploy to postgres-primary occurred shortly before the incident, which could be a candidate cause if the retention job failure pattern from  applies, but the evidence does not explicitly link this specific deploy to the current disk full state.\n\nSource:\n# Postmortem: postgres-primary disk full (2026-10-17)\n\n## Summary\n\nOn 2026-10-17, postgres-primary stopped accepting writes for 94 minutes. The cause was in postgres-primary.\nThe incident was sev1 and was opened by `PostgresPrimaryDiskFull`.\n\n## Impact\n\n- 29% of postgres-primary requests failed or timed out at the peak.\n- Callers affected: auth, inventory, ledger, orders.\n- 34,068 customers saw errors; 98 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **08:55** Routine traffic; nothing unusual in postgres-primary.\n- **09:01** `PostgresPrimaryDiskFull` fired; on-call acknowledged.\n- **09:37** Checked the postgres-primary runbook for disk full.\n- **10:01** Found the cause in postgres-primary.\n- **10:05** Mitigation applied; error rate falling.\n- **10:35** Recovered; incident resolved.\n\n## Root cause\n\nThe retention job for postgres-primary had failed for 408 hours after a cron syntax change.\n\nCategory: disk full. Component: postgres-primary.\n\n## Contributing factors\n\n- The disk full alert for postgres-primary had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- POST-8683 (platform): Add an alert on disk_used_pct for postgres-primary.\n- POST-9812 (platform): Add a regression test for: the retention job for postgres-primary had failed for 408 hours after a cron syntax change.\n- POST-2489 (platform): Link the runbook from the alert."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": false, \"reason\": \"The source describes a past incident with a different cause, a retention job failure, and does not mention a deploy to postgres-primary.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": false, \"reason\": \"The source describes a past incident with a different cause, a retention job failure, and does not mention a deploy to postgres-primary.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 567,
+    "output_tokens": 37,
+    "total_ms": 3429,
+    "load_ms": 0,
+    "prompt_eval_ms": 1907,
+    "eval_ms": 1515
+   },
+   "ttft_ms": 3443,
+   "total_ms": 3443
+  }
+ ]
+}

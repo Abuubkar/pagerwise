@@ -1,0 +1,322 @@
+{
+ "run": "20261102T182502",
+ "at": "2026-11-02T18:25:02+00:00",
+ "split": "dev",
+ "embedding": "v2",
+ "reranker": "Xenova/ms-marco-MiniLM-L-6-v2",
+ "rerank_candidates": 0,
+ "metrics": {
+  "triage.root_cause_hit_at_1": 0.0,
+  "triage.root_cause_hit_at_3": 0.0,
+  "triage.abstention": 0.0,
+  "triage.degraded_honesty": 1.0,
+  "triage.format_validity": 1.0,
+  "triage.ttft_p50_ms": 20381,
+  "triage.ttft_p95_ms": 26397,
+  "triage.total_p50_ms": 40093,
+  "triage.total_p95_ms": 54875,
+  "triage.output_tokens_per_s": 9.900027666240458,
+  "triage.briefs": 3
+ },
+ "triage": [
+  {
+   "case": "ans-03",
+   "kind": "answerable",
+   "status": "done",
+   "verdict": "CAUSE_IDENTIFIED",
+   "error": null,
+   "likely_cause": "The alert `KafkaBrokerLatencyHigh` fired because `kafka_broker_p99_latency_ms` stayed above its threshold, and the most common cause is garbage collection pauses [C1]. A deploy in the last hour makes \"garbage collection pauses\" less likely than a regression [C1], but no recent deploy to kafka-broker is listed in the evidence for this specific incident.",
+   "gold": {
+    "category": "high-latency",
+    "component": "kafka-broker"
+   },
+   "named": [
+    "bad-deploy"
+   ],
+   "hit_at_1": false,
+   "hit_at_3": false
+  },
+  {
+   "case": "una-05",
+   "kind": "unanswerable",
+   "status": "done",
+   "verdict": "CAUSE_IDENTIFIED",
+   "error": null,
+   "likely_cause": "The incident involves a network routing issue (IPv6 default route withdrawal) which is not described in the provided evidence for kafka-broker failures. [C1][C3][C5][C6][C7]",
+   "gold": {
+    "category": "ipv6-route-flap",
+    "component": "kafka-broker"
+   },
+   "named": [],
+   "abstained": false
+  },
+  {
+   "case": "deg-01",
+   "kind": "degraded",
+   "status": "done",
+   "verdict": "CAUSE_IDENTIFIED",
+   "error": null,
+   "likely_cause": "The alert `NotificationsPostDeployErrors` fired shortly after a deploy, which is consistent with the runbook stating that this alert fires when errors in the 30 minutes after a deploy exceed their threshold [C1]. The most common cause for this specific alert on notifications is schema mismatch, which explained 23 of the last 23 pages for this alert [C1]. Alternatively, a recent release could have introduced an exception on a common path (code regression) or the release expects a setting not present in production (config drift) [C1].",
+   "gold": {
+    "category": "bad-deploy",
+    "component": "notifications"
+   },
+   "named": [
+    "bad-deploy",
+    "error-rate"
+   ],
+   "honest": true,
+   "deploy_lines": [
+    "The alert `NotificationsPostDeployErrors` fired shortly after a deploy, which is consistent with the runbook stating that this alert fires when errors in the 30 minutes after a deploy exceed their threshold [C1]. The most common cause for this specific alert on notifications is schema mismatch, which explained 23 of the last 23 pages for this alert [C1]. Alternatively, a recent release could have introduced an exception on a common path (code regression) or the release expects a setting not present in production (config drift) [C1].",
+    "2. Check recent changes: `deployctl history notifications --since 2h` [C1].",
+    "3. Search the logs for the error code this failure logs: `kubectl -n growth logs deploy/notifications --since 15m | grep NOT-DEPLOY-333` [C1].",
+    "4. If `notifications_post_deploy_error_pct` stays above 2 for 7 minutes, treat it as regression after a deploy and move to mitigation; below that it usually recovers on its own [C1].",
+    "5. Roll back: `deployctl rollback notifications`; don't wait to debug [C1].",
+    "Postmortem 2026-07-11-notifications-error-rate.md describes a past incident where notifications returned errors for 63 minutes due to a credential rotation without restarting consumers [C7]. Postmortem 2026-05-13-kafka-broker-bad-deploy.md describes a past incident where kafka-broker broke after a deploy, affecting callers including notifications [C5]. Postmortem 2025-10-19-kafka-broker-bad-deploy.md describes a past incident where kafka-broker broke after a deploy due to reading a column that the migration hadn't added yet, affecting callers including notifications [C6]."
+   ]
+  }
+ ],
+ "repeats": 1,
+ "briefs": [
+  {
+   "case": "ans-03",
+   "kind": "answerable",
+   "repeat": 0,
+   "status": "done",
+   "error": null,
+   "problems": [],
+   "verdict": "CAUSE_IDENTIFIED",
+   "raw": "## Likely cause\nThe alert `KafkaBrokerLatencyHigh` fired because `kafka_broker_p99_latency_ms` stayed above its threshold, and the most common cause is garbage collection pauses [C1]. A deploy in the last hour makes \"garbage collection pauses\" less likely than a regression [C1], but no recent deploy to kafka-broker is listed in the evidence for this specific incident.\n\n## Blast radius\nCallers affected are ledger, notifications, and payments [C5][C6][C7]. 34,209 customers saw errors in a similar past incident [C5], while 36,365 customers saw errors in another [C6], and 9,015 customers saw errors in a third [C7].\n\n## First steps\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_p99_latency_ms` with the same hour last week [C1].\n2. Check recent changes: `deployctl history kafka-broker --since 2h` [C1].\n3. Search the logs for the error code this failure logs: `kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-LAT-509` [C1].\n4. If `kafka_broker_p99_latency_ms` stays above 2259 for 12 minutes, treat it as high p99 latency and move to mitigation [C1].\n5. Shed non-critical traffic with `trafficctl shed kafka-broker --class batch` [C2].\n\n## Similar incidents\nOn 2026-03-04, kafka-broker was slow for 109 minutes due to a slow query plan in kafka-broker after statistics went stale made p99 climb to 2494 ms [C5]. On 2026-04-16, kafka-broker held a lock across a network call introduced in 7.10.18, serializing writes [C6]. On 2026-09-15, a slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms [C7].",
+   "evidence": [
+    {
+     "tag": "C1",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-7b86-7700-a103-78296e4cea36",
+     "heading_path": "Kafka broker: high p99 latency",
+     "text": "# Kafka broker: high p99 latency\n\nAlert: `KafkaBrokerLatencyHigh` fires when the p99 of `kafka_broker_p99_latency_ms` stays above its threshold for 5 minutes. Kafka broker is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nledger, notifications, payments call it.\n\n## Symptoms\n\n- p99 rises first; p50 usually stays flat until the problem spreads.\n- Time spent waiting on its database grows faster than time spent in the service itself.\n- Request rate is normal: this is slowness, not extra load.\n\n## Likely causes\n\n- **Garbage collection pauses.** Heap close to its limit makes collection pauses show up in p99.\n- **Lock contention.** Long-held row or mutex locks serialize requests under normal load.\n- **Slow dependency.** Most latency is spent waiting on its database; check its own latency first.\n\nThe most common cause on kafka-broker is garbage collection pauses: it explained 12 of the\nlast 21 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_p99_latency_ms` with the\n   same hour last week.\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes\n   \"garbage collection pauses\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-LAT-509\n   ```\n\n4. If `kafka_broker_p99_latency_ms` stays above 2259 for 12 minutes, treat it as\n   high p99 latency and move to mitigation; below that it usually recovers on its own.\n5. Compare the service's own processing time with the time spent waiting on its database."
+    },
+    {
+     "tag": "C2",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-7b88-7a79-90ea-bfa5ab94fe5d",
+     "heading_path": "Kafka broker: high p99 latency",
+     "text": "## Mitigation\n\n1. Shed non-critical traffic with `trafficctl shed kafka-broker --class batch`.\n2. If one dependency explains the latency, follow that dependency's runbook.\n3. If that doesn't help within 10 minutes, set `request_timeout_ms=60` on\n   kafka-broker (`configctl set kafka-broker request_timeout_ms 60`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the platform secondary after 45 minutes without improvement, or at once if more than\n5% of kafka-broker requests are failing. Coordinate in `#platform-oncall`."
+    },
+    {
+     "tag": "C3",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-high-latency.md",
+     "chunk_id": "01a19c98-8a9a-7b14-b69b-3955a83f8f78",
+     "heading_path": "Notifications: high p99 latency",
+     "text": "# Notifications: high p99 latency\n\nAlert: `NotificationsLatencyHigh` fires when the p99 of `notifications_p99_latency_ms` stays above its threshold for 5 minutes. Notifications is a\nsupporting-tier service owned by the growth team; it calls\nkafka-broker, and\norders call it.\n\n## Symptoms\n\n- p99 rises first; p50 usually stays flat until the problem spreads.\n- Time spent waiting on kafka-broker grows faster than time spent in the service itself.\n- Request rate is normal: this is slowness, not extra load.\n\n## Likely causes\n\n- **Slow dependency.** Most latency is spent waiting on kafka-broker; check its own latency first.\n- **Lock contention.** Long-held row or mutex locks serialize requests under normal load.\n- **Garbage collection pauses.** Heap close to its limit makes collection pauses show up in p99.\n\nThe most common cause on notifications is slow dependency: it explained 11 of the\nlast 21 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_p99_latency_ms` with the\n   same hour last week.\n2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes\n   \"slow dependency\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-LAT-354\n   ```\n\n4. If `notifications_p99_latency_ms` stays above 789 for 7 minutes, treat it as\n   high p99 latency and move to mitigation; below that it usually recovers on its own.\n5. Compare the service's own processing time with the time spent waiting on kafka-broker."
+    },
+    {
+     "tag": "C4",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-high-latency.md",
+     "chunk_id": "01a19c98-8a9d-730b-b035-5f0bafc1c766",
+     "heading_path": "Notifications: high p99 latency",
+     "text": "## Mitigation\n\n1. Shed non-critical traffic with `trafficctl shed notifications --class batch`.\n2. If one dependency explains the latency, follow that dependency's runbook.\n3. If that doesn't help within 10 minutes, set `worker_threads=27` on\n   notifications (`configctl set notifications worker_threads 27`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the growth secondary after 20 minutes without improvement, or at once if more than\n5% of notifications requests are failing. Coordinate in `#growth-oncall`."
+    },
+    {
+     "tag": "C5",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-03-04-kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-c456-71b7-814d-cf9e4f94eccf",
+     "heading_path": "Postmortem: kafka-broker high p99 latency (2026-03-04)",
+     "text": "# Postmortem: kafka-broker high p99 latency (2026-03-04)\n\n## Summary\n\nOn 2026-03-04, kafka-broker was slow for 109 minutes. The cause was in kafka-broker.\nThe incident was sev3 and was opened by `KafkaBrokerLatencyHigh`.\n\n## Impact\n\n- 47% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 34,209 customers saw errors; 32 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **02:22** Routine traffic; nothing unusual in kafka-broker.\n- **02:38** `KafkaBrokerLatencyHigh` fired; on-call acknowledged.\n- **02:43** Checked the kafka-broker runbook for high p99 latency.\n- **03:17** Found the cause in kafka-broker.\n- **03:48** Mitigation applied; error rate falling.\n- **04:27** Recovered; incident resolved.\n\n## Root cause\n\nA slow query plan in kafka-broker after statistics went stale made p99 climb to 2494 ms.\n\nCategory: high p99 latency. Component: kafka-broker.\n\n## Contributing factors\n\n- The high p99 latency alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-1015 (platform): Add an alert on p99_latency_ms for kafka-broker.\n- KAFK-5691 (platform): Add a regression test for: a slow query plan in kafka-broker after statistics went stale made p99 climb to 2494 ms.\n- KAFK-1775 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C6",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-04-16-kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-c462-79bc-8c1d-b9620e0e49a4",
+     "heading_path": "Postmortem: kafka-broker high p99 latency (2026-04-16)",
+     "text": "# Postmortem: kafka-broker high p99 latency (2026-04-16)\n\n## Summary\n\nOn 2026-04-16, kafka-broker was slow for 48 minutes. The cause was in kafka-broker.\nThe incident was sev1 and was opened by `KafkaBrokerLatencyHigh`.\n\n## Impact\n\n- 36% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 36,365 customers saw errors; 62 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **08:41** kafka-broker 7.10.18 deployed by Catherine Perkins.\n- **09:17** `KafkaBrokerLatencyHigh` fired; on-call acknowledged.\n- **09:26** Checked the kafka-broker runbook for high p99 latency.\n- **09:34** Found the cause in kafka-broker.\n- **09:52** Mitigation applied; error rate falling.\n- **10:05** Recovered; incident resolved.\n\n## Root cause\n\nkafka-broker held a lock across a network call introduced in 7.10.18, serializing writes.\n\nCategory: high p99 latency. Component: kafka-broker.\n\n## Contributing factors\n\n- The high p99 latency alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n\n## Action items\n\n- KAFK-4834 (platform): Add an alert on p99_latency_ms for kafka-broker.\n- KAFK-1943 (platform): Add a regression test for: kafka-broker held a lock across a network call introduced in 7.10.18, serializing writes.\n- KAFK-8623 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C7",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-09-15-kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-cc51-79c5-885e-69f13ef63954",
+     "heading_path": "Postmortem: kafka-broker high p99 latency (2026-09-15)",
+     "text": "# Postmortem: kafka-broker high p99 latency (2026-09-15)\n\n## Summary\n\nOn 2026-09-15, kafka-broker was slow for 38 minutes. The cause was in kafka-broker.\nThe incident was sev2 and was opened by `KafkaBrokerLatencyHigh`.\n\n## Impact\n\n- 25% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 9,015 customers saw errors; 70 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **13:26** Routine traffic; nothing unusual in kafka-broker.\n- **13:53** `KafkaBrokerLatencyHigh` fired; on-call acknowledged.\n- **14:04** Checked the kafka-broker runbook for high p99 latency.\n- **14:12** Found the cause in kafka-broker.\n- **14:13** Mitigation applied; error rate falling.\n- **14:31** Recovered; incident resolved.\n\n## Root cause\n\nA slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms.\n\nCategory: high p99 latency. Component: kafka-broker.\n\n## Contributing factors\n\n- The high p99 latency alert for kafka-broker had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-4921 (platform): Add an alert on p99_latency_ms for kafka-broker.\n- KAFK-1675 (platform): Add a regression test for: a slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms.\n- KAFK-7606 (platform): Link the runbook from the alert."
+    }
+   ],
+   "degraded": [],
+   "ttft_ms": 26397,
+   "total_ms": 54875,
+   "prompt_tokens": 3361,
+   "output_tokens": 490
+  },
+  {
+   "case": "una-05",
+   "kind": "unanswerable",
+   "repeat": 0,
+   "status": "done",
+   "error": null,
+   "problems": [],
+   "verdict": "CAUSE_IDENTIFIED",
+   "raw": "## Likely cause\nThe incident involves a network routing issue (IPv6 default route withdrawal) which is not described in the provided evidence for kafka-broker failures. [C1][C3][C5][C6][C7]\n\n## Blast radius\nCallers affected: ledger, notifications, payments. [C5][C6]\nCustomers affected: 3,522 customers saw errors; 34 support tickets were opened. [C5]\nCustomers affected: 30,395 customers saw errors; 31 support tickets were opened. [C6]\n\n## First steps\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_upstream_timeout_pct` with the same hour last week. [C1]\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes \"dependency degraded\" less likely than a regression. [C1]\n3. Search the logs for the error code this failure logs: `kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-DEP-358` [C1]\n4. If `kafka_broker_upstream_timeout_pct` stays above 9 for 4 minutes, treat it as dependency timeouts and move to mitigation; below that it usually recovers on its own. [C1]\n5. Check its database's own dashboard before changing anything in kafka-broker. [C1]\n\n## Similar incidents\nNone in the evidence.",
+   "evidence": [
+    {
+     "tag": "C1",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+     "chunk_id": "01a19c98-7b79-703a-8843-cd342f4164fd",
+     "heading_path": "Kafka broker: dependency timeouts",
+     "text": "# Kafka broker: dependency timeouts\n\nAlert: `KafkaBrokerUpstreamTimeouts` fires when the share of calls to a dependency that time out, `kafka_broker_upstream_timeout_pct`, stays above its threshold for 5 minutes. Kafka broker is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nledger, notifications, payments call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to its database.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Dependency degraded.** its database itself is slow or partially down.\n- **Network path.** Packet loss between zones adds retransmits.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on kafka-broker is dependency degraded: it explained 14 of the\nlast 16 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes\n   \"dependency degraded\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-DEP-358\n   ```\n\n4. If `kafka_broker_upstream_timeout_pct` stays above 9 for 4 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check its database's own dashboard before changing anything in kafka-broker."
+    },
+    {
+     "tag": "C2",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-dependency-timeout.md",
+     "chunk_id": "01a19c98-7b7b-7383-9380-26c3aeee4e6c",
+     "heading_path": "Kafka broker: dependency timeouts",
+     "text": "## Mitigation\n\n1. Open the circuit breaker for its database if the feature can degrade.\n2. Fail over calls to the standby region for its database if one exists.\n3. If that doesn't help within 10 minutes, set `retry_max_attempts=42` on\n   kafka-broker (`configctl set kafka-broker retry_max_attempts 42`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the platform secondary after 20 minutes without improvement, or at once if more than\n20% of kafka-broker requests are failing. Coordinate in `#platform-oncall`."
+    },
+    {
+     "tag": "C3",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-cert-expiry.md",
+     "chunk_id": "01a19c98-6aeb-74da-83f0-c2368eeb7b4d",
+     "heading_path": "Kafka broker: TLS certificate expiry",
+     "text": "# Kafka broker: TLS certificate expiry\n\nAlert: `KafkaBrokerCertExpiring` fires when a certificate's remaining validity, `kafka_broker_cert_days_left`, drops below its threshold. Kafka broker is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nledger, notifications, payments call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n\nThe most common cause on kafka-broker is clock skew: it explained 20 of the\nlast 27 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `kafka-broker-overview` dashboard and compare `kafka_broker_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history kafka-broker --since 2h`. A deploy in the last hour makes\n   \"clock skew\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/kafka-broker --since 15m | grep KAF-TLS-865\n   ```\n\n4. If `kafka_broker_cert_days_left` stays above 14 for 3 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect kafka-broker:443 | openssl x509 -noout -enddate`."
+    },
+    {
+     "tag": "C4",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/kafka-broker-cert-expiry.md",
+     "chunk_id": "01a19c98-6aed-7858-a2cb-348bf98b3521",
+     "heading_path": "Kafka broker: TLS certificate expiry",
+     "text": "## Mitigation\n\n1. Force renewal: `kubectl -n platform annotate certificate kafka-broker renew=now`.\n2. Restart pods so they load the new certificate.\n3. If that doesn't help within 10 minutes, set `cert_renew_before_days=16` on\n   kafka-broker (`configctl set kafka-broker cert_renew_before_days 16`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the platform secondary after 45 minutes without improvement, or at once if more than\n20% of kafka-broker requests are failing. Coordinate in `#platform-oncall`."
+    },
+    {
+     "tag": "C5",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-10-30-kafka-broker-cert-expiry.md",
+     "chunk_id": "01a19c98-cc68-72af-a44a-c41a73329f67",
+     "heading_path": "Postmortem: kafka-broker TLS certificate expiry (2026-10-30)",
+     "text": "# Postmortem: kafka-broker TLS certificate expiry (2026-10-30)\n\n## Summary\n\nOn 2026-10-30, kafka-broker rejected TLS connections for 69 minutes. The cause was in kafka-broker.\nThe incident was sev2 and was opened by `KafkaBrokerCertExpiring`.\n\n## Impact\n\n- 47% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 3,522 customers saw errors; 34 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **13:42** Routine traffic; nothing unusual in kafka-broker.\n- **13:54** `KafkaBrokerCertExpiring` fired; on-call acknowledged.\n- **13:58** Checked the kafka-broker runbook for TLS certificate expiry.\n- **14:07** Found the cause in kafka-broker.\n- **14:23** Mitigation applied; error rate falling.\n- **15:03** Recovered; incident resolved.\n\n## Root cause\n\nThe renewal job for kafka-broker failed for 3718 days because its DNS challenge record was deleted.\n\nCategory: TLS certificate expiry. Component: kafka-broker.\n\n## Contributing factors\n\n- The TLS certificate expiry alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-5843 (platform): Add an alert on cert_days_left for kafka-broker.\n- KAFK-2399 (platform): Add a regression test for: the renewal job for kafka-broker failed for 3718 days because its dns challenge record was deleted.\n- KAFK-3781 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C6",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-05-06-kafka-broker-dependency-timeout.md",
+     "chunk_id": "01a19c98-c46c-79eb-8de1-b74c4e771024",
+     "heading_path": "Postmortem: kafka-broker dependency timeouts (2026-05-06)",
+     "text": "# Postmortem: kafka-broker dependency timeouts (2026-05-06)\n\n## Summary\n\nOn 2026-05-06, kafka-broker timed out calling its dependencies for 57 minutes. The cause was in kafka-broker.\nThe incident was sev1 and was opened by `KafkaBrokerUpstreamTimeouts`.\n\n## Impact\n\n- 44% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 30,395 customers saw errors; 31 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **11:58** kafka-broker 8.40.20 deployed by Anthony Tate.\n- **12:25** `KafkaBrokerUpstreamTimeouts` fired; on-call acknowledged.\n- **12:26** Checked the kafka-broker runbook for dependency timeouts.\n- **12:48** Found the cause in kafka-broker.\n- **13:08** Mitigation applied; error rate falling.\n- **13:22** Recovered; incident resolved.\n\n## Root cause\n\nA config change in 8.40.20 cut the timeout to its database to below its normal p99.\n\nCategory: dependency timeouts. Component: kafka-broker.\n\n## Contributing factors\n\n- The dependency timeouts alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-2600 (platform): Add an alert on upstream_timeout_pct for kafka-broker.\n- KAFK-5775 (platform): Add a regression test for: a config change in 8.40.20 cut the timeout to its database to below its normal p99.\n- KAFK-5438 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C7",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-09-15-kafka-broker-high-latency.md",
+     "chunk_id": "01a19c98-cc51-79c5-885e-69f13ef63954",
+     "heading_path": "Postmortem: kafka-broker high p99 latency (2026-09-15)",
+     "text": "# Postmortem: kafka-broker high p99 latency (2026-09-15)\n\n## Summary\n\nOn 2026-09-15, kafka-broker was slow for 38 minutes. The cause was in kafka-broker.\nThe incident was sev2 and was opened by `KafkaBrokerLatencyHigh`.\n\n## Impact\n\n- 25% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 9,015 customers saw errors; 70 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **13:26** Routine traffic; nothing unusual in kafka-broker.\n- **13:53** `KafkaBrokerLatencyHigh` fired; on-call acknowledged.\n- **14:04** Checked the kafka-broker runbook for high p99 latency.\n- **14:12** Found the cause in kafka-broker.\n- **14:13** Mitigation applied; error rate falling.\n- **14:31** Recovered; incident resolved.\n\n## Root cause\n\nA slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms.\n\nCategory: high p99 latency. Component: kafka-broker.\n\n## Contributing factors\n\n- The high p99 latency alert for kafka-broker had no runbook link.\n- A recent reorg left the alert routed to the wrong team.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-4921 (platform): Add an alert on p99_latency_ms for kafka-broker.\n- KAFK-1675 (platform): Add a regression test for: a slow query plan in kafka-broker after statistics went stale made p99 climb to 1533 ms.\n- KAFK-7606 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C8",
+     "source_type": "deploy",
+     "source_id": "gdep-01",
+     "chunk_id": null,
+     "heading_path": "deploy notifications 8.27.26",
+     "text": "Deploy gdep-01: notifications version 8.27.26 deployed at 2026-10-28T08:16:04.847826Z by Golden Set (commit 6218110327, succeeded). Change: Release with the regression."
+    },
+    {
+     "tag": "C9",
+     "source_type": "deploy",
+     "source_id": "gdep-10",
+     "chunk_id": null,
+     "heading_path": "deploy ledger 6.3.4",
+     "text": "Deploy gdep-10: ledger version 6.3.4 deployed at 2026-10-28T07:50:45.498366Z by Golden Set (commit 045622cdb6, succeeded). Change: Release with the regression."
+    }
+   ],
+   "degraded": [],
+   "ttft_ms": 20381,
+   "total_ms": 40093,
+   "prompt_tokens": 3487,
+   "output_tokens": 337
+  },
+  {
+   "case": "deg-01",
+   "kind": "degraded",
+   "repeat": 0,
+   "status": "done",
+   "error": null,
+   "problems": [],
+   "verdict": "CAUSE_IDENTIFIED",
+   "raw": "## Likely cause\nThe alert `NotificationsPostDeployErrors` fired shortly after a deploy, which is consistent with the runbook stating that this alert fires when errors in the 30 minutes after a deploy exceed their threshold [C1]. The most common cause for this specific alert on notifications is schema mismatch, which explained 23 of the last 23 pages for this alert [C1]. Alternatively, a recent release could have introduced an exception on a common path (code regression) or the release expects a setting not present in production (config drift) [C1].\n\n## Blast radius\nThe service affected is notifications, which is a supporting-tier service owned by the growth team [C1][C3]. Callers affected include orders, which call notifications [C1][C3]. The incident impacts customers who rely on notifications from the orders service.\n\n## First steps\n1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_post_deploy_error_pct` with the same hour last week [C1].\n2. Check recent changes: `deployctl history notifications --since 2h` [C1].\n3. Search the logs for the error code this failure logs: `kubectl -n growth logs deploy/notifications --since 15m | grep NOT-DEPLOY-333` [C1].\n4. If `notifications_post_deploy_error_pct` stays above 2 for 7 minutes, treat it as regression after a deploy and move to mitigation; below that it usually recovers on its own [C1].\n5. Roll back: `deployctl rollback notifications`; don't wait to debug [C1].\n\n## Similar incidents\nPostmortem 2026-07-11-notifications-error-rate.md describes a past incident where notifications returned errors for 63 minutes due to a credential rotation without restarting consumers [C7]. Postmortem 2026-05-13-kafka-broker-bad-deploy.md describes a past incident where kafka-broker broke after a deploy, affecting callers including notifications [C5]. Postmortem 2025-10-19-kafka-broker-bad-deploy.md describes a past incident where kafka-broker broke after a deploy due to reading a column that the migration hadn't added yet, affecting callers including notifications [C6].",
+   "evidence": [
+    {
+     "tag": "C1",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-bad-deploy.md",
+     "chunk_id": "01a19c98-b472-73d6-b927-daac602ea576",
+     "heading_path": "Notifications: regression after a deploy",
+     "text": "# Notifications: regression after a deploy\n\nAlert: `NotificationsPostDeployErrors` fires when errors in the 30 minutes after a deploy, `notifications_post_deploy_error_pct`, exceed their threshold. Notifications is a\nsupporting-tier service owned by the growth team; it calls\nkafka-broker, and\norders call it.\n\n## Symptoms\n\n- Errors start within minutes of a deploy finishing.\n- Only pods on the new version show errors.\n- Canary metrics were borderline but passed.\n\n## Likely causes\n\n- **Schema mismatch.** The release reads a column a migration hasn't added yet.\n- **Code regression.** The new release breaks a path the tests don't cover.\n- **Config drift.** The release expects a setting that isn't present in production.\n\nThe most common cause on notifications is schema mismatch: it explained 23 of the\nlast 23 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_post_deploy_error_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes\n   \"schema mismatch\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-DEPLOY-333\n   ```\n\n4. If `notifications_post_deploy_error_pct` stays above 2 for 7 minutes, treat it as\n   regression after a deploy and move to mitigation; below that it usually recovers on its own.\n5. Compare error rates between pods on the old and new version.\n\n## Mitigation\n\n1. Roll back: `deployctl rollback notifications`; don't wait to debug.\n2. Freeze deploys for notifications.\n3. If that doesn't help within 10 minutes, set `feature_flag_default=29` on\n   notifications (`configctl set notifications feature_flag_default 29`) and restart one pod at a\n   time."
+    },
+    {
+     "tag": "C2",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-bad-deploy.md",
+     "chunk_id": "01a19c98-b476-7d14-8353-6b6c89eb51d0",
+     "heading_path": "Notifications: regression after a deploy > Escalation",
+     "text": "## Escalation\n\nPage the growth secondary after 30 minutes without improvement, or at once if more than\n25% of notifications requests are failing. Coordinate in `#growth-oncall`."
+    },
+    {
+     "tag": "C3",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-error-rate.md",
+     "chunk_id": "01a19c98-7b40-7ca6-9600-0f69f7c1269d",
+     "heading_path": "Notifications: elevated error rate",
+     "text": "# Notifications: elevated error rate\n\nAlert: `NotificationsErrorRateHigh` fires when the share of 5xx responses in `notifications_error_ratio_pct` stays above its threshold for 5 minutes. Notifications is a\nsupporting-tier service owned by the growth team; it calls\nkafka-broker, and\norders call it.\n\n## Symptoms\n\n- 5xx responses rise across all endpoints, not one.\n- Retries from callers double the request rate.\n- Logs show the same error code repeating.\n\n## Likely causes\n\n- **Expired credentials.** A rotated secret wasn't picked up and calls to kafka-broker are rejected.\n- **Dependency errors passed through.** kafka-broker returns errors and the service doesn't degrade.\n- **Bad deploy.** A recent release introduced an exception on a common path.\n\nThe most common cause on notifications is expired credentials: it explained 20 of the\nlast 24 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `notifications-overview` dashboard and compare `notifications_error_ratio_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history notifications --since 2h`. A deploy in the last hour makes\n   \"expired credentials\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n growth logs deploy/notifications --since 15m | grep NOT-ERR-701\n   ```\n\n4. If `notifications_error_ratio_pct` stays above 8 for 12 minutes, treat it as\n   elevated error rate and move to mitigation; below that it usually recovers on its own.\n5. Group errors by endpoint and by upstream: one endpoint means a code path, all of them means a dependency."
+    },
+    {
+     "tag": "C4",
+     "source_type": "runbook",
+     "source_id": "data/corpus/runbooks/notifications-error-rate.md",
+     "chunk_id": "01a19c98-7b42-7f79-9a79-756d15788a66",
+     "heading_path": "Notifications: elevated error rate",
+     "text": "## Mitigation\n\n1. Roll back the last deploy if it is less than two hours old: `deployctl rollback notifications`.\n2. Turn off the feature flag named in the error, if any.\n3. If that doesn't help within 10 minutes, set `circuit_breaker_threshold=2` on\n   notifications (`configctl set notifications circuit_breaker_threshold 2`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the growth secondary after 20 minutes without improvement, or at once if more than\n5% of notifications requests are failing. Coordinate in `#growth-oncall`."
+    },
+    {
+     "tag": "C5",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-05-13-kafka-broker-bad-deploy.md",
+     "chunk_id": "01a19c98-c473-7a1d-81cc-0dd7116386f9",
+     "heading_path": "Postmortem: kafka-broker regression after a deploy (2026-05-13)",
+     "text": "# Postmortem: kafka-broker regression after a deploy (2026-05-13)\n\n## Summary\n\nOn 2026-05-13, kafka-broker broke after a deploy for 152 minutes. The cause was in kafka-broker.\nThe incident was sev2 and was opened by `KafkaBrokerPostDeployErrors`.\n\n## Impact\n\n- 57% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 39,882 customers saw errors; 14 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **21:31** kafka-broker 3.26.3 deployed by John Williams.\n- **21:45** `KafkaBrokerPostDeployErrors` fired; on-call acknowledged.\n- **22:15** Checked the kafka-broker runbook for regression after a deploy.\n- **23:26** Found the cause in kafka-broker.\n- **23:52** Mitigation applied; error rate falling.\n- **00:17** Recovered; incident resolved.\n\n## Root cause\n\n3.26.3 of kafka-broker renamed a config key, so production fell back to a default of 47.\n\nCategory: regression after a deploy. Component: kafka-broker.\n\n## Contributing factors\n\n- The regression after a deploy alert for kafka-broker had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- KAFK-8502 (platform): Add an alert on post_deploy_error_pct for kafka-broker.\n- KAFK-6777 (platform): Add a regression test for: 3.26.3 of kafka-broker renamed a config key, so production fell back to a default of 47.\n- KAFK-6782 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C6",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2025-10-19-kafka-broker-bad-deploy.md",
+     "chunk_id": "01a19c98-bc39-7a3f-9ab4-575aa2a35484",
+     "heading_path": "Postmortem: kafka-broker regression after a deploy (2025-10-19)",
+     "text": "# Postmortem: kafka-broker regression after a deploy (2025-10-19)\n\n## Summary\n\nOn 2025-10-19, kafka-broker broke after a deploy for 133 minutes. The cause was in kafka-broker.\nThe incident was sev2 and was opened by `KafkaBrokerPostDeployErrors`.\n\n## Impact\n\n- 33% of kafka-broker requests failed or timed out at the peak.\n- Callers affected: ledger, notifications, payments.\n- 10,868 customers saw errors; 69 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **04:21** kafka-broker 2.16.13 deployed by Mark Meza.\n- **04:35** `KafkaBrokerPostDeployErrors` fired; on-call acknowledged.\n- **04:49** Checked the kafka-broker runbook for regression after a deploy.\n- **06:34** Found the cause in kafka-broker.\n- **06:38** Mitigation applied; error rate falling.\n- **06:48** Recovered; incident resolved.\n\n## Root cause\n\n2.16.13 of kafka-broker read a column that the migration hadn't added in production yet.\n\nCategory: regression after a deploy. Component: kafka-broker.\n\n## Contributing factors\n\n- The regression after a deploy alert for kafka-broker had no runbook link.\n- Two teams investigated the same symptom without knowing it.\n\n## Action items\n\n- KAFK-6254 (platform): Add an alert on post_deploy_error_pct for kafka-broker.\n- KAFK-9152 (platform): Add a regression test for: 2.16.13 of kafka-broker read a column that the migration hadn't added in production yet.\n- KAFK-8631 (platform): Link the runbook from the alert."
+    },
+    {
+     "tag": "C7",
+     "source_type": "postmortem",
+     "source_id": "data/corpus/postmortems/2026-07-11-notifications-error-rate.md",
+     "chunk_id": "01a19c98-cc39-7afc-a2c4-f1892a5777dc",
+     "heading_path": "Postmortem: notifications elevated error rate (2026-07-11)",
+     "text": "# Postmortem: notifications elevated error rate (2026-07-11)\n\n## Summary\n\nOn 2026-07-11, notifications returned errors for 63 minutes. The cause was in notifications.\nThe incident was sev1 and was opened by `NotificationsErrorRateHigh`.\n\n## Impact\n\n- 26% of notifications requests failed or timed out at the peak.\n- Callers affected: orders.\n- 19,047 customers saw errors; 53 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **16:43** Routine traffic; nothing unusual in notifications.\n- **17:03** `NotificationsErrorRateHigh` fired; on-call acknowledged.\n- **17:19** Checked the notifications runbook for elevated error rate.\n- **17:26** Found the cause in notifications.\n- **17:30** Mitigation applied; error rate falling.\n- **18:06** Recovered; incident resolved.\n\n## Root cause\n\nA credential for notifications was rotated without restarting consumers, so every call was refused.\n\nCategory: elevated error rate. Component: notifications.\n\n## Contributing factors\n\n- The elevated error rate alert for notifications had no runbook link.\n- The on-call engineer had no access to the database dashboards.\n\n## Action items\n\n- NOTI-5809 (growth): Add an alert on error_ratio_pct for notifications.\n- NOTI-1262 (growth): Add a regression test for: a credential for notifications was rotated without restarting consumers, so every call was refused.\n- NOTI-9319 (growth): Link the runbook from the alert."
+    }
+   ],
+   "degraded": [
+    {
+     "source": "deploys",
+     "reason": "HTTP 503"
+    }
+   ],
+   "ttft_ms": 15725,
+   "total_ms": 38769,
+   "prompt_tokens": 3167,
+   "output_tokens": 497
+  }
+ ]
+}

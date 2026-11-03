@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\"), and facts the incident line already gives (its service, its start): they say nothing about the source.\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. \"Shortly before the incident\" means up to 2 hours before its start; a deploy record says how long before or after the start it was. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nledger, started 2026-10-28T08:02:45.498366+00:00\n\nSentence:\nWithout specific details on which deploy occurred immediately before this incident, we cannot pinpoint the exact commit, but the timing aligns with the \"regression after a deploy\" pattern described in the runbook .\n\nSource:\n# Ledger: regression after a deploy\n\nAlert: `LedgerPostDeployErrors` fires when errors in the 30 minutes after a deploy, `ledger_post_deploy_error_pct`, exceed their threshold. Ledger is a\ncore-tier service owned by the ledger team; it calls\npostgres-primary, kafka-broker, and\npayments call it.\n\n## Symptoms\n\n- Errors start within minutes of a deploy finishing.\n- Only pods on the new version show errors.\n- Canary metrics were borderline but passed.\n\n## Likely causes\n\n- **Config drift.** The release expects a setting that isn't present in production.\n- **Code regression.** The new release breaks a path the tests don't cover.\n- **Schema mismatch.** The release reads a column a migration hasn't added yet.\n\nThe most common cause on ledger is config drift: it explained 8 of the\nlast 15 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `ledger-overview` dashboard and compare `ledger_post_deploy_error_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history ledger --since 2h`. A deploy in the last hour makes\n   \"config drift\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n ledger logs deploy/ledger --since 15m | grep LED-DEPLOY-586\n   ```\n\n4. If `ledger_post_deploy_error_pct` stays above 7 for 4 minutes, treat it as\n   regression after a deploy and move to mitigation; below that it usually recovers on its own.\n5. Compare error rates between pods on the old and new version.\n\n## Mitigation\n\n1. Roll back: `deployctl rollback ledger`; don't wait to debug.\n2. Freeze deploys for ledger.\n3. If that doesn't help within 10 minutes, set `deploy_batch_size=34` on\n   ledger (`configctl set ledger deploy_batch_size 34`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"the timing aligns with the \\\"regression after a deploy\\\" pattern described in the runbook\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"the timing aligns with the \\\"regression after a deploy\\\" pattern described in the runbook\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 950,
+    "output_tokens": 33,
+    "total_ms": 9587,
+    "load_ms": 3,
+    "prompt_eval_ms": 7271,
+    "eval_ms": 2254
+   },
+   "ttft_ms": 9613,
+   "total_ms": 9613
+  }
+ ]
+}

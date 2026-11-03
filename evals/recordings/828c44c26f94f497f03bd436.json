@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nFirst split the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Take facts only from the sentence, never from the source. Keep each fact framed the way the sentence frames it: \"a deploy to X is a candidate cause\" stays a candidate, not \"X caused it\". Leave out statements about the evidence or the brief itself (\"the evidence does not cover X\", \"the evidence points to Y\").\n\nThen compare each fact with the source and give it a status:\n- stated: the source says this, in any wording. Facts the incident line gives (its service, its start) count as stated. \"Shortly before the incident\" means up to 2 hours before its start. A candidate cause is stated when the source shows it happening in that time or names it as a possible or common cause.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event the sentence places shortly before the incident that the source dates after its start or more than 2 hours before; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\norders, started 2026-10-28T06:09:46.431150+00:00\n\nSentence:\nSearch the logs for the error code this failure logs: `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-TLS-415`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-QUEUE-733`  or `kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678` . (this sentence cites 3 sources)\n\nSource:\n# Orders: dependency timeouts\n\nAlert: `OrdersUpstreamTimeouts` fires when the share of calls to a dependency that time out, `orders_upstream_timeout_pct`, stays above its threshold for 5 minutes. Orders is a\ncore-tier service owned by the commerce team; it calls\npayments, inventory, notifications, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to payments.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Network path.** Packet loss between zones adds retransmits.\n- **Dependency degraded.** payments itself is slow or partially down.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on orders is network path: it explained 12 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes\n   \"network path\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678\n   ```\n\n4. If `orders_upstream_timeout_pct` stays above 8 for 5 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check payments's own dashboard before changing anything in orders.\n\n## Mitigation\n\n1. Open the circuit breaker for payments if the feature can degrade.\n2. Fail over calls to the standby region for payments if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=40` on\n   orders (`configctl set orders upstream_timeout_ms 40`) and restart one pod at a\n   time."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"the service is orders\", \"status\": \"stated\"}, {\"fact\": \"the error code ORD-TLS-415 is a failure log\", \"status\": \"not_stated\"}, {\"fact\": \"the error code ORD-QUEUE-733 is a failure log\", \"status\": \"not_stated\"}, {\"fact\": \"the error code ORD-DEP-678 is a failure log\", \"status\": \"stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"the service is orders\", \"status\": \"stated\"}, {\"fact\": \"the error code ORD-TLS-415 is a failure log\", \"status\": \"not_stated\"}, {\"fact\": \"the error code ORD-QUEUE-733 is a failure log\", \"status\": \"not_stated\"}, {\"fact\": \"the error code ORD-DEP-678 is a failure log\", \"status\": \"stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 988,
+    "output_tokens": 99,
+    "total_ms": 17763,
+    "load_ms": 11,
+    "prompt_eval_ms": 7009,
+    "eval_ms": 7977
+   },
+   "ttft_ms": 17787,
+   "total_ms": 17787
+  }
+ ]
+}

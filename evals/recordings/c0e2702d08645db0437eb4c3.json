@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe incident occurred shortly after deploys to api-gateway, ledger, and orders , which are candidates for the cause. (this sentence cites 3 sources)\n\nSource:\nDeploy gdep-07: api-gateway version 2.31.1 deployed at 2026-10-28T08:08:43.659038Z by Golden Set (commit 2ddd3869d9, succeeded). Change: Release with the regression."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"supports\": true,\n  \"reason\": \"The source states the fact that the incident occurred after a deploy to api-gateway.\"\n}"
+   ],
+   "result": {
+    "content": "{\n  \"supports\": true,\n  \"reason\": \"The source states the fact that the incident occurred after a deploy to api-gateway.\"\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 261,
+    "output_tokens": 31,
+    "total_ms": 1861,
+    "load_ms": 0,
+    "prompt_eval_ms": 458,
+    "eval_ms": 1398
+   },
+   "ttft_ms": 1899,
+   "total_ms": 1899
+  }
+ ]
+}

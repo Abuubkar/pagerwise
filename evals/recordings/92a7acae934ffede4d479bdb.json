@@ -1,0 +1,168 @@
+{
+ "request": {
+  "model": "qwen3.5:9b-q4_K_M",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You write the first triage brief for an incident, for the on-call engineer. Use only the evidence below. It comes from three sources: runbooks (how to handle a failure), postmortems (past incidents) and deploys (recent releases). Each item starts with a tag such as [C1]. The incident description after the evidence is what you are triaging; it is not evidence and not a past incident.\n\nWrite exactly these four sections, in this order, each starting with its heading line, and nothing before the first:\n\n## Likely cause\n## Blast radius\n## First steps\n## Similar incidents\n\nRules:\n1. End every sentence that states a fact with the tag of the item that supports it, for example: \"Payments p99 rises when the ledger pool drops below 20 idle connections [C2].\" If two items support it, write both tags: [C2][C5].\n2. Only use tags that appear in the evidence. Never make up a tag. Do not use knowledge from outside the evidence.\n3. Likely cause: its first line is \"Match: \" and the tag of the runbook or postmortem that describes this incident's failure (the same kind of symptom on the affected service or one it depends on), or \"Match: none\" if no item does. A runbook for a different failure does not match, and a deploy never does. After \"Match: none\", write nothing else in the section. After a match, on the next lines, give the most likely cause and why, in at most 3 sentences; a deploy shortly before the incident (each deploy says how long before it was) to the affected service or a service it depends on is a candidate cause: say so with its tag.\n4. Blast radius: which services and users are affected, per the evidence. If the evidence says nothing about it, the whole section is exactly INSUFFICIENT_EVIDENCE.\n5. First steps: a numbered list of at most 5 steps from the evidence, each ending with its tag. Include the exact commands from the items. If there are none, the whole section is exactly INSUFFICIENT_EVIDENCE.\n6. Similar incidents: past incidents that a postmortem describes, with tags. A runbook's instructions and a deploy are not past incidents. If no postmortem describes a similar past incident, the whole section is exactly: None in the evidence.\n7. Unavailable sources: if the message lists sources that were unavailable, you know nothing about them. Do not state, guess or imply anything about what they contain, including that they contain nothing. Other evidence does not stand in for them: if deploys are unavailable, never say this incident followed a deploy, or that it didn't, even when a postmortem or runbook mentions a deploy; a postmortem describes a past incident, not this one. You may add a first step to check that source by hand, without a tag."
+   },
+   {
+    "role": "user",
+    "content": "Evidence:\n\n[C1] (runbook orders-cert-expiry.md: Orders: TLS certificate expiry)\n# Orders: TLS certificate expiry\n\nAlert: `OrdersCertExpiring` fires when a certificate's remaining validity, `orders_cert_days_left`, drops below its threshold. Orders is a\ncore-tier service owned by the commerce team; it calls\npayments, inventory, notifications, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Handshake failures from clients with strict validation.\n- Errors start at the same minute everywhere.\n- Internal calls fail while external ones work, or the reverse.\n\n## Likely causes\n\n- **Renewal job failed.** cert-manager couldn't complete its challenge.\n- **Clock skew.** A node's clock is far enough off to reject valid certificates.\n- **Pinned intermediate.** A client pins an intermediate that rotated.\n\nThe most common cause on orders is renewal job failed: it explained 22 of the\nlast 29 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_cert_days_left` with the\n   same hour last week.\n2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes\n   \"renewal job failed\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-TLS-415\n   ```\n\n4. If `orders_cert_days_left` stays above 13 for 10 minutes, treat it as\n   TLS certificate expiry and move to mitigation; below that it usually recovers on its own.\n5. Check expiry with `openssl s_client -connect orders:443 | openssl x509 -noout -enddate`.\n\n[C2] (runbook orders-cert-expiry.md: Orders: TLS certificate expiry)\n## Mitigation\n\n1. Force renewal: `kubectl -n platform annotate certificate orders renew=now`.\n2. Restart pods so they load the new certificate.\n3. If that doesn't help within 10 minutes, set `ocsp_stapling=17` on\n   orders (`configctl set orders ocsp_stapling 17`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the commerce secondary after 45 minutes without improvement, or at once if more than\n10% of orders requests are failing. Coordinate in `#commerce-oncall`.\n\n[C3] (runbook orders-queue-backlog.md: Orders: queue backlog)\n# Orders: queue backlog\n\nAlert: `OrdersConsumerLagHigh` fires when consumer lag, `orders_consumer_lag_msgs`, stays above its threshold for 10 minutes. Orders is a\ncore-tier service owned by the commerce team; it calls\npayments, inventory, notifications, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Consumer lag grows steadily.\n- Processing rate is lower than the produce rate.\n- Downstream data is stale.\n\n## Likely causes\n\n- **Too few consumers.** Consumers crashed or were scaled down.\n- **Poison message.** One message fails and blocks its partition.\n- **Slow consumers.** Each message takes longer to process than usual.\n\nThe most common cause on orders is too few consumers: it explained 27 of the\nlast 27 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_consumer_lag_msgs` with the\n   same hour last week.\n2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes\n   \"too few consumers\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-QUEUE-733\n   ```\n\n4. If `orders_consumer_lag_msgs` stays above 8063 for 3 minutes, treat it as\n   queue backlog and move to mitigation; below that it usually recovers on its own.\n5. Check whether lag grows on all partitions or a few: a few points at a poison message or hot key.\n\n## Mitigation\n\n1. Scale consumers up to the partition count.\n2. Skip and dead-letter a poison message after 3 attempts.\n3. If that doesn't help within 10 minutes, set `consumer_concurrency=31` on\n   orders (`configctl set orders consumer_concurrency 31`) and restart one pod at a\n   time.\n\n## Escalation\n\nPage the commerce secondary after 45 minutes without improvement, or at once if more than\n10% of orders requests are failing. Coordinate in `#commerce-oncall`.\n\n[C4] (runbook orders-dependency-timeout.md: Orders: dependency timeouts)\n# Orders: dependency timeouts\n\nAlert: `OrdersUpstreamTimeouts` fires when the share of calls to a dependency that time out, `orders_upstream_timeout_pct`, stays above its threshold for 5 minutes. Orders is a\ncore-tier service owned by the commerce team; it calls\npayments, inventory, notifications, postgres-primary, and\napi-gateway call it.\n\n## Symptoms\n\n- Timeouts concentrate on calls to payments.\n- The service's own CPU and memory look normal.\n- Thread or connection pools fill while waiting.\n\n## Likely causes\n\n- **Network path.** Packet loss between zones adds retransmits.\n- **Dependency degraded.** payments itself is slow or partially down.\n- **Timeout set too low.** A recent config change shortened the timeout below normal latency.\n\nThe most common cause on orders is network path: it explained 12 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `orders-overview` dashboard and compare `orders_upstream_timeout_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history orders --since 2h`. A deploy in the last hour makes\n   \"network path\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n commerce logs deploy/orders --since 15m | grep ORD-DEP-678\n   ```\n\n4. If `orders_upstream_timeout_pct` stays above 8 for 5 minutes, treat it as\n   dependency timeouts and move to mitigation; below that it usually recovers on its own.\n5. Check payments's own dashboard before changing anything in orders.\n\n## Mitigation\n\n1. Open the circuit breaker for payments if the feature can degrade.\n2. Fail over calls to the standby region for payments if one exists.\n3. If that doesn't help within 10 minutes, set `upstream_timeout_ms=40` on\n   orders (`configctl set orders upstream_timeout_ms 40`) and restart one pod at a\n   time.\n\n[C5] (postmortem 2026-02-07-orders-error-rate.md: Postmortem: orders elevated error rate (2026-02-07))\n# Postmortem: orders elevated error rate (2026-02-07)\n\n## Summary\n\nOn 2026-02-07, orders returned errors for 76 minutes. The cause was in inventory.\nThe incident was sev2 and was opened by `OrdersErrorRateHigh`.\n\n## Impact\n\n- 51% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 776 customers saw errors; 49 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **13:49** inventory 2.26.7 deployed by Benjamin Davis.\n- **14:20** `OrdersErrorRateHigh` fired; on-call acknowledged.\n- **14:22** Checked the orders runbook for elevated error rate.\n- **15:14** Found the cause in inventory.\n- **15:18** Mitigation applied; error rate falling.\n- **15:36** Recovered; incident resolved.\n\n## Root cause\n\n2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.\n\nCategory: elevated error rate. Component: inventory.\n\n## Contributing factors\n\n- The elevated error rate alert for inventory had no runbook link.\n- Logs were sampled at 1%, so the first errors weren't visible.\n\n## Action items\n\n- ORDE-1624 (commerce): Add an alert on error_ratio_pct for inventory.\n- ORDE-9902 (discovery): Add a regression test for: 2.26.7 of inventory sent a null currency on refunds, which the validation layer rejected.\n- ORDE-3635 (discovery): Link the runbook from the alert.\n\n[C6] (postmortem 2026-09-08-orders-error-rate.md: Postmortem: orders elevated error rate (2026-09-08))\n# Postmortem: orders elevated error rate (2026-09-08)\n\n## Summary\n\nOn 2026-09-08, orders returned errors for 146 minutes. The cause was in inventory.\nThe incident was sev1 and was opened by `OrdersErrorRateHigh`.\n\n## Impact\n\n- 45% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 13,578 customers saw errors; 54 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **10:47** Routine traffic; nothing unusual in inventory.\n- **11:13** `OrdersErrorRateHigh` fired; on-call acknowledged.\n- **11:36** Checked the orders runbook for elevated error rate.\n- **12:42** Found the cause in inventory.\n- **13:01** Mitigation applied; error rate falling.\n- **13:39** Recovered; incident resolved.\n\n## Root cause\n\nA credential for inventory was rotated without restarting consumers, so every call was refused.\n\nCategory: elevated error rate. Component: inventory.\n\n## Contributing factors\n\n- The elevated error rate alert for inventory had no runbook link.\n- The on-call engineer had no access to the database dashboards.\n- Dashboards showed averages, which hid the p99.\n\n## Action items\n\n- ORDE-4101 (discovery): Add an alert on error_ratio_pct for inventory.\n- ORDE-5279 (discovery): Add a regression test for: a credential for inventory was rotated without restarting consumers, so every call was refused.\n- ORDE-9952 (discovery): Link the runbook from the alert.\n\n[C7] (postmortem 2025-12-21-orders-error-rate.md: Postmortem: orders elevated error rate (2025-12-21))\n# Postmortem: orders elevated error rate (2025-12-21)\n\n## Summary\n\nOn 2025-12-21, orders returned errors for 41 minutes. The cause was in payments.\nThe incident was sev1 and was opened by `OrdersErrorRateHigh`.\n\n## Impact\n\n- 59% of orders requests failed or timed out at the peak.\n- Callers affected: api-gateway.\n- 18,487 customers saw errors; 38 support tickets were opened.\n\n## Timeline\n\nAll times UTC.\n\n- **14:30** payments 3.38.14 deployed by Angela Cole.\n- **14:48** `OrdersErrorRateHigh` fired; on-call acknowledged.\n- **14:48** Checked the orders runbook for elevated error rate.\n- **15:06** Found the cause in payments.\n- **15:11** Mitigation applied; error rate falling.\n- **15:29** Recovered; incident resolved.\n\n## Root cause\n\n3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.\n\nCategory: elevated error rate. Component: payments.\n\n## Contributing factors\n\n- The elevated error rate alert for payments had no runbook link.\n- The on-call engineer had no access to the database dashboards.\n\n## Action items\n\n- ORDE-6061 (payments): Add an alert on error_ratio_pct for payments.\n- ORDE-2851 (commerce): Add a regression test for: 3.38.14 of payments sent a null currency on refunds, which the validation layer rejected.\n- ORDE-6316 (payments): Link the runbook from the alert.\n\nIncident:\nTitle: OrdersLicenseCheckFailing on orders\nService: orders\nSeverity: sev1\nOpened: 2026-10-28T06:09:46.431150+00:00\nSummary: commercial license validation failing on orders-0"
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3572,
+    "output_tokens": 40,
+    "total_ms": 18857,
+    "load_ms": 8,
+    "prompt_eval_ms": 16849,
+    "eval_ms": 1823
+   },
+   "ttft_ms": 17054,
+   "total_ms": 18867
+  },
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3572,
+    "output_tokens": 40,
+    "total_ms": 19063,
+    "load_ms": 1,
+    "prompt_eval_ms": 16803,
+    "eval_ms": 1808
+   },
+   "ttft_ms": 17271,
+   "total_ms": 19073
+  },
+  {
+   "pieces": [
+    "##",
+    " Likely",
+    " cause",
+    "\nMatch",
+    ":",
+    " none",
+    "\n\n##",
+    " Blast",
+    " radius",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " First",
+    " steps",
+    "\nINS",
+    "UFF",
+    "ICIENT",
+    "_E",
+    "VID",
+    "ENCE",
+    "\n\n##",
+    " Similar",
+    " incidents",
+    "\nNone",
+    " in",
+    " the",
+    " evidence",
+    "."
+   ],
+   "result": {
+    "content": "## Likely cause\nMatch: none\n\n## Blast radius\nINSUFFICIENT_EVIDENCE\n\n## First steps\nINSUFFICIENT_EVIDENCE\n\n## Similar incidents\nNone in the evidence.",
+    "model": "qwen3.5:9b-q4_K_M",
+    "prompt_tokens": 3572,
+    "output_tokens": 40,
+    "total_ms": 19139,
+    "load_ms": 3,
+    "prompt_eval_ms": 16806,
+    "eval_ms": 1805
+   },
+   "ttft_ms": 17355,
+   "total_ms": 19152
+  }
+ ]
+}

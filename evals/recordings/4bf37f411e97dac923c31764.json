@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nConfirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the same hour last week .\n\nSource:\n# Redis cache: disk full\n\nAlert: `RedisCacheDiskFull` fires when disk usage, `redis_cache_disk_used_pct`, rises above its threshold. Redis cache is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nauth, card-auth, search call it.\n\n## Symptoms\n\n- Writes fail with 'no space left on device'.\n- Log volume grew sharply in the last day.\n- Compaction or cleanup jobs are behind.\n\n## Likely causes\n\n- **Log volume.** Debug logging left on after an investigation.\n- **Retention not applied.** A cleanup job failed silently and old data piled up.\n- **Large temporary files.** A batch job writes temp files it doesn't remove.\n\nThe most common cause on redis-cache is log volume: it explained 14 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history redis-cache --since 2h`. A deploy in the last hour makes\n   \"log volume\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/redis-cache --since 15m | grep RED-DISK-856\n   ```\n\n4. If `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as\n   disk full and move to mitigation; below that it usually recovers on its own.\n5. Find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"supports\": true, \"reason\": \"The source states the fact that the claim is asking to confirm, specifically by comparing `redis_cache_disk_used_pct` with the same hour last week.\"}"
+   ],
+   "result": {
+    "content": "{\"supports\": true, \"reason\": \"The source states the fact that the claim is asking to confirm, specifically by comparing `redis_cache_disk_used_pct` with the same hour last week.\"}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 566,
+    "output_tokens": 41,
+    "total_ms": 3597,
+    "load_ms": 0,
+    "prompt_eval_ms": 1895,
+    "eval_ms": 1687
+   },
+   "ttft_ms": 3608,
+   "total_ms": 3608
+  }
+ ]
+}

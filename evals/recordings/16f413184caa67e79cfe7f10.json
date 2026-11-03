@@ -1,0 +1,56 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check citations in an incident triage brief. You get one claim (a sentence from the brief, which may cite several sources) and the text of one source it cites. Decide whether this source supports the claim.\n\nAnswer yes if the source states the claim's facts, or, when the claim cites several sources, states at least one of its facts and contradicts none. Answer no if the source states none of the claim's facts, contradicts the claim, the claim turns a possibility in the source into a certainty, or the claim presents what the source says about a different, past incident as a fact about the current one. Wording can differ.\n\nAnswer in JSON: {\"supports\": true or false, \"reason\": \"<one short sentence>\"}."
+   },
+   {
+    "role": "user",
+    "content": "Claim:\nThe incident involves a kernel soft lockup, which is not explicitly described as a likely cause in the provided evidence; however, recent deploys to `auth` (dep-0366  and gdep-04 ) occurred shortly before the incident. (this sentence cites 2 sources)\n\nSource:\nDeploy dep-0366: auth version 8.14.25 deployed at 2026-10-28T11:18:00Z by Lori Krueger (commit 402607f1ea, succeeded). Change: Roll out inventory behind a flag."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "supports": {
+     "type": "boolean"
+    },
+    "reason": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "supports",
+    "reason"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"supports\": true,\n  \"reason\": \"The source states one of the facts mentioned in the claim, specifically that a recent deploy to `auth` occurred shortly before the incident.\"\n}"
+   ],
+   "result": {
+    "content": "{\n  \"supports\": true,\n  \"reason\": \"The source states one of the facts mentioned in the claim, specifically that a recent deploy to `auth` occurred shortly before the incident.\"\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 285,
+    "output_tokens": 41,
+    "total_ms": 2628,
+    "load_ms": 0,
+    "prompt_eval_ms": 618,
+    "eval_ms": 2006
+   },
+   "ttft_ms": 2652,
+   "total_ms": 2652
+  }
+ ]
+}

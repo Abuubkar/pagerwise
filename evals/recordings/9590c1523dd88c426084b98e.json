@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "llama3.1:8b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\nredis-cache, started 2026-10-28T10:39:15.304277+00:00\n\nSentence:\nConfirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the same hour last week .\n\nSource:\n# Redis cache: disk full\n\nAlert: `RedisCacheDiskFull` fires when disk usage, `redis_cache_disk_used_pct`, rises above its threshold. Redis cache is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nauth, card-auth, search call it.\n\n## Symptoms\n\n- Writes fail with 'no space left on device'.\n- Log volume grew sharply in the last day.\n- Compaction or cleanup jobs are behind.\n\n## Likely causes\n\n- **Log volume.** Debug logging left on after an investigation.\n- **Retention not applied.** A cleanup job failed silently and old data piled up.\n- **Large temporary files.** A batch job writes temp files it doesn't remove.\n\nThe most common cause on redis-cache is log volume: it explained 14 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `redis-cache-overview` dashboard and compare `redis_cache_disk_used_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history redis-cache --since 2h`. A deploy in the last hour makes\n   \"log volume\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/redis-cache --since 15m | grep RED-DISK-856\n   ```\n\n4. If `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as\n   disk full and move to mitigation; below that it usually recovers on its own.\n5. Find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\n  \"facts\": [\n    {\n      \"fact\": \"the alert is real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"open the `redis-cache-overview` dashboard\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"compare `redis_cache_disk_used_pct` with the same hour last week\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache is a data-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache is owned by the platform team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache calls no other internal services\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"auth, card-auth, search call redis-cache\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"writes fail with 'no space left on device'\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume grew sharply in the last day\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"compaction or cleanup jobs are behind\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume is the most common cause of this alert\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume explained 14 of the last 20 pages for this alert\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour makes 'log volume' less likely\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour makes 'regression' more likely\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"search the logs for the error code RED-DISK-856\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"if `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as disk full\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"if `redis_cache_disk_used_pct` stays below 89 for 7 minutes, it usually recovers on its own\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`\",\n      \"status\": \"stated\"\n    }\n  ]\n}"
+   ],
+   "result": {
+    "content": "{\n  \"facts\": [\n    {\n      \"fact\": \"the alert is real\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"open the `redis-cache-overview` dashboard\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"compare `redis_cache_disk_used_pct` with the same hour last week\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache is a data-tier service\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache is owned by the platform team\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"redis-cache calls no other internal services\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"auth, card-auth, search call redis-cache\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"writes fail with 'no space left on device'\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume grew sharply in the last day\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"compaction or cleanup jobs are behind\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume is the most common cause of this alert\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"log volume explained 14 of the last 20 pages for this alert\",\n      \"status\": \"contradicted\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour makes 'log volume' less likely\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"a deploy in the last hour makes 'regression' more likely\",\n      \"status\": \"not_stated\"\n    },\n    {\n      \"fact\": \"search the logs for the error code RED-DISK-856\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"if `redis_cache_disk_used_pct` stays above 89 for 7 minutes, treat it as disk full\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"if `redis_cache_disk_used_pct` stays below 89 for 7 minutes, it usually recovers on its own\",\n      \"status\": \"stated\"\n    },\n    {\n      \"fact\": \"find the largest directories with `du -sh /var/lib/redis-cache/* | sort -h | tail`\",\n      \"status\": \"stated\"\n    }\n  ]\n}",
+    "model": "llama3.1:8b",
+    "prompt_tokens": 693,
+    "output_tokens": 554,
+    "total_ms": 25388,
+    "load_ms": 0,
+    "prompt_eval_ms": 2097,
+    "eval_ms": 23178
+   },
+   "ttft_ms": 25403,
+   "total_ms": 25403
+  }
+ ]
+}

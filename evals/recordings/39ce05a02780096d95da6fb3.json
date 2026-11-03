@@ -1,0 +1,72 @@
+{
+ "request": {
+  "model": "gemma4:12b",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You check one citation in an incident triage brief. You get the incident (its service and when it started), one sentence from the brief, and the text of one source the sentence cites. The sentence may cite other sources too.\n\nSplit the sentence into its separate facts: each a short statement about a service, a number, a cause, an event, a time or a command. Leave out hedges (\"may\", \"a candidate cause\") and statements about the evidence itself (\"the evidence does not show X\"). Then compare each fact with the source and give it a status:\n- stated: the source says this, in any wording.\n- contradicted: the source says something that can't be true at the same time: a different service, number, cause or kind of failure; an event whose time doesn't fit what the sentence says about it relative to the incident's start; a possibility in the source stated as a certainty; or what the source says about a past incident stated as a fact about this incident.\n- not_stated: the source says nothing either way.\n\nAnswer in JSON: {\"facts\": [{\"fact\": \"<short statement>\", \"status\": \"stated\" or \"not_stated\" or \"contradicted\"}]}"
+   },
+   {
+    "role": "user",
+    "content": "Incident:\npostgres-primary, started 2026-10-28T08:36:57.279467+00:00\n\nSentence:\nA deploy shortly before the incident to the affected service is a candidate cause .\n\nSource:\n# Postgres primary: regression after a deploy\n\nAlert: `PostgresPrimaryPostDeployErrors` fires when errors in the 30 minutes after a deploy, `postgres_primary_post_deploy_error_pct`, exceed their threshold. Postgres primary is a\ndata-tier service owned by the platform team; it calls\nno other internal services, and\nauth, inventory, ledger, orders call it.\n\n## Symptoms\n\n- Errors start within minutes of a deploy finishing.\n- Only pods on the new version show errors.\n- Canary metrics were borderline but passed.\n\n## Likely causes\n\n- **Code regression.** The new release breaks a path the tests don't cover.\n- **Schema mismatch.** The release reads a column a migration hasn't added yet.\n- **Config drift.** The release expects a setting that isn't present in production.\n\nThe most common cause on postgres-primary is code regression: it explained 14 of the\nlast 20 pages for this alert.\n\n## Diagnosis\n\n1. Confirm the alert is real: open the `postgres-primary-overview` dashboard and compare `postgres_primary_post_deploy_error_pct` with the\n   same hour last week.\n2. Check recent changes: `deployctl history postgres-primary --since 2h`. A deploy in the last hour makes\n   \"code regression\" less likely than a regression.\n3. Search the logs for the error code this failure logs:\n\n   ```bash\n   kubectl -n platform logs deploy/postgres-primary --since 15m | grep POS-DEPLOY-939\n   ```\n\n4. If `postgres_primary_post_deploy_error_pct` stays above 8 for 4 minutes, treat it as\n   regression after a deploy and move to mitigation; below that it usually recovers on its own.\n5. Compare error rates between pods on the old and new version."
+   }
+  ],
+  "think": false,
+  "keep_alive": "10m",
+  "options": {
+   "temperature": 0.0,
+   "num_ctx": 8192,
+   "num_predict": 1024
+  },
+  "format": {
+   "type": "object",
+   "properties": {
+    "facts": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "fact": {
+        "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "stated",
+         "not_stated",
+         "contradicted"
+        ]
+       }
+      },
+      "required": [
+       "fact",
+       "status"
+      ]
+     }
+    }
+   },
+   "required": [
+    "facts"
+   ]
+  }
+ },
+ "runs": [
+  {
+   "pieces": [
+    "{\"facts\": [{\"fact\": \"A deploy occurred shortly before the incident.\", \"status\": \"not_stated\"}]}"
+   ],
+   "result": {
+    "content": "{\"facts\": [{\"fact\": \"A deploy occurred shortly before the incident.\", \"status\": \"not_stated\"}]}",
+    "model": "gemma4:12b",
+    "prompt_tokens": 743,
+    "output_tokens": 25,
+    "total_ms": 8803,
+    "load_ms": 5,
+    "prompt_eval_ms": 5980,
+    "eval_ms": 1665
+   },
+   "ttft_ms": 8828,
+   "total_ms": 8828
+  }
+ ]
+}
