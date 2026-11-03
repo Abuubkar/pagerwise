@@ -54,8 +54,10 @@ design.
   Failing on every miss would turn every PR red until triage meets its gates.
 - **The PR comment:** a sticky comment shows the metrics against main, with deltas. `gh api` updates it in place,
   found by a marker, so no third-party comment action is needed.
-- **Open risk:** a triage replay needs the same evidence as when it was recorded. If the runners' x86 embeddings
-  rank chunks differently from the Mac, a prompt changes and its recording is missing.
+- **A replay needs the evidence it was recorded with.** The first CI run missed a recording because the
+  local database held a stale copy of 6 postmortems (docs/challenges.md); x86 embeddings changed no prompt. The eval
+  now refuses to run when the database's documents differ from `data/`, and a replay miss prints the diff against
+  the nearest recording.
 
 **load-smoke** runs `scripts/storm.py` (slice 3's check) at 500 events/s for 60 s, with a replica killed halfway,
 against the compose stack. A `git diff` against the base decides whether it runs, instead of a third-party

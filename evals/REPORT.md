@@ -1,6 +1,6 @@
 # Eval report: dev split, embedding v2
 
-Run 20261103T093618 at 2026-11-03T09:36:18+00:00, reranker Xenova/ms-marco-MiniLM-L-6-v2 on the top 0.
+Run 20261103T110428 at 2026-11-03T11:04:28+00:00, reranker Xenova/ms-marco-MiniLM-L-6-v2 on the top 0.
 
 ## Gates
 
@@ -8,17 +8,17 @@ Run 20261103T093618 at 2026-11-03T09:36:18+00:00, reranker Xenova/ms-marco-MiniL
 |---|---|---|---|
 | retrieval.recall_at_8 | 1.000 | >= 0.9 | pass |
 | retrieval.mrr_at_10 | 1.000 | >= 0.7 | pass |
-| retrieval.latency_p95_ms | 56.100 | <= 250 | pass |
+| retrieval.latency_p95_ms | 35.700 | <= 250 | pass |
 | clustering.f1 | 0.847 | >= 0.84 | pass |
 | triage.root_cause_hit_at_1 | 0.800 | >= 0.6 | pass |
 | triage.root_cause_hit_at_3 | 0.840 | >= 0.8 | pass |
 | triage.abstention | 0.400 | >= 0.8 | **MISS** |
 | triage.degraded_honesty | 1.000 | >= 1.0 | pass |
 | triage.format_validity | 0.927 | >= 0.95 | **MISS** |
-| triage.ttft_p95_ms | 20376.000 | <= 20000 | **MISS** |
+| triage.ttft_p95_ms | 20670.000 | <= 20000 | **MISS** |
 | triage.total_p95_ms | 42321.000 | <= 45000 | pass |
 | triage.citation_precision | 0.962 | >= 0.9 | pass |
-| triage.unsupported_claim_rate | 0.158 | <= 0.08 | **MISS** |
+| triage.unsupported_claim_rate | 0.142 | <= 0.08 | **MISS** |
 
 ## Retrieval ablation
 
@@ -26,25 +26,25 @@ Run 20261103T093618 at 2026-11-03T09:36:18+00:00, reranker Xenova/ms-marco-MiniL
 
 | stage | Recall@8 | MRR@10 | p95 ms (cumulative) |
 |---|---|---|---|
-| full-text only | 0.000 | 0.000 | 6 |
-| vector only | 0.740 | 1.000 | 11 |
-| hybrid (RRF) | 0.740 | 1.000 | 61 |
-| hybrid + rerank | 0.740 | 1.000 | 61 |
-| final (+ sibling chunks) | 1.000 | 1.000 | 56 |
+| full-text only | 0.000 | 0.000 | 4 |
+| vector only | 0.740 | 1.000 | 6 |
+| hybrid (RRF) | 0.740 | 1.000 | 37 |
+| hybrid + rerank | 0.740 | 1.000 | 37 |
+| final (+ sibling chunks) | 1.000 | 1.000 | 36 |
 
 ### Retrieval cases short of perfect (0 of 25)
 
 
 ## Clustering
 
-508 alerts from 41 cases became 53 incidents (in 8.1s). Pairwise precision 0.983, recall 0.743, F1 0.847.
+508 alerts from 41 cases became 53 incidents (in 4.2s). Pairwise precision 0.983, recall 0.743, F1 0.847.
 
 - Split across several incidents (13): ans-06 (notifications) into 2, ans-09 (payments) into 2, ans-10 (kafka-broker) into 2, ans-14 (kafka-broker) into 2, ans-21 (inventory) into 2, ans-23 (search) into 2, ans-26 (orders) into 2, ans-27 (payments) into 2, ans-32 (api-gateway) into 3, ans-34 (kafka-broker) into 2, ans-36 (api-gateway) into 2, ans-38 (ledger) into 2, deg-09 (search) into 2
 - Merged with another case (4): ans-14 (kafka-broker) with ans-32, ans-23 (search) with deg-09, ans-32 (api-gateway) with ans-14, deg-09 (search) with ans-23
 
 ## Triage
 
-123 briefs (3 per case). TTFT p50/p95 17.1 / 20.4 s, total p50/p95 34.1 / 42.3 s, 10.3 output tokens/s.
+123 briefs (3 per case). TTFT p50/p95 16.8 / 20.7 s, total p50/p95 33.7 / 42.3 s, 11.0 output tokens/s.
 
 ### Cases that missed (11 of 41)
 
@@ -62,7 +62,7 @@ Run 20261103T093618 at 2026-11-03T09:36:18+00:00, reranker Xenova/ms-marco-MiniL
   - Likely cause: A deploy shortly before the incident (gdep-10) to the affected service is a candidate cause [C8].
 The most likely cause is dependency degraded, as it explained 14 of the last 16 pages for this alert [C1].
 - **una-07** (unanswerable) verdict CAUSE_IDENTIFIED
-  - Likely cause: The incident involves `card-auth` returning errors or failing, which aligns with the elevated error rate, connection pool exhaustion, and memory pressure incidents where the root cause was identified in `redis-cache`. A recent deploy to `redis-cache` (specifically version 6.38.7 on 2026-10-25) is a 
+  - Likely cause: A recent release introduced an exception or change that caused the service to fail, as bad deploys are the most common cause for elevated error rates and memory pressure incidents on this service [C1]. A deploy shortly before the incident (specifically redis-cache 6.38.7 deployed by Chris Curtis) is
 - **una-09** (unanswerable) format: format_invalid
   - Likely cause: The most likely cause is a hot loop in a release, as this was the most common cause for CPU saturation alerts on postgres-primary in the past. A deploy to auth (dep-0366) occurred 26 minutes before the incident opened, making it a candidate cause if the change affected postgres-primary or its caller
 - **una-12** (unanswerable) verdict CAUSE_IDENTIFIED
@@ -74,7 +74,7 @@ The most likely cause is dependency degraded, as it explained 14 of the last 16 
 
 ## Citations (deterministic checks, ADR 0010)
 
-Citation precision 0.962 over 286 checkable (sentence, source) pairs; unsupported-claim rate 0.158; 77% of sentences have checkable content; 0 citations of a deploy from after the incident started.
+Citation precision 0.962 over 288 checkable (sentence, source) pairs; unsupported-claim rate 0.142; 76% of sentences have checkable content; 0 citations of a deploy from after the incident started.
 
 Against the hand labels: held-out 16 of 20 rows checkable, agreement 0.81, kappa 0.613; tune 31 of 40, agreement 0.77, kappa 0.467. A check's no is nearly always right; its yes misses wrong relationships (a real number or service in a false statement), so precision here is an upper bound.
 
@@ -82,6 +82,7 @@ Against the hand labels: held-out 16 of 20 rows checkable, agreement 0.81, kappa
 
 - **ans-08** blast_radius ['C5'] [False]: The blast radius affects the payments service and its callers, specifically api-gateway and orders, as well as 14,151 customers who saw errors .
 - **ans-11** blast_radius ['C5', 'C6'] [False, True]: Callers affected: auth, card-auth, search . 10% of redis-cache requests failed or timed out at the peak . 4,595 customers saw errors .
+- **ans-15** likely_cause ['C1'] [False]: A deploy to auth shortly before the incident (specifically gdep-03 to postgres-primary at 104 minutes prior) is a candidate cause if it introduced a regression, though the evidence points primarily to
 - **ans-18** first_steps ['C4'] [False]: If it is the ledger, run `kubectl -n ledger exec deploy/ledger -- ledgerctl pool stats` to check the pool status .
 - **ans-21** likely_cause ['C8'] [False]: A deploy to postgres-primary shortly before the incident (specifically gdep-09 to search was 33 minutes prior, but postmortems C5, C6, and C7 indicate recent deploys to postgres-primary caused similar
 - **ans-22** likely_cause ['C5'] [False]: A deploy to orders occurred 75 minutes before the incident opened, but the root cause description points to persistent debug logging rather than a regression from that specific release .
@@ -89,12 +90,11 @@ Against the hand labels: held-out 16 of 20 rows checkable, agreement 0.81, kappa
 - **ans-32** blast_radius ['C5', 'C6'] [False, True]: Customers seeing errors depend on the specific callers affected by the underlying cause (e.g., if auth is down, api-gateway callers are affected) .
 - **una-05** blast_radius ['C5'] [False]: 3,522 customers saw errors .
 - **una-05** blast_radius ['C6'] [False]: 30,395 customers saw errors .
-- **una-07** likely_cause ['C7'] [False]: A recent deploy to `redis-cache` (specifically version 6.38.7 on 2026-10-25) is a candidate cause for issues affecting `card-auth` .
 - **una-12** likely_cause ['C1'] [False]: A deploy to orders occurred 38 minutes before the incident opened, which makes a regression less likely according to the runbook's guidance on checking recent changes .
 
 ## Missed
 
 - triage.abstention = 0.400, gate >= 0.8 (also on the baseline)
 - triage.format_validity = 0.927, gate >= 0.95 (also on the baseline)
-- triage.ttft_p95_ms = 20376.000, gate <= 20000 (also on the baseline)
-- triage.unsupported_claim_rate = 0.158, gate <= 0.08 (also on the baseline)
+- triage.ttft_p95_ms = 20670.000, gate <= 20000 (also on the baseline)
+- triage.unsupported_claim_rate = 0.142, gate <= 0.08 (also on the baseline)
