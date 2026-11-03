@@ -1,0 +1,58 @@
+# Slice 8 done-when, 2026-11-03. Local compose stack: otel-collector-contrib 0.163.2 (tail sampling), Jaeger 2.22,
+# Prometheus 3.15.1, Loki 3.7.9, Grafana 13.2.5. OpenTelemetry Python 1.45.2 / contrib 0.66b2, semconv 1.44.0.
+
+## 60 s storm with telemetry on: scripts/storm.py --rate 500 --duration 60 --kill-at 30
+== Results
+  [PASS] valid events lost (produced IDs vs DB): 0
+  [PASS] malformed produced vs dead-lettered: 307 vs 307
+  [PASS] alerts.v1 lag < 1,000 within 60s of storm end: after 1s
+  stored by attempt: 28210 first try, 1204 after one retry, 279 after two
+  ingest freshness (first-try events, occurred_at -> row committed): p50 0.11s, p95 9.66s
+  surviving replica: {'client_id': 'consumer-Abubakars-MacBook-Pro-3.local-87147', 'records': 20127, 'inserted': 18502, 'duplicates': 244, 'retried': 1204, 'dead_lettered': 177, 'pauses': 11, 'infra_retries': 0, 'incidents_opened': 0, 'triages_queued': 0, 'published': 3221, 'publish_failures': 0}
+Same as slice 7's CI run without telemetry (first-try freshness p95 9.71 s there, 9.66 s here).
+
+## One retried alert from the Jaeger API: uv run python scripts/trace.py retry
+trace 81d2e30e2ba411bb6e653199355b5f43: event key inventory, 34 spans (30 fetch spans not shown)
+
+  +  0.000s  alerts.v1 send             simulator      0.0 ms  publish
+  +  0.032s  alerts.v1 process          consumer     108.9 ms  attempt 1, error TransientError -> retried  (offset 90898)
+  +  0.129s  alerts.retry.30s send      consumer       0.0 ms  publish, x-attempt 1 (TransientError)
+  + 30.635s  alerts.retry.30s process   consumer      14.2 ms  attempt 2, ok -> stored  (offset 2952)
+            └ link -> alerts.retry.30s batch (trace b9bd2f96fb7d…, 14.2 ms, 1 messages)
+               └ incident upsert    11.9 ms  inserted 1, incidents touched 1, opened 0
+
+## One triage's span tree from the Jaeger API: uv run python scripts/trace.py triage --id <run>
+trace d8ee4b9772efb581f969ae4eda4d3f94: triage 01a1a290-0133-73fd-80d0-b7818eed0a87 for incident 01a1a290-012d-7b1f-a4af-b7372c86378b, 535 spans (SQL statements below the stage spans are left out)
+
+        0.0 ms  triage                               40328.7 ms  outcome=done
+       68.5 ms    evidence runbooks                    113.4 ms  degraded=False, result_count=4
+       68.6 ms      hybrid search                      112.5 ms  result_count=4
+       68.6 ms        embed                             42.7 ms  
+      111.5 ms        fts                               34.5 ms  result_count=0
+      112.4 ms        vector                            40.7 ms  result_count=40
+      176.1 ms        siblings                           4.9 ms  result_count=8
+       68.7 ms    evidence postmortems                 112.7 ms  degraded=False, result_count=3
+       68.7 ms      hybrid search                      110.9 ms  result_count=3
+       68.7 ms        embed                             44.1 ms  
+      112.9 ms        fts                               33.0 ms  result_count=0
+      115.9 ms        vector                            35.3 ms  result_count=40
+      174.3 ms        siblings                           5.2 ms  result_count=3
+       68.9 ms    evidence deploys                      21.6 ms  degraded=False, result_count=0
+       68.9 ms      deploys_http                        21.6 ms  result_count=0
+       69.4 ms        GET                               19.5 ms  status_code=200
+       81.9 ms          GET /v1/deploys                  6.3 ms  status_code=200
+       85.4 ms            GET /v1/deploys http send       0.1 ms  status_code=200
+       88.0 ms            GET /v1/deploys http send       0.0 ms  
+      373.7 ms    chat qwen3.5:9b-q4_K_M             39935.8 ms  verdict=CAUSE_IDENTIFIED, citation_count=8, ttft_ms=15869, tokens_per_second=21.6, input_tokens=3275, output_tokens=521
+      379.1 ms      POST                             15860.2 ms  status_code=200
+    40326.1 ms    EXPIRE                                 0.6 ms  
+    40326.9 ms    ZREM                                   0.5 ms  
+    16245.1 ms    XADD x512                             839.4 ms  (total)
+
+  link (queued_by) -> trace d2a4b0171b024b389fd65e9bbf36a239: incident upsert in consumer
+
+## Denylist test and the rest
+packages/telemetry/tests/test_denylist.py: 4 passed (denied keys dropped from span, event and link attributes).
+make test: 107 passed. make test-int: 14 passed. make obs-check: collector config valid, prometheus.yml valid,
+19 rules, promtool tests SUCCESS. Prometheus after the storm: FreshnessBudgetBurnSlow firing (5% injected transient
+failures, each retry waits >= 30 s: the budget is overspent by design); every rule healthy.
