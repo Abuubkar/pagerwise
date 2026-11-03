@@ -215,4 +215,9 @@ def main() -> None:
     parser.add_argument("--fail-rate", type=float, default=0.0, help="share of listing requests that get a 503")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
-    uvicorn.run(create_app(faults=Faults(fail_rate=args.fail_rate, seed=args.seed)), host=args.host, port=args.port)
+    import pagerwise_telemetry as telemetry
+
+    telemetry.setup("pagerwise-docs-mock")
+    app = create_app(faults=Faults(fail_rate=args.fail_rate, seed=args.seed))
+    telemetry.instrument_app(app)
+    uvicorn.run(app, host=args.host, port=args.port, log_config=None)

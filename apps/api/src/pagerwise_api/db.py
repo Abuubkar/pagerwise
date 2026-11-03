@@ -157,6 +157,8 @@ class TriageRun(Base):
     # Renewed while the model streams; a running run whose heartbeat is stale was abandoned (process died).
     heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # W3C traceparent of the consumer span that queued the run; the triage span links to it (docs/adr/0012).
+    traceparent: Mapped[str | None] = mapped_column(String(64))
 
 
 class AlertEvent(Base):

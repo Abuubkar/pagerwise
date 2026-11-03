@@ -6,14 +6,18 @@ scores the sum of 1 / (60 + rank) over the lists it appears in, so agreeing near
 in one. The best fused chunks (settings.rerank_candidates) are then rescored by a cross-encoder reranker, a model that reads the question and
 each chunk together (slower, much more accurate than comparing two embeddings), and the top k are returned.
 
-Every stage's rank is kept on each hit, for GET /v1/search and for evals."""
+Every stage's rank is kept on each hit, for GET /v1/search and for evals. Each search is a `hybrid search` span with
+a child per stage (embed, fts, vector, rerank, siblings) and its result count; spans carry a hash of the query,
+never its text (docs/adr/0012)."""
 
 import asyncio
+import hashlib
 import time
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
+from opentelemetry import metrics, trace
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +25,11 @@ from pagerwise_api.chunking import embed_text
 from pagerwise_api.db import Chunk, Document
 from pagerwise_api.embedding import embed_query_v2, rerank
 from pagerwise_api.settings import settings
+
+tracer = trace.get_tracer("pagerwise.retrieval")
+STAGE_SECONDS = metrics.get_meter("pagerwise.retrieval").create_histogram(
+    "pagerwise.retrieval.duration", unit="s", description="Hybrid search time, by stage",
+    explicit_bucket_boundaries_advisory=[0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5])
 
 RRF_K = 60  # the constant from the original RRF paper; damps the difference between ranks 1 and 2
 CANDIDATES = 40  # per search; the fused list is cut to settings.rerank_candidates for the reranker
@@ -88,10 +97,27 @@ async def _vector(session: AsyncSession, column, vector: list[float], limit: int
     return [(i, float(d)) for i, d in rows.all()]
 
 
+def query_hash(query: str) -> str:
+    """What spans and logs carry instead of the query: enough to group repeats, nothing to read."""
+    return hashlib.sha256(query.encode()).hexdigest()[:16]
+
+
 async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
                         source_type: str | None = None) -> SearchResult:
     """source_type ("runbook" or "postmortem") limits both searches to that kind of document."""
     k = k or settings.retrieval_top_k
+    with tracer.start_as_current_span("hybrid search", attributes={
+        "pagerwise.query_hash": query_hash(query), "pagerwise.source_type": source_type or "any", "pagerwise.k": k,
+    }) as span:
+        result = await _hybrid_search(session, query, k, source_type)
+        span.set_attributes({"pagerwise.result_count": len(result.hits), "pagerwise.candidates": result.candidates})
+    for stage, ms in result.timings_ms.items():
+        if stage not in ("total", "searches"):
+            STAGE_SECONDS.record(ms / 1000, {"stage": stage})
+    return result
+
+
+async def _hybrid_search(session: AsyncSession, query: str, k: int, source_type: str | None) -> SearchResult:
     timings: dict[str, float] = {}
     started = time.perf_counter()
 
@@ -101,14 +127,17 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
         return now
 
     # Embedding and reranking are CPU-bound ONNX work; keep them off the event loop.
-    vector = await asyncio.to_thread(embed_query_v2, query)
+    with tracer.start_as_current_span("embed"):
+        vector = await asyncio.to_thread(embed_query_v2, query)
     mark = lap("embed", started)
 
     async def timed(name: str, search):
-        t = time.perf_counter()
-        result = await search
-        lap(name, t)
-        return result
+        with tracer.start_as_current_span(name) as span:
+            t = time.perf_counter()
+            result = await search
+            lap(name, t)
+            span.set_attribute("pagerwise.result_count", len(result))
+            return result
 
     # More sessions on the same engine, so the searches really run concurrently (one connection each).
     async with AsyncSession(bind=session.bind) as own:
@@ -142,7 +171,8 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
     if hits and settings.rerank_candidates:
         # Cost grows with candidates x tokens: a cross-encoder reads every candidate in full (ADR 0006).
         top = hits[: settings.rerank_candidates]
-        scores = await asyncio.to_thread(rerank, query, [embed_text(h.heading_path, h.text) for h in top])
+        with tracer.start_as_current_span("rerank", attributes={"pagerwise.result_count": len(top)}):
+            scores = await asyncio.to_thread(rerank, query, [embed_text(h.heading_path, h.text) for h in top])
         for h, s in zip(top, scores, strict=True):
             h.rerank_score = round(s, 4)
         top.sort(key=lambda h: -(h.rerank_score or 0.0))
@@ -152,7 +182,9 @@ async def hybrid_search(session: AsyncSession, query: str, k: int | None = None,
     mark = lap("rerank", mark)
     before = [h.chunk_id for h in hits]
     if settings.retrieval_sibling_chunks and hits:
-        hits = await _with_siblings(session, hits, k)
+        with tracer.start_as_current_span("siblings") as span:
+            hits = await _with_siblings(session, hits, k)
+            span.set_attribute("pagerwise.result_count", len(hits))
     lap("siblings", mark)
     lap("total", started)
     return SearchResult(hits=hits[:k], candidates=len(before), timings_ms=timings, before_siblings=before)

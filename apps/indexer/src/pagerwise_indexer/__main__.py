@@ -5,11 +5,11 @@ uv run python -m pagerwise_indexer [--docs-url http://localhost:8002] [--source 
 
 import argparse
 import asyncio
-import logging
 import sys
 
 import httpx
 
+import pagerwise_telemetry as telemetry
 from pagerwise_api.db import SessionLocal, engine
 from pagerwise_indexer.importer import SOURCE_TYPES, ImportFailed, import_collection
 
@@ -35,6 +35,6 @@ async def main() -> int:
     return status
 
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-logging.getLogger("httpx").setLevel(logging.WARNING)
+telemetry.setup("pagerwise-indexer")
+telemetry.instrument_engine([engine])
 sys.exit(asyncio.run(main()))
