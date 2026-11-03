@@ -53,6 +53,56 @@ services:
       timeout: 3s
       retries: 20
 
+  # Observability (docs/adr/0012). Apps on the host send OTLP to the collector on :4317; it tail-samples traces into
+  # Jaeger (:16686), and forwards metrics to Prometheus (:9090) and logs to Loki. Grafana on :3000.
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.163.2
+    command: ["--config=/etc/otelcol/collector.yaml"]
+    volumes:
+      - ./observability/collector.yaml:/etc/otelcol/collector.yaml:ro
+    ports:
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+    depends_on: [jaeger, prometheus, loki]
+
+  jaeger:
+    # v2, all-in-one with in-memory storage: traces are gone on restart.
+    image: jaegertracing/jaeger:2.22.0
+    ports:
+      - "16686:16686"  # UI and query API
+
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-otlp-receiver
+      - --enable-feature=exemplar-storage
+      - --storage.tsdb.retention.time=15d  # the abstention alert compares with a 7-day baseline
+    volumes:
+      - ./observability/prometheus:/etc/prometheus:ro
+      - prometheus:/prometheus
+    ports:
+      - "9090:9090"
+
+  loki:
+    image: grafana/loki:3.7.9  # its default config takes OTLP logs on /otlp
+    ports:
+      - "3100:3100"
+
+  grafana:
+    image: grafana/grafana:13.2.5
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"  # local only: no login
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on: [prometheus, jaeger, loki]
+
 volumes:
   pgdata:
   redpanda:
+  prometheus:

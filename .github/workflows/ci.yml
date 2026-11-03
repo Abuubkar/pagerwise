@@ -53,6 +53,8 @@ jobs:
         working-directory: apps/web
       - run: pnpm lint --max-warnings 0
         working-directory: apps/web
+      - name: Collector config, Prometheus rules and their tests
+        run: make obs-check
       - name: actionlint
         run: >-
           docker run --rm -v "$PWD:/repo" -w /repo
@@ -185,6 +187,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write  # the sticky metrics comment
+    env:
+      OTEL_SDK_DISABLED: "true"  # no collector in this job: docs_mock and the indexer log JSON and export nothing
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

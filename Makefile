@@ -1,6 +1,9 @@
 OASDIFF := docker run --rm -v $(CURDIR):/specs:ro tufin/oasdiff:v1.35.0@sha256:82b1840a77335562bb11ce95f77ad31745a0c6f3a770929333ed1c5ef466e400
+# The same images as docker-compose.yml, pinned by digest for CI.
+OTELCOL := otel/opentelemetry-collector-contrib:0.163.2@sha256:7f22d2a6748110ffb6a59bc0df448bccbf501cdb667d610ede4c61d3863d5849
+PROMTOOL := docker run --rm --entrypoint promtool -v $(CURDIR)/observability/prometheus:/p:ro -w /p prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
 
-.PHONY: codegen contract-check breaking-check migration-lint lint test test-int smoke topics storm web-test eval eval-test golden
+.PHONY: codegen contract-check breaking-check migration-lint lint obs-check test test-int smoke topics storm web-test eval eval-test golden
 
 # Regenerate everything derived from the contracts. Generated code is never edited by hand.
 codegen:
@@ -27,6 +30,12 @@ breaking-check:
 # squawk on the SQL of migrations added since BASE (default origin/main).
 migration-lint:
 	scripts/lint_migrations.sh $(or $(BASE),origin/main)
+
+# The collector config validates, the Prometheus rules parse, and each alert fires on what it's meant for.
+obs-check:
+	docker run --rm -v $(CURDIR)/observability/collector.yaml:/c.yaml:ro $(OTELCOL) validate --config=/c.yaml
+	$(PROMTOOL) check config prometheus.yml
+	$(PROMTOOL) test rules rules.test.yml
 
 # The CI lint job: ruff, mypy, tsc, eslint (actionlint runs there in Docker).
 lint:

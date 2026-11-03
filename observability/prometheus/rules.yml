@@ -1,0 +1,129 @@
+# Recording rules, SLO burn-rate alerts and the operational alerts. Each alert links its runbook in docs/alerts.md;
+# the SLOs and the burn-rate maths are in docs/slo.md. Tested by rules.test.yml (make obs-check).
+groups:
+  - name: pagerwise-slo-ratios
+    rules:
+      # Freshness SLO: 99% of stored alerts committed within 5 s of their first publish. Bad = slower than 5 s.
+      - record: pagerwise:ingest_freshness:bad_ratio5m
+        expr: >-
+          1 - sum(rate(pagerwise_ingest_freshness_seconds_bucket{le=~"5(\\.0)?"}[5m]))
+            / sum(rate(pagerwise_ingest_freshness_seconds_count[5m]))
+      - record: pagerwise:ingest_freshness:bad_ratio30m
+        expr: >-
+          1 - sum(rate(pagerwise_ingest_freshness_seconds_bucket{le=~"5(\\.0)?"}[30m]))
+            / sum(rate(pagerwise_ingest_freshness_seconds_count[30m]))
+      - record: pagerwise:ingest_freshness:bad_ratio1h
+        expr: >-
+          1 - sum(rate(pagerwise_ingest_freshness_seconds_bucket{le=~"5(\\.0)?"}[1h]))
+            / sum(rate(pagerwise_ingest_freshness_seconds_count[1h]))
+      - record: pagerwise:ingest_freshness:bad_ratio6h
+        expr: >-
+          1 - sum(rate(pagerwise_ingest_freshness_seconds_bucket{le=~"5(\\.0)?"}[6h]))
+            / sum(rate(pagerwise_ingest_freshness_seconds_count[6h]))
+      # Triage availability SLO: 99.5% of triages end with a brief (or a deliberate abstention). Bad = the system
+      # failed: model unreachable, prompt over budget, worker crash. format_invalid is the model's quality, held
+      # to the eval's format gate instead (docs/slo.md).
+      - record: pagerwise:triage_unavailable:ratio5m
+        expr: >-
+          sum(rate(pagerwise_triage_runs_total{error_code=~"model_unavailable|prompt_too_long|triage_failed"}[5m]))
+            / sum(rate(pagerwise_triage_runs_total[5m]))
+      - record: pagerwise:triage_unavailable:ratio30m
+        expr: >-
+          sum(rate(pagerwise_triage_runs_total{error_code=~"model_unavailable|prompt_too_long|triage_failed"}[30m]))
+            / sum(rate(pagerwise_triage_runs_total[30m]))
+      - record: pagerwise:triage_unavailable:ratio1h
+        expr: >-
+          sum(rate(pagerwise_triage_runs_total{error_code=~"model_unavailable|prompt_too_long|triage_failed"}[1h]))
+            / sum(rate(pagerwise_triage_runs_total[1h]))
+      - record: pagerwise:triage_unavailable:ratio6h
+        expr: >-
+          sum(rate(pagerwise_triage_runs_total{error_code=~"model_unavailable|prompt_too_long|triage_failed"}[6h]))
+            / sum(rate(pagerwise_triage_runs_total[6h]))
+      # Share of completed briefs that abstained; its 7-day average is the baseline the retrieval alert compares to.
+      - record: pagerwise:triage_insufficient_evidence:ratio1h
+        expr: >-
+          sum(rate(pagerwise_triage_verdicts_total{verdict="INSUFFICIENT_EVIDENCE"}[1h]))
+            / sum(rate(pagerwise_triage_verdicts_total[1h]))
+
+  - name: pagerwise-slo-burn
+    rules:
+      # Multiwindow, multi-burn-rate (Google SRE workbook, ch. 5): page when the long window burns the 30-day budget
+      # 14.4x (2% in an hour) or 6x (5% in 6 hours) faster than sustainable, and the short window confirms it's
+      # still happening. Budget: 1% for freshness, 0.5% for triage availability.
+      - alert: FreshnessBudgetBurnFast
+        expr: pagerwise:ingest_freshness:bad_ratio1h > 14.4 * 0.01 and pagerwise:ingest_freshness:bad_ratio5m > 14.4 * 0.01
+        labels: {severity: page, slo: freshness}
+        annotations:
+          summary: "Ingest freshness is burning its error budget 14.4x too fast (2% of a month's budget per hour)"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#freshness-budget-burn
+      - alert: FreshnessBudgetBurnSlow
+        expr: pagerwise:ingest_freshness:bad_ratio6h > 6 * 0.01 and pagerwise:ingest_freshness:bad_ratio30m > 6 * 0.01
+        labels: {severity: page, slo: freshness}
+        annotations:
+          summary: "Ingest freshness is burning its error budget 6x too fast (5% of a month's budget in 6 hours)"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#freshness-budget-burn
+      - alert: TriageAvailabilityBudgetBurnFast
+        expr: pagerwise:triage_unavailable:ratio1h > 14.4 * 0.005 and pagerwise:triage_unavailable:ratio5m > 14.4 * 0.005
+        labels: {severity: page, slo: triage-availability}
+        annotations:
+          summary: "Triages are failing fast enough to spend 2% of a month's error budget per hour"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#triage-availability-budget-burn
+      - alert: TriageAvailabilityBudgetBurnSlow
+        expr: pagerwise:triage_unavailable:ratio6h > 6 * 0.005 and pagerwise:triage_unavailable:ratio30m > 6 * 0.005
+        labels: {severity: page, slo: triage-availability}
+        annotations:
+          summary: "Triages are failing fast enough to spend 5% of a month's error budget in 6 hours"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#triage-availability-budget-burn
+
+  - name: pagerwise-alerts
+    rules:
+      - alert: ConsumerLagHigh
+        # max per partition first: mid-rebalance, two replicas can both report a partition.
+        expr: >-
+          sum by (messaging_destination_name) (
+            max by (messaging_destination_name, messaging_destination_partition_id) (pagerwise_consumer_lag)
+          ) > 10000
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: "{{ $labels.messaging_destination_name }} is {{ $value }} messages behind"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#consumer-lag-high
+      - alert: IngestFreshnessP95High
+        expr: histogram_quantile(0.95, sum by (le) (rate(pagerwise_ingest_freshness_seconds_bucket[5m]))) > 5
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: "95% of alerts take up to {{ $value | humanizeDuration }} to be stored (target 5 s)"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#ingest-freshness-p95-high
+      - alert: DeadLettersHigh
+        expr: sum(increase(pagerwise_consumer_dead_letters_total[10m])) > 50
+        labels: {severity: ticket}
+        annotations:
+          summary: "{{ $value | humanize }} alerts dead-lettered in 10 minutes"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#dead-letters-high
+      - alert: InsufficientEvidenceRateHigh
+        # Abstaining twice as often as usual means retrieval likely broke (empty index, failed import). Needs a
+        # baseline and at least 10 briefs in the hour, so a quiet hour can't trip it.
+        expr: >-
+          pagerwise:triage_insufficient_evidence:ratio1h
+            > 2 * avg_over_time(pagerwise:triage_insufficient_evidence:ratio1h[7d])
+          and sum(increase(pagerwise_triage_verdicts_total[1h])) >= 10
+        for: 30m
+        labels: {severity: ticket}
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of briefs found insufficient evidence, over twice the 7-day rate"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#insufficient-evidence-rate-high
+      - alert: TriageP95Slow
+        expr: histogram_quantile(0.95, sum by (le) (rate(pagerwise_triage_duration_seconds_bucket[15m]))) > 45
+        for: 15m
+        labels: {severity: ticket}
+        annotations:
+          summary: "95% of triages take up to {{ $value | humanizeDuration }} (target 45 s)"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#triage-p95-slow
+      - alert: OllamaUnreachable
+        expr: max(pagerwise_ollama_up) == 0
+        for: 2m
+        labels: {severity: page}
+        annotations:
+          summary: "The triage worker hasn't reached Ollama for 2 minutes"
+          runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#ollama-unreachable
