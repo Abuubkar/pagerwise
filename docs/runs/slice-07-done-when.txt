@@ -1,0 +1,31 @@
+# Slice 7 done-when, 2026-11-03. PR 8 (slice/07-ci-cd), merged as 8320f33. docs/adr/0011.
+
+## actionlint: clean (rhysd/actionlint 1.7.12, run in the lint job and locally)
+
+## PR checks on GitHub, head 2f9385b: https://github.com/Abuubkar/pagerwise/actions/runs/41624650903
+lint ✓  contracts ✓  unit ✓  integration ✓  migrations ✓  web ✓  eval-offline ✓  load-smoke ✓
+The same 8 are required by the main ruleset (PR required, no force-push). Push to main: ci run 41641826486 ✓.
+
+## load-smoke output (storm.py --rate 500 --duration 60 --kill-at 30, ubuntu-24.04 runner)
+== Storm: 500 events/s for 60s, 1% malformed, 5% transient failures, 2 replicas, replica 0 killed at 30s
+  produced 30000 events in 60.0s (500/s): 29677 valid, 323 malformed
+  alerts.v1 lag at storm end: 683
+== Results
+  [PASS] valid events lost (produced IDs vs DB): 0
+  [PASS] malformed produced vs dead-lettered: 323 vs 323
+  [PASS] alerts.v1 lag < 1,000 within 60s of storm end: after 0s
+  stored by attempt: 28247 first try, 1145 after one retry, 285 after two
+  ingest freshness (first-try events, occurred_at -> row committed): p50 0.14s, p95 9.71s
+
+## release.yml on 8320f33: https://github.com/Abuubkar/pagerwise/actions/runs/41641827134 (13:09 -> 13:19 UTC)
+models ✓ and images ✓ for api, consumer, indexer, simulator, docs-mock, web: built for linux/amd64 + linux/arm64,
+trivy (CRITICAL, fixable) passed on each, pushed with SBOM and provenance, signed with cosign keyless.
+Signed digests:
+  ghcr.io/abuubkar/pagerwise-models@sha256:c94ca5db074586f7ab0016f05256058c90fe0578ee9fe604e85895158130c35e
+  ghcr.io/abuubkar/pagerwise-api@sha256:5bde009b29307fa5386904b4a7a67b7f7b00a91f6aef0ada42957e2e46c06199
+  ghcr.io/abuubkar/pagerwise-consumer@sha256:aa21c05618ef5a4442e1c21aaf0e87a098990ba3c6293288c03efa79c9c8fa16
+  ghcr.io/abuubkar/pagerwise-indexer@sha256:0baa0d69da27b33068afd6bc59954542b95dbf25860b22e1aaa1821c6d09dd9a
+  ghcr.io/abuubkar/pagerwise-simulator@sha256:7391c1ffa9c7b147cc16416e0b8d20c987db8a097f0b0cf64d0dff3c6b9b6b39
+  ghcr.io/abuubkar/pagerwise-docs-mock@sha256:f2847a494b918005aad94ba97be286c75f8ccd3883818e5b3cc0e94ac216c15b
+  ghcr.io/abuubkar/pagerwise-web@sha256:e91ab9cda942f990263c5faeb30492cf4bb4dbf69cea580ca907007626ae4bf7
+Independent `cosign verify` of these: pending until the packages are public (they're private on first push).
