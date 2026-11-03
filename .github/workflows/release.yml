@@ -109,7 +109,7 @@ jobs:
         include:
           - name: api  # also the triage worker: python -m pagerwise_api.worker
             package: pagerwise-api
-            command: uvicorn pagerwise_api.main:app --host 0.0.0.0 --port 8001
+            command: python -m pagerwise_api --host 0.0.0.0 --port 8001  # with telemetry (docs/adr/0012)
             models: true
           - name: consumer
             package: pagerwise-consumer

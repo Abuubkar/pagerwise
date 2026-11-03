@@ -1,0 +1,77 @@
+# OpenTelemetry Collector (contrib build: it has tail_sampling). Apps send OTLP here; traces are tail-sampled into
+# Jaeger, metrics go to Prometheus's OTLP receiver, logs to Loki's. docs/adr/0012.
+receivers:
+  otlp:
+    protocols:
+      grpc: {endpoint: 0.0.0.0:4317}
+      http: {endpoint: 0.0.0.0:4318}
+
+processors:
+  memory_limiter: {check_interval: 1s, limit_mib: 1536, spike_limit_mib: 384}
+  tail_sampling:
+    # A trace is decided 60 s after its first span: long enough for a 45 s triage to finish. One alert's trace
+    # spans its retry hops (30 s, then 5 min later), so decisions are cached: a late hop follows its trace's
+    # decision instead of being judged alone. Any policy that matches keeps the trace.
+    decision_wait: 60s
+    num_traces: 300000
+    expected_new_traces_per_sec: 2000
+    decision_cache: {sampled_cache_size: 1000000, non_sampled_cache_size: 1000000}
+    policies:
+      - name: errors  # a failed attempt (its process span), a failed triage, any error span
+        type: status_code
+        status_code: {status_codes: [ERROR]}
+      - name: dlq-hops
+        type: string_attribute
+        string_attribute: {key: messaging.destination.name, values: [alerts.dlq]}
+      - name: retried-batches  # the batch that finished a retried message: its incident upsert and SQL
+        type: numeric_attribute
+        numeric_attribute: {key: pagerwise.kafka.max_x_attempt, min_value: 1, max_value: 100}
+      - name: incident-openers  # the batch a triage links back to (triage_runs.traceparent)
+        type: numeric_attribute
+        numeric_attribute: {key: pagerwise.incidents_opened, min_value: 1, max_value: 100000}
+      - name: degraded-retrieval
+        type: boolean_attribute
+        boolean_attribute: {key: pagerwise.degraded, value: true}
+      - name: every-triage  # one per new incident: few, and each is worth seeing (the plan's 10% would drop most)
+        type: string_attribute
+        string_attribute: {key: pagerwise.triage_id, values: [".+"], enabled_regex_matching: true}
+      - name: slow-triage  # kept by every-triage too; stays so the 45 s rule holds if every-triage is removed
+        type: and
+        and:
+          and_sub_policy:
+            - name: worker
+              type: string_attribute
+              string_attribute: {key: service.name, values: [pagerwise-worker]}
+            - name: over-45s
+              type: latency
+              latency: {threshold_ms: 45000}
+      - name: the-rest
+        type: probabilistic
+        probabilistic: {sampling_percentage: 10}
+  batch: {}
+
+exporters:
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls: {insecure: true}
+  otlp_http/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
+    tls: {insecure: true}
+  otlp_http/loki:
+    endpoint: http://loki:3100/otlp
+    tls: {insecure: true}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, tail_sampling, batch]
+      exporters: [otlp_grpc/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp_http/loki]

@@ -1,0 +1,107 @@
+# promtool test rules rules.test.yml (make obs-check): each alert fires on the input it's meant for, and not before.
+rule_files: [rules.yml]
+evaluation_interval: 1m
+
+tests:
+  - name: lag over 10k for 5 minutes pages, counted once per partition
+    interval: 1m
+    input_series:
+      # two replicas both report partition 0 mid-rebalance: counted once
+      - series: 'pagerwise_consumer_lag{messaging_destination_name="alerts.v1",messaging_destination_partition_id="0",instance="a"}'
+        values: '6000x10'
+      - series: 'pagerwise_consumer_lag{messaging_destination_name="alerts.v1",messaging_destination_partition_id="0",instance="b"}'
+        values: '6000x10'
+      - series: 'pagerwise_consumer_lag{messaging_destination_name="alerts.v1",messaging_destination_partition_id="1",instance="a"}'
+        values: '5000x10'
+    alert_rule_test:
+      - {eval_time: 4m, alertname: ConsumerLagHigh, exp_alerts: []}
+      - eval_time: 6m
+        alertname: ConsumerLagHigh
+        exp_alerts:
+          - exp_labels: {severity: page, messaging_destination_name: alerts.v1}
+            exp_annotations:
+              summary: "alerts.v1 is 11000 messages behind"
+              runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#consumer-lag-high
+
+  - name: freshness budget burns fast when a fifth of alerts take over 5 s
+    interval: 1m
+    input_series:
+      - series: 'pagerwise_ingest_freshness_seconds_bucket{le="5"}'
+        values: '0+80x70'
+      - series: 'pagerwise_ingest_freshness_seconds_count'
+        values: '0+100x70'
+    alert_rule_test:
+      - eval_time: 65m
+        alertname: FreshnessBudgetBurnFast
+        exp_alerts:
+          - exp_labels: {severity: page, slo: freshness}
+            exp_annotations:
+              summary: "Ingest freshness is burning its error budget 14.4x too fast (2% of a month's budget per hour)"
+              runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#freshness-budget-burn
+
+  - name: freshness within budget does not page
+    interval: 1m
+    input_series:
+      - series: 'pagerwise_ingest_freshness_seconds_bucket{le="5"}'
+        values: '0+995x70'
+      - series: 'pagerwise_ingest_freshness_seconds_count'
+        values: '0+1000x70'
+    alert_rule_test:
+      - {eval_time: 65m, alertname: FreshnessBudgetBurnFast, exp_alerts: []}
+      - {eval_time: 65m, alertname: FreshnessBudgetBurnSlow, exp_alerts: []}
+
+  - name: more than 50 dead letters in 10 minutes
+    interval: 1m
+    input_series:
+      - series: 'pagerwise_consumer_dead_letters_total{error_type="PermanentError"}'
+        values: '0+6x20'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: DeadLettersHigh
+        exp_alerts:
+          - exp_labels: {severity: ticket}
+            exp_annotations:
+              summary: "60 alerts dead-lettered in 10 minutes"
+              runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#dead-letters-high
+
+  - name: Ollama unreachable for 2 minutes
+    interval: 30s
+    input_series:
+      - series: 'pagerwise_ollama_up{instance="worker"}'
+        values: '1 1 0 0 0 0 0 0'
+    alert_rule_test:
+      - {eval_time: 2m, alertname: OllamaUnreachable, exp_alerts: []}
+      - eval_time: 3m30s
+        alertname: OllamaUnreachable
+        exp_alerts:
+          - exp_labels: {severity: page}
+            exp_annotations:
+              summary: "The triage worker hasn't reached Ollama for 2 minutes"
+              runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#ollama-unreachable
+
+  - name: model failures burn the triage availability budget
+    interval: 1m
+    input_series:
+      - series: 'pagerwise_triage_runs_total{outcome="done",error_code=""}'
+        values: '0+9x70'
+      - series: 'pagerwise_triage_runs_total{outcome="error",error_code="model_unavailable"}'
+        values: '0+2x70'
+    alert_rule_test:
+      - eval_time: 65m
+        alertname: TriageAvailabilityBudgetBurnFast
+        exp_alerts:
+          - exp_labels: {severity: page, slo: triage-availability}
+            exp_annotations:
+              summary: "Triages are failing fast enough to spend 2% of a month's error budget per hour"
+              runbook_url: https://github.com/Abuubkar/pagerwise/blob/main/docs/alerts.md#triage-availability-budget-burn
+
+  - name: format_invalid briefs are a quality problem, not unavailability
+    interval: 1m
+    input_series:
+      - series: 'pagerwise_triage_runs_total{outcome="done",error_code=""}'
+        values: '0+9x70'
+      - series: 'pagerwise_triage_runs_total{outcome="error",error_code="format_invalid"}'
+        values: '0+5x70'
+    alert_rule_test:
+      - {eval_time: 65m, alertname: TriageAvailabilityBudgetBurnFast, exp_alerts: []}
+      - {eval_time: 65m, alertname: TriageAvailabilityBudgetBurnSlow, exp_alerts: []}
