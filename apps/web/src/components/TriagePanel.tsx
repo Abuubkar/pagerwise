@@ -5,15 +5,13 @@ import { TriageBrief } from "@/components/TriageBrief";
 import { applyEvent, emptyBrief, streamTriage } from "@/lib/triage";
 
 // Opens the incident's triage stream and shows the brief as it arrives: live while the worker writes it, replayed
-// once it's done. `version` re-opens the stream when a newer triage starts.
+// once it's done. Its parent keys it by incident and triage, so a newer triage starts from an empty brief.
 export function TriagePanel({ incidentId, triageId, baseUrl = "" }: { incidentId: string; triageId: string | null; baseUrl?: string }) {
   const [state, setState] = useState(emptyBrief);
-  const [status, setStatus] = useState<"loading" | "streaming" | "none" | "failed">("loading");
+  const [status, setStatus] = useState<"streaming" | "none" | "failed">("streaming");
 
   useEffect(() => {
     const abort = new AbortController();
-    setState(emptyBrief());
-    setStatus("streaming");
     streamTriage(incidentId, (event, data) => setState(s => applyEvent(s, event, data)), abort.signal, baseUrl)
       .then(result => result === "none" && setStatus("none"))
       .catch(() => !abort.signal.aborted && setStatus("failed"));

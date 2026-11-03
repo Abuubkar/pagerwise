@@ -1,5 +1,5 @@
 // next/jest wires the Next.js compiler, CSS and next/font mocks, and path aliases into Jest.
-const nextJest = require("next/jest");
+import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({ dir: "./" });
 
@@ -18,8 +18,10 @@ const config = {
   moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
 };
 
-module.exports = async () => {
+async function jestConfig() {
   const resolved = await createJestConfig(config)();
   resolved.transformIgnorePatterns = [`/node_modules/(?!(\\.pnpm|${ESM_ONLY.join("|")})(/|@))`, ...resolved.transformIgnorePatterns.filter(p => !p.includes("node_modules"))];
   return resolved;
-};
+}
+
+export default jestConfig;

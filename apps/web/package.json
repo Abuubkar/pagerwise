@@ -11,6 +11,7 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start --port 3001",
+    "lint": "eslint .",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "codegen": "graphql-codegen && openapi-typescript ../../contracts/openapi.yaml -o src/api/schema.d.ts"
@@ -36,6 +37,8 @@
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "eslint": "10.14.0",
+    "eslint-config-next": "16.4.3",
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
     "jest-fixed-jsdom": "0.0.11",

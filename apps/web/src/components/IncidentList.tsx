@@ -20,8 +20,11 @@ export function IncidentList({ pageSize = PAGE }: { pageSize?: number }) {
   useEffect(() => {
     if (!data) return;
     const page = data.incidents.edges.map(edge => edge.node);
+    // Rows are state, not derived: each fetched page is appended to rows the live subscription also changes.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (after !== null) setRows(current => appendPage(current, page));
     else setRows([...live.current].reverse().reduce((list, row) => upsertTop(list, row), page));
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [data, after]);
 
   // New and changed incidents arrive live and go to the top.
