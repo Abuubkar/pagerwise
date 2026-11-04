@@ -35,27 +35,27 @@ postmortems and runbook it drew on. Briefs stream in live as the model writes th
 
 Measured on an Apple M1 Pro laptop with 16 GB, with `qwen3.5:9b` running locally through Ollama.
 
-| | Result | Target |
-|---|---|---|
-| Finds the right evidence (recall@8) | **1.00** | ≥ 0.90 |
-| Search latency, p95 | **36 ms** | ≤ 250 ms |
-| Names the right root cause, first guess / top 3 | **0.80 / 0.84** | ≥ 0.60 / 0.80 |
-| Citations that support their sentence | **0.96** | ≥ 0.90 |
-| Briefs that stay silent about a missing source | **100%** | 100% |
-| Alerts grouped into the right incident (F1) | **0.85** | ≥ 0.84 |
-| Alert storm: 360,000 alerts at 2,000/s, a consumer killed | **0 lost**, 3,526/3,526 malformed dead-lettered | 0 lost |
+| | Result | Target | Where |
+|---|---|---|---|
+| Finds the right evidence (recall@8) | **1.00** | ≥ 0.90 | [eval report](evals/REPORT.md#retrieval-ablation) |
+| Search latency, p95 | **36 ms** | ≤ 250 ms | [eval report](evals/REPORT.md#retrieval-ablation) |
+| Names the right root cause, first guess / top 3 | **0.80 / 0.84** | ≥ 0.60 / 0.80 | [eval report](evals/REPORT.md#triage) |
+| Citations that support their sentence | **0.96** | ≥ 0.90 | [eval report](evals/REPORT.md#triage) |
+| Briefs that stay silent about a missing source | **100%** | 100% | [eval report](evals/REPORT.md#gates) |
+| Alerts grouped into the right incident (F1) | **0.85** | ≥ 0.84 | [eval report](evals/REPORT.md#clustering) |
+| Alert storm: 360,000 alerts at 2,000/s, a consumer killed | **0 lost**, 3,526/3,526 malformed dead-lettered | 0 lost | [storm run](docs/runs/slice-03-done-when.txt) |
 
 Where it falls short, reported as measured and never re-targeted:
 
-| | Result | Target |
-|---|---|---|
-| Says "insufficient evidence" when the cause isn't documented | 0.40 | ≥ 0.80 |
-| Briefs in the exact section format | 0.93 | ≥ 0.95 |
-| Sentences without a supporting citation | 14% | ≤ 8% |
-| Time to first token, p95 | 20.7 s | ≤ 20 s |
-| Alert stored within 5 s of publishing, p95 at 2,000/s | 6.3 s | ≤ 5 s |
+| | Result | Target | Where |
+|---|---|---|---|
+| Says "insufficient evidence" when the cause isn't documented | 0.40 | ≥ 0.80 | [eval report](evals/REPORT.md#triage) |
+| Briefs in the exact section format | 0.93 | ≥ 0.95 | [eval report](evals/REPORT.md#triage) |
+| Sentences without a supporting citation | 14% | ≤ 8% | [eval report](evals/REPORT.md#triage) |
+| Time to first token, p95 | 20.7 s | ≤ 20 s | [eval report](evals/REPORT.md#triage) |
+| Alert stored within 5 s of publishing, p95 at 2,000/s | 6.3 s | ≤ 5 s | [storm run](docs/runs/slice-03-done-when.txt) |
 
-Full numbers: [evals/REPORT.md](evals/REPORT.md) and the per-slice records in [docs/runs/](docs/runs/).
+Each slice's acceptance run is recorded in [docs/runs/](docs/runs/).
 
 ## Seeing inside it
 
@@ -164,6 +164,58 @@ failure as seen in past incidents where deploys to postgres-primary triggered el
 - Postmortem: postgres-primary elevated error rate (2026-10-18) [C5]
 - Postmortem: postgres-primary dependency timeouts (2025-10-29) [C6]
 ```
+
+### The API
+
+The UI is built on a REST API on `:8001`, written first as [contracts/openapi.yaml](contracts/openapi.yaml). Incidents,
+newest first, filtered and paged with a cursor:
+
+```bash
+curl 'localhost:8001/v1/incidents?severity=sev1&limit=1'
+```
+
+```json
+{
+  "items": [
+    {
+      "id": "01a1a4a4-de88-7075-9727-b6aa72bad84c",
+      "title": "OrdersCheckoutErrors on orders",
+      "service": "orders",
+      "severity": "sev1",
+      "status": "open",
+      "summary": "checkout errors 40% on orders-3",
+      "opened_at": "2026-11-04T03:40:29.743251Z",
+      "version": 1
+    }
+  ],
+  "next_cursor": "eyJ0IjoiMjAyNi0xMS0wNFQwMzo0MDoyOS43NDMy..."
+}
+```
+
+An incident's brief, as server-sent events: live while the model writes it, replayed once it's stored. The text
+comes first, then each section's resolved citations, and a final `done` with the whole parsed brief:
+
+```bash
+curl -N localhost:8001/v1/incidents/01a19d30-e5e3-7471-b1ea-1595406e68fb/triage/stream
+```
+
+```text
+event: token
+data: {"text":"## Likely cause\nThe incident occurred shortly after the deployment of redis-cache version 6.38.7 [C8], ..."}
+
+event: citation
+data: {"tag":"C8","source_type":"deploy","source_id":"dep-0323","section":"likely_cause","chunk_excerpt":"Deploy dep-0323: redis-cache version 6.38.7 deployed at 2026-10-25T10:48:00Z ..."}
+
+event: section_complete
+data: {"section":"likely_cause"}
+
+event: done
+data: {"verdict":"CAUSE_IDENTIFIED","sections":{...},"model":"qwen3.5:9b-q4_K_M","degraded_sources":[], ...}
+```
+
+The same incidents are on GraphQL at `/graphql` (Relay connections, plus a subscription for live updates), and
+`POST /v1/admin/dlq/replay` republishes dead letters by offset range or key. Errors are RFC 9457 problem+json with
+a stable `code`, each documented in [docs/problems.md](docs/problems.md).
 
 ## Design decisions
 
