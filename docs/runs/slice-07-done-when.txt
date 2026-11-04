@@ -28,4 +28,14 @@ Signed digests:
   ghcr.io/abuubkar/pagerwise-simulator@sha256:7391c1ffa9c7b147cc16416e0b8d20c987db8a097f0b0cf64d0dff3c6b9b6b39
   ghcr.io/abuubkar/pagerwise-docs-mock@sha256:f2847a494b918005aad94ba97be286c75f8ccd3883818e5b3cc0e94ac216c15b
   ghcr.io/abuubkar/pagerwise-web@sha256:e91ab9cda942f990263c5faeb30492cf4bb4dbf69cea580ca907007626ae4bf7
-Independent `cosign verify` of these: pending until the packages are public (they're private on first push).
+
+## cosign verify, run independently on 2026-11-04 (cosign v3.1.4, ghcr.io/sigstore/cosign/cosign:v3.1.4)
+The packages are public: an anonymous GHCR token can list each one's tags.
+  cosign verify <each digest above> \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+    --certificate-identity-regexp '^https://github.com/Abuubkar/pagerwise/\.github/workflows/release\.yml@refs/heads/main$'
+  [PASS] all 7 digests: exit 0. Checks: the cosign claims were validated; existence of the claims in the transparency
+         log was verified offline; the code-signing certificate was verified using trusted certificate authority
+         certificates.
+  [PASS] negative check, api digest with the identity set to ci.yml: exit 1, "no matching CertificateIdentity found"
+         (the certificate's SAN is release.yml@refs/heads/main).
