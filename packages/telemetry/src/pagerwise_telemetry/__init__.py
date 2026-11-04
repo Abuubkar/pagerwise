@@ -18,6 +18,7 @@ import socket
 import sys
 from collections.abc import Iterable, Mapping, MutableMapping
 from importlib.metadata import PackageNotFoundError, version
+from importlib.util import find_spec
 from typing import Any
 
 import structlog
@@ -26,8 +27,6 @@ from opentelemetry.context import Context
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
@@ -115,13 +114,25 @@ def setup(service: str, package: str | None = None) -> None:
         logger_provider = LoggerProvider(resource=resource)
         logger_provider.add_log_record_processor(BatchLogRecordProcessor(OTLPLogExporter()))
         handlers.append(LoggingHandler(logger_provider=logger_provider))
-        HTTPXClientInstrumentor().instrument()
-        RedisInstrumentor().instrument()
+        _instrument_clients()
     root = logging.getLogger()
     root.handlers[:] = handlers
     root.setLevel(logging.INFO)
     for noisy in ("httpx", "httpcore", "aiokafka", "opentelemetry"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
+
+
+def _instrument_clients() -> None:
+    """httpx and Redis, where the app installs them: the instrumentations import their library, and docs-mock and
+    the simulator have neither."""
+    if find_spec("httpx"):
+        from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
+        HTTPXClientInstrumentor().instrument()
+    if find_spec("redis"):
+        from opentelemetry.instrumentation.redis import RedisInstrumentor
+
+        RedisInstrumentor().instrument()
 
 
 def instrument_app(app: Any) -> None:
