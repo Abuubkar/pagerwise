@@ -116,23 +116,15 @@ cosign verify ghcr.io/abuubkar/pagerwise-api:main \
 ## How it works
 
 ```mermaid
-flowchart LR
-    subgraph ingest [Ingest]
-        direction TB
-        alerts[Alert sources] --> kafka[(Kafka)]
-        kafka --> consumer[Consumer]
-        consumer -. fails .-> retry[Retry topics<br/>30 s, then 5 min]
-        retry -. still failing .-> dlq[(Dead letters)]
-        consumer --> pg[(Postgres)]
-    end
-    subgraph triage [Triage]
-        direction TB
-        docs[Hybrid search over<br/>runbooks and postmortems] --> worker[Triage worker]
-        deploys[Deploy log] --> worker
-        worker <--> llm[Local model]
-        worker --> ui[Web UI, streamed]
-    end
-    consumer -- new incident --> worker
+flowchart TB
+    alerts[Alert sources] --> kafka[(Kafka)] --> consumer[Consumer]
+    consumer -. fails .-> retry[Retry topics<br/>30 s, then 5 min] -. still failing .-> dlq[(Dead letters)]
+    consumer --> pg[(Postgres)]
+    consumer -- new incident --> worker[Triage worker]
+    search[Hybrid search over<br/>runbooks and postmortems] --> worker
+    deploys[Deploy log] --> worker
+    worker <--> llm[Local model]
+    worker -- streamed brief --> ui[Web UI]
 ```
 
 1. **Ingest.** The consumer reads alerts in batches and slows down instead of falling over: when its queue or
