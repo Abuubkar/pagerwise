@@ -9,6 +9,9 @@
 
 x-app: &app
   restart: unless-stopped
+  # The tags (main, a branch) move: without this, compose keeps whatever an earlier run pulled, and a profile service
+  # (the simulator) isn't even pulled by `docker compose pull`.
+  pull_policy: always
   extra_hosts:
     - "host.docker.internal:host-gateway"  # Ollama on the host, also on Linux
   environment: &env
@@ -89,6 +92,7 @@ services:
     # Built to proxy to http://api:8001; the browser opens GraphQL subscriptions on ws://localhost:8001.
     image: ghcr.io/abuubkar/pagerwise-web:${PAGERWISE_TAG:-main}
     restart: unless-stopped
+    pull_policy: always
     ports:
       - "3001:3001"
     depends_on:
