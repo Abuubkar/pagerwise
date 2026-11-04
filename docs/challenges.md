@@ -318,3 +318,18 @@ stream, not when `chat()` returns, so the `trace.use_span` around `chat()` didn'
 **Small things:** the collector renamed its `otlp`/`otlphttp` exporters to `otlp_grpc`/`otlp_http` (old names
 warn). Prometheus 3 writes histogram `le` labels as `5`, not `5.0`; the rules match either. Unit `"1"` on a gauge
 becomes a `_ratio` suffix, so `pagerwise.ollama.up` has no unit.
+
+## After slice 8: README and the release compose
+
+**Two published images crashed on start, and nothing had run them.** docs-mock and the simulator exited with
+`No module named 'redis'`: slice 8's telemetry setup imported the httpx and Redis instrumentations unconditionally,
+and those instrumentations import their library, which only the api, consumer and indexer install. CI builds and
+scans the images but never starts them, and locally every app runs from the workspace, where everything is installed.
+- *Did:* telemetry instruments httpx and Redis only when they're installed, with a test that runs setup with both
+  unimportable. `docker-compose.release.yml` runs every published image, which is how this was found.
+
+**`seed.py graph` couldn't run in an image.** It imported faker and jinja2 (dev dependencies) at the top, and the
+simulator's graph loader, which only the simulator image installs.
+- *Did:* faker and jinja2 are imported in the two commands that use them; the release compose's setup step puts the
+  simulator's source (in every image, since `/app` is the repository) on `PYTHONPATH`. Its one third-party import,
+  pyyaml, is already in the api image.
