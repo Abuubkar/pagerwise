@@ -310,6 +310,16 @@ so only the 10% rule could keep it. The first done-when triage wasn't in Jaeger.
 stream, not when `chat()` returns, so the `trace.use_span` around `chat()` didn't cover it.
 - *Did:* the first chunk is awaited inside it too (`llm.chat_stream`).
 
+**There were no SQL spans at all, and nothing said so.** opentelemetry-instrumentation-sqlalchemy 0.66b2 declares
+`sqlalchemy < 2.1`; with 2.1.6 installed it logged one error at startup and instrumented nothing, so every "SQL below
+the stage spans" this slice described was absent. Found in the indexer's log while writing the README.
+- *Did:* `instrument_engine` passes `skip_dep_check=True`; its engine hooks work on 2.1 async engines (a test checks a
+  span appears). Statements are parameterized (`$1`), so no alert or user text reaches `db.statement`. Span attributes
+  are capped at 2,048 characters: a storm's multi-row insert statement ran past that. The worker's 5-second claim
+  poll is no longer traced: it would have been a root trace every 5 s.
+- *Checked live:* consumer batches and API requests now have `connect`/`SELECT`/`INSERT` children; no SQL span without
+  a parent.
+
 **Telemetry showed full-text search finding nothing for triage.** Every triage trace so far has `fts`
 `result_count=0` for both runbooks and postmortems. The triage query is long (title, services, alert summaries), and
 `websearch_to_tsquery` ANDs every term, so vector search carries triage alone.

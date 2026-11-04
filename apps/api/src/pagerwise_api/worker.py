@@ -143,9 +143,11 @@ async def main() -> None:
         log.info("triage worker started (deploy source %s)", settings.deploy_source_url)
         try:
             while not stopping.is_set():
-                run = await claim_next(SessionLocal)
+                with suppress_instrumentation():  # polling: a SQL and a Redis trace every 5 s that say nothing
+                    run = await claim_next(SessionLocal)
+                    if run is None:
+                        waiting = asyncio.create_task(bus.wait_for_work(redis, settings.triage_poll_s))
                 if run is None:
-                    waiting = asyncio.create_task(bus.wait_for_work(redis, settings.triage_poll_s))
                     stop = asyncio.create_task(stopping.wait())
                     await asyncio.wait({waiting, stop}, return_when=asyncio.FIRST_COMPLETED)
                     for task in (waiting, stop):

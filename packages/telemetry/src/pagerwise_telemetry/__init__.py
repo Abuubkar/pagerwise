@@ -32,7 +32,7 @@ from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import Event, ReadableSpan, Span, SpanProcessor, TracerProvider
+from opentelemetry.sdk.trace import Event, ReadableSpan, Span, SpanLimits, SpanProcessor, TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.trace import Link
 
@@ -103,7 +103,9 @@ def setup(service: str, package: str | None = None) -> None:
             "service.instance.id": f"{socket.gethostname()}-{os.getpid()}",
             "deployment.environment.name": os.environ.get("PAGERWISE_ENV", "local"),
         })
-        tracer_provider = TracerProvider(resource=resource)
+        # db.statement of a multi-row insert grows with the batch (tens of KB in a storm): 2,048 characters shows the
+        # statement's shape, and nothing else of ours comes close.
+        tracer_provider = TracerProvider(resource=resource, span_limits=SpanLimits(max_span_attribute_length=2048))
         # The consumer makes a few spans per alert at thousands of alerts a second: a big queue, exported every
         # second, so bursts are queued rather than dropped.
         tracer_provider.add_span_processor(DenylistSpanProcessor(BatchSpanProcessor(
@@ -146,7 +148,9 @@ def instrument_engine(engines: Iterable[Any]) -> None:
     """SQLAlchemy spans for these async engines (their sync_engine is what SQLAlchemy runs underneath)."""
     from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
-    SQLAlchemyInstrumentor().instrument(engines=[e.sync_engine for e in engines])
+    # 0.66b2 declares sqlalchemy < 2.1 and, without skip_dep_check, logs one error and instruments nothing. Its engine
+    # event hooks work on 2.1 async engines (tests/test_sqlalchemy.py checks a span appears): recheck on each bump.
+    SQLAlchemyInstrumentor().instrument(engines=[e.sync_engine for e in engines], skip_dep_check=True)
 
 
 def _add_trace_ids(_: Any, __: str, event: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
