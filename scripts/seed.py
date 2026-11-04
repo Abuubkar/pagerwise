@@ -32,8 +32,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import asyncpg
-from faker import Faker
-from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from sqlalchemy import delete
 
 from pagerwise_api.db import Service as ServiceRow
@@ -227,6 +225,10 @@ def callers_of(graph: dict[str, Service], name: str) -> list[str]:
 
 
 def corpus(seed: int, anchor: datetime) -> None:
+    # faker and jinja2 are dev dependencies: imported here so graph and alerts also run in the published api image.
+    from faker import Faker
+    from jinja2 import Environment, FileSystemLoader, StrictUndefined
+
     rng = random.Random(seed)
     fake = Faker()
     fake.seed_instance(seed)
@@ -354,6 +356,8 @@ def corpus(seed: int, anchor: datetime) -> None:
 def deploys(seed: int, anchor: datetime) -> None:
     """30 days of deploys before the anchor, plus the deploys the recent postmortems blame, written to
     data/corpus/deploys.json. docs_mock serves them at GET /v1/deploys; triage fetches them from there."""
+    from faker import Faker
+
     rng = random.Random(seed + 1)
     fake = Faker()
     fake.seed_instance(seed + 1)
