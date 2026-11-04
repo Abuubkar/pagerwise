@@ -129,3 +129,43 @@ Run scripts from the repo root: document paths are stored relative to it.
 - Metric names and labels are an interface: a rename must update observability/prometheus/rules.yml, its tests and
   the Grafana dashboards. Prometheus sees `pagerwise.ingest.freshness` (unit s) as
   `pagerwise_ingest_freshness_seconds_bucket`, counters get `_total`, dots in labels become underscores.
+
+## Lessons from Ledgerline
+
+Ledgerline (`../ledgerline`) hit these first; the full stories are in `../ledgerline/docs/challenges.md`. Each is a
+trap nothing in this repo's config will warn about.
+
+- **An Ollama `format` schema forces the answer into the schema, even when that means null.** A field typed `string`
+  while the model writes bare numbers comes back null every time (Ledgerline lost every amount from Qwen this way).
+  Type fields the way the model writes them (`string | number`), parse numbers with `json.loads(parse_float=Decimal)`,
+  and keep the prompt's wording consistent with the schema.
+- **Check the scorer before trusting a low score.** Ledgerline's first real-data line F1 (6%) measured its scoring
+  rule, not the model. Reading the per-case failure reasons (not the averages) found that, and found the one gap
+  (no currency read) behind most real failures.
+- **Models measured on this Mac** (M1 Pro 16 GB, Ledgerline's sweep, `think: false`):
+  - gemma4:12b: best quality and tool choice (8.7 GB, ~34 s per page).
+  - qwen3.5:9b-q4_K_M: close behind, 1.6× faster, 6.6 GB.
+  - qwen2.5:7b: fast and reads well, but weakest at picking a tool action (10 of 15).
+
+  Pin explicit quant tags; a bare tag can pull different builds.
+- **OpenTelemetry Python:**
+  - The SDK and the contrib instrumentations release in matched pairs (SDK 1.45.0 with 0.66b0); a mismatched pin
+    won't resolve.
+  - An instrumentation switches itself off silently when a library is newer than it declares (0.66b0's SQLAlchemy
+    says < 2.1). Confirm its spans appear; if its hooks still fit, `instrument(skip_dep_check=True)` with a comment.
+- **Metrics over OTLP into Prometheus:**
+  - A new series' first measurement never counts in `rate()` or `increase()`, because the receiver ignores start
+    times: report counters at 0 when a process starts.
+  - A stopped process's gauges linger for 5 minutes (no staleness marker): gauge alerts and panels use
+    `last_over_time(x[1m])`.
+  - A worker process that exits without atexit hooks loses its last export: flush the providers on shutdown.
+  - A unit suffix can double: unit `{token}/s` on a metric named `…_per_second` became `…_per_second_per_second`.
+- **httpx logs every request at INFO, URL included:** set the `httpx` logger to WARNING. A management URL carrying
+  credentials reached Ledgerline's logs that way.
+- **Next.js 16:**
+  - `next lint` is gone: use the ESLint CLI with a flat config.
+  - `rewrites()` are fixed at build time, so the API address a container proxies to is a build argument.
+  - `next dev` writes `apps/web/AGENTS.md`: gitignore it.
+- **Images and pins:**
+  - GHCR packages come out public, linked to the repo; name them `<project>-<service>`.
+  - A collector-contrib release can lack its image (0.163.0 did): check the tag exists before pinning.
