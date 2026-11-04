@@ -283,6 +283,11 @@ my local database was never re-imported, so every slice 6 eval and recording use
 **main already misses four triage gates, so a gate-checking CI job would be red forever.**
 - *Did:* asked; with `--baseline`, misses the baseline shares are reported, not failed (ADR 0011). No threshold moved.
 
+**The runner ran out of disk building the consumer image** (slice 8's first release; a rerun passed). A models image
+is built three times on one runner: for the scan, then for both platforms, each on the 0.6 GB models base.
+- *Did:* the images job deletes preinstalled toolchains it doesn't use (.NET, Android, GHC, CodeQL) for models
+  images, and removes the scan image after trivy.
+
 ## Slice 8: Instrumentation
 
 **The aiokafka instrumentation exists, but its consumer spans end at the fetch.** Its `receive` spans close when
