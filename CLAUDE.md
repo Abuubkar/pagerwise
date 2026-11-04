@@ -13,6 +13,7 @@ Incident-response copilot: alerts in, cited triage briefs out, built in thin sli
 ```bash
 docker compose up -d --wait               # Postgres 18 + pgvector :5435, Redpanda (Kafka API) :19092, Redis :6379,
                                           # OTel Collector :4317, Jaeger :16686, Prometheus :9090, Loki :3100, Grafana :3000
+docker compose -f docker-compose.yml -f docker-compose.release.yml up -d --wait   # the published images instead
 uv run alembic upgrade head
 make topics                               # alerts.v1, alerts.retry.30s, alerts.retry.5m, alerts.dlq (idempotent)
 ollama pull qwen3.5:9b-q4_K_M             # once; Ollama runs natively on the Mac, not in Docker (ADR 0001)
@@ -113,7 +114,9 @@ Run scripts from the repo root: document paths are stored relative to it.
 - CI (`.github/workflows/`, ADR 0011): pin every action to a commit SHA with its tag in a comment, give each job
   only the permissions it uses, and keep `persist-credentials: false`. actionlint runs in the lint job.
 - Images: every Python app builds from `docker/python.Dockerfile` (PACKAGE, COMMAND); apps that embed or rerank use
-  the models base image as RUNTIME. A new model in settings.py changes that image's tag, so release.yml rebuilds it.
+  the models base image as RUNTIME. Each image installs only its own package's dependencies, so shared code
+  (pagerwise_telemetry) imports optional libraries only when they're installed; docker-compose.release.yml runs
+  them all. A new model in settings.py changes that image's tag, so release.yml rebuilds it.
 - In CI the eval runs with `--baseline` main's baseline: a gate main already misses is reported, not failed; a new
   miss or a quality drop fails. That's not a reason to move a gate.
 - Telemetry (ADR 0012): every app calls `pagerwise_telemetry.setup` first in its main, never on import (tests import

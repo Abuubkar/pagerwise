@@ -1,0 +1,104 @@
+# The published images instead of running from source: layer it over docker-compose.yml, which brings the
+# infrastructure (Postgres, Redpanda, Redis and the observability stack).
+#
+#   export PAGERWISE_TAG=main   # or an image tag like sha-1d960e9
+#   docker compose -f docker-compose.yml -f docker-compose.release.yml up -d --wait
+#
+# Ollama stays on the host (Docker on macOS has no GPU access, ADR 0001). The images are signed by release.yml;
+# verify them with cosign before running (README).
+
+x-app: &app
+  restart: unless-stopped
+  extra_hosts:
+    - "host.docker.internal:host-gateway"  # Ollama on the host, also on Linux
+  environment: &env
+    DATABASE_URL: postgresql+asyncpg://pagerwise:pagerwise@postgres:5432/pagerwise
+    REDIS_URL: redis://redis:6379/0
+    KAFKA_BOOTSTRAP: redpanda:9092
+    OLLAMA_HOST: http://host.docker.internal:11434
+    DEPLOY_SOURCE_URL: http://docs-mock:8002
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+
+services:
+  setup:
+    # One-shot: migrations, Kafka topics, the service graph that clustering reads. Safe to rerun.
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-api:${PAGERWISE_TAG:-main}
+    restart: "no"
+    command: ["sh", "-c", "alembic upgrade head && python scripts/topics.py && python scripts/seed.py graph"]
+    environment:
+      <<: *env
+      # seed.py reads the graph with the simulator's loader; its source is in the image (/app is the whole repo)
+      # and its only third-party import, pyyaml, is installed.
+      PYTHONPATH: /app/apps/simulator/src
+    depends_on:
+      postgres: {condition: service_healthy}
+      redpanda: {condition: service_healthy}
+
+  docs-mock:
+    # The documentation API the indexer imports from, and the deploy tool triage asks.
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-docs-mock:${PAGERWISE_TAG:-main}
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/_stats')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  indexer:
+    # One-shot: imports 120 runbooks and 60 postmortems from docs-mock, chunked and embedded.
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-indexer:${PAGERWISE_TAG:-main}
+    restart: "no"
+    command: ["python", "-m", "pagerwise_indexer", "--docs-url", "http://docs-mock:8002"]
+    depends_on:
+      setup: {condition: service_completed_successfully}
+      docs-mock: {condition: service_healthy}
+
+  consumer:
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-consumer:${PAGERWISE_TAG:-main}
+    depends_on:
+      setup: {condition: service_completed_successfully}
+
+  api:
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-api:${PAGERWISE_TAG:-main}
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/openapi.json')"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      setup: {condition: service_completed_successfully}
+
+  worker:
+    # Generates triage briefs with the model on the host.
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-api:${PAGERWISE_TAG:-main}
+    command: ["python", "-m", "pagerwise_api.worker"]
+    depends_on:
+      setup: {condition: service_completed_successfully}
+      docs-mock: {condition: service_healthy}
+
+  web:
+    # Built to proxy to http://api:8001; the browser opens GraphQL subscriptions on ws://localhost:8001.
+    image: ghcr.io/abuubkar/pagerwise-web:${PAGERWISE_TAG:-main}
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      api: {condition: service_healthy}
+
+  simulator:
+    # Not started by `up`: docker compose ... run --rm simulator --rate 200 --duration 60
+    <<: *app
+    image: ghcr.io/abuubkar/pagerwise-simulator:${PAGERWISE_TAG:-main}
+    restart: "no"
+    profiles: [tools]
+    entrypoint: ["python", "-m", "pagerwise_simulator", "--bootstrap", "redpanda:9092"]
+    command: ["--rate", "200", "--duration", "60"]
