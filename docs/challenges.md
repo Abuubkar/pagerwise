@@ -343,3 +343,9 @@ simulator's graph loader, which only the simulator image installs.
 - *Did:* faker and jinja2 are imported in the two commands that use them; the release compose's setup step puts the
   simulator's source (in every image, since `/app` is the repository) on `PYTHONPATH`. Its one third-party import,
   pyyaml, is already in the api image.
+
+**The quick start ran stale images.** Re-run after the fixes above were released, from a fresh clone, it failed the same
+way: compose doesn't pull a tag it already has, so a machine that had pulled `main` before kept the broken images, and
+`docker compose pull` skips the simulator entirely (it sits behind a profile).
+- *Did:* `pull_policy: always` on every release service. Checked by tagging a pre-fix simulator image as `main`:
+  `run --rm simulator` pulled the current one and ran.
