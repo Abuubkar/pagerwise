@@ -82,7 +82,7 @@ paths-filter action.
   merge step; that's worth it if release time becomes a problem.
 
 **Assumptions.**
-- GHCR packages are made public by hand after the first push, because the Actions token can't change package
-  visibility.
+- GHCR packages are public without any manual step: pushed by this public repository's workflow, all seven allowed
+  anonymous pulls (checked 2026-11-04), and each signature verifies with `cosign verify` (docs/runs/slice-07-done-when.txt).
 - Branch protection is a ruleset on main requiring these checks, added once their names exist (after the first
   green run).
